@@ -22,7 +22,7 @@ type (
 	}
 
 	RegisterResponse struct {
-		Id    uuid.UUID `json:"uuid"`
+		Id    uuid.UUID `json:"id"`
 		Email string    `json:"email"`
 	}
 )

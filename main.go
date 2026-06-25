@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -9,19 +10,12 @@ import (
 	"github.com/Hugo-R94/Transcendance/internal/models"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-func main() {
-
-	err_env := godotenv.Load(".env")
-	if err_env != nil {
-		log.Printf("[WARNING] Error while trying to load .env: %v", err_env)
-	}
-
-	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=%v", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"), os.Getenv("DB_SSL"), os.Getenv("DB_TZ"))
+func dbSetup() (*gorm.DB, *sql.DB) {
+	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=%v sslrootcert=%v", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"), os.Getenv("DB_SSL"), os.Getenv("DB_TZ"), os.Getenv("DB_CERT"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("[ERROR] Fatal error, could not open db: %v", err)
@@ -30,30 +24,38 @@ func main() {
 	if err != nil {
 		log.Fatalf("[ERROR] Fatal error, could not get db generic interface: %v", err)
 	}
-
-	defer sqldb.Close()
-
 	db.AutoMigrate(&models.User{})
-	portString := os.Getenv("ADDR")
+	return db, sqldb
+}
 
-	if portString == "" {
-		log.Fatal("[ERROR] ADDR not found in env")
-	}
+func setupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
+	trustedProxies := os.Getenv("TRUSTED_PROXIES")
+	if trustedProxies == "" {
+		trustedProxies = "127.0.0.1"
+		log.Printf("[INFO] No trusted proxies detected in env, using default 127.0.0.1")
+	}
 	router.Use(cors.Default())
 
-	api := router.Group("/api")
-	userGroup := api.Group("/user")
+	v1 := router.Group("/api/v1")
+	userGroup := v1.Group("/user")
 
 	user.RegisterUser(userGroup, db)
+	user.LoginUser(userGroup, db)
+	return router
+}
 
-	//	user.GET(":id", handler_user_get)
-	//	user.PUT(":id", handler_user_put)
-	//	user.PATCH(":id", handler_user_patch)
-	//	user.DELETE(":id", handle_user_delete)
+func main() {
 
+	envCheck()
+
+	db, sqldb := dbSetup()
+	defer sqldb.Close()
+
+	router := setupRouter(db)
+	addrString := os.Getenv("ADDR")
 	log.Println("[INFO] Starting server ...")
-	err_run := router.Run(portString)
+	err_run := router.Run(addrString)
 	if err_run != nil {
 		log.Fatalf("[ERROR] Fatal error on server: %v", err_run)
 	}

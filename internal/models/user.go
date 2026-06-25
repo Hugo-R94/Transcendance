@@ -12,7 +12,7 @@ type (
 		gorm.Model
 		Id        uuid.UUID `gorm:"primary_key;type:uuid;default:gen_random_uuid()"`
 		Email     string    `gorm:"uniqueIndex"`
-		PassHash  string    `json:"-"`
+		PassHash  string    `gorm:"not null"`
 		CreatedAt time.Time
 		UpdatedAt time.Time
 	}
