@@ -1,0 +1,49 @@
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tailwindplus/elements@1" type="module"></script>
+<script src="topbar.js"></script>
+
+<style>
+  @keyframes card-wobble {
+    0%, 100% { transform: scale(1.1) rotate(-3deg); }
+    50%      { transform: scale(1.1) rotate(3deg); }
+  }
+  .balatro:hover {
+    animation: card-wobble 2.4s ease-in-out infinite;
+    outline: 2px solid white;
+    box-shadow: 0 35px 70px -15px rgb(0 0 0 / 0.5);
+    z-index: 20;
+  }
+</style>
+
+
+<topbar></topbar>
+
+<div class="min-h-screen bg-black p-[3vw]">
+  <div id="grid" class="grid  lg:grid-cols-6 md:grid-cols-4 sm:grid-cols-3 grid-cols-2 gap-[2vw]"></div>
+</div>
+
+<script>
+  function fiche({ image, titre, genre }) {
+    return `
+      <div class="fiche-card relative w-full aspect-[3/4] rounded-lg overflow-hidden shadow-sm shadow-blue-300 hover:shadow-2xl hover:scale-110 transitionshadow">
+        <img class="absolute inset-0 h-full w-full object-cover" src="${image}" alt="" />
+        <div class="absolute bottom-0 w-full p-[1.2vw]">
+          <h1 class="text-white font-bold" style="font-size: clamp(0.75rem, 1.6vw, 1.5rem);">${titre}</h1>
+          <p class="text-gray-300" style="font-size: clamp(0.5rem, 0.8vw, 0.75rem);">${genre}</p>
+        </div>
+      </div>
+    `;
+  }
+
+  const jeu = {
+    image: "https://images.igdb.com/igdb/image/upload/t_cover_big/co670h.webp",
+    titre: "Baldur's gate",
+    genre: "RPG",
+  };
+
+  const grid = document.getElementById("grid");
+  for (let i = 0; i < 25; i++) {
+    grid.innerHTML += fiche(jeu);
+  }
+</script>
