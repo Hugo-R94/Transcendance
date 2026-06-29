@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/Hugo-R94/Transcendance/internal/apiHandlers/user"
 	"github.com/Hugo-R94/Transcendance/internal/models"
@@ -47,6 +49,14 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 }
 
 func main() {
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+
+	go func() {
+		<-sigCh
+		log.Printf("[INFO] Shutting down the server ...")
+		os.Exit(0)
+	}()
 
 	envCheck()
 
