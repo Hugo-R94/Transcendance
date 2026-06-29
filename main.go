@@ -15,7 +15,7 @@ import (
 )
 
 func dbSetup() (*gorm.DB, *sql.DB) {
-	dsn := fmt.Sprintf("host=%v user=%v password=%v dbname=%v port=%v sslmode=%v TimeZone=%v sslrootcert=%v", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_NAME"), os.Getenv("DB_PORT"), os.Getenv("DB_SSL"), os.Getenv("DB_TZ"), os.Getenv("DB_CERT"))
+	dsn := fmt.Sprintf("host=%v user=%v dbname=%v sslmode=%v sslrootcert=%v sslcert=%v sslkey=%v", os.Getenv("DB_HOST"), os.Getenv("DB_USER"), os.Getenv("DB_NAME"), os.Getenv("DB_SSL"), os.Getenv("DB_ROOTCA"), os.Getenv("DB_CRT"), os.Getenv("DB_KEY"))
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("[ERROR] Fatal error, could not open db: %v", err)
@@ -30,11 +30,12 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 
 func setupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
-	trustedProxies := os.Getenv("TRUSTED_PROXIES")
-	if trustedProxies == "" {
-		trustedProxies = "127.0.0.1"
+	trustedProxies := []string{os.Getenv("TRUSTED_PROXIES")}
+	if trustedProxies[0] == "" {
+		trustedProxies = []string{"127.0.0.1"}
 		log.Printf("[INFO] No trusted proxies detected in env, using default 127.0.0.1")
 	}
+	router.SetTrustedProxies(trustedProxies)
 	router.Use(cors.Default())
 
 	v1 := router.Group("/api/v1")
