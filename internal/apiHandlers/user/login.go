@@ -39,8 +39,8 @@ func (h *UserHandler) login(c *gin.Context) {
 	//Check if the request is correctly formated
 	err_format := c.ShouldBindJSON(&request)
 	if err_format != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err_format,
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid email or password",
 		})
 		return
 	}

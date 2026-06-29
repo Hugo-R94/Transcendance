@@ -77,9 +77,11 @@
 	
   <div class="absolute  flex flex-col w-70 h-100 bg-[#334b4d] rounded-2xl p-3 focus:shadow-2xl shadow-lg shadow-black outline-10 outline-gray-300  transition"> 
 
-    <div class="z-15 rounded-full text-gray-300 outline-1  bg-[#00509f]  w-full h-10 text-center font-bold shadow-md shadow-black p-2">
-      SIGN IN
-    </div>
+   <a href="http://localhost:8080/signin">
+	  <button class="balatro z-15 rounded-full text-gray-300 outline-1  bg-[#00509f]  w-full h-10 text-center font-bold shadow-md shadow-black p-2 hover:scale-105 active:scale-90">
+		SIGNIN
+    </button>
+   </a>
 
     <img src="https://cdn2.steamgriddb.com/logo/2553761c31ac33576b6030cf1a70a08b.png" class="z-15 scale-70 mt-5"></img>
 
@@ -110,49 +112,69 @@ async function handleConnexion() {
 await new Promise(resolve => setTimeout(resolve, 700));
 
   // Simulation
-  if (email === "admin@test.com" && password === "1234") {
-    message.textContent = "✅ Connexion réussie !";
-	card.classList.add("-translate-y-25","-rotate-5")
-    message.className = "text-green-500 text-center mt-3 font-semibold";
-	setTimeout(() => {
-    card.classList.remove("-translate-y-25","-rotate-5");
-    message.textContent = "";
+//  if (email === "admin@test.com" && password === "1234") {
+//    message.textContent = "✅ Connexion réussie !";
+//	card.classList.add("-translate-y-25","-rotate-5")
+//    message.className = "text-green-500 text-center mt-3 font-semibold";
+//	setTimeout(() => {
+//    card.classList.remove("-translate-y-25","-rotate-5");
+//    message.textContent = "";
+//  }, 5000);
+//  }
+//   else {
+//	card.classList.add("-translate-y-25","rotate-5")
+//    message.textContent = "❌ Email ou mot de passe incorrect.";
+//    message.className = "text-red-500 text-center mt-3 font-semibold";
+//	setTimeout(() => {
+//    card.classList.remove("-translate-y-25","rotate-5", ) ;
+//    message.textContent = "";
+//  }, 5000);
+//  }
+   try {
+     const response = await fetch("http://localhost:8080/api/v1/user/login", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({ email, password }),
+     });
+
+     const result = await response.json();
+
+     if (!response.ok) {
+       message.textContent = result.error || "Une erreur est survenue.";
+       message.className = "text-red-500 text-center mt-3 font-semibold";
+		card.classList.add("-translate-y-25","rotate-5")
+	    message.textContent = result.error;
+	    message.className = "text-red-500 text-center mt-3 font-semibold";
+		setTimeout(() => {
+	    card.classList.remove("-translate-y-25","rotate-5", ) ;
+	    message.textContent = "";
   }, 5000);
-  }
-   else {
-	card.classList.add("-translate-y-25","rotate-5")
-    message.textContent = "❌ Email ou mot de passe incorrect.";
-    message.className = "text-red-500 text-center mt-3 font-semibold";
-	setTimeout(() => {
-    card.classList.remove("-translate-y-25","rotate-5", ) ;
-    message.textContent = "";
+       return;
+     }
+
+     message.textContent = result.error;
+     message.className = "text-green-500 text-center mt-3 font-semibold";
+		card.classList.add("-translate-y-25","rotate-5")
+	    message.textContent = "❌ Email ou mot de passe incorrect.";
+	    message.className = "text-red-500 text-center mt-3 font-semibold";
+		setTimeout(() => {
+	    card.classList.remove("-translate-y-25","rotate-5", ) ;
+	    message.textContent = "";
   }, 5000);
-  }
-//   try {
-//     const response = await fetch("https://webhook.site/afad8fa9-2f97-489e-998a-0ddaf3df4262", {
-//       method: "POST",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: JSON.stringify({ email, password }),
-//     });
 
-//     const result = await response.json();
-
-
-//     if (!response.ok) {
-//       message.textContent = result.message || "Une erreur est survenue.";
-//       message.className = "text-red-500 text-center mt-3 font-semibold";
-//       return;
-//     }
-
-//     message.textContent = result.message;
-//     message.className = "text-green-500 text-center mt-3 font-semibold";
-
-//   } catch (error) {
-//     message.textContent = "Impossible de contacter le serveur.";
-//     message.className = "text-red-500 text-center mt-3 font-semibold";
-//   }
+   } catch (error) {
+     message.textContent = "Impossible de contacter le serveur.";
+     message.className = "text-red-500 text-center mt-3 font-semibold";
+		card.classList.add("-translate-y-25","rotate-5")
+	    message.textContent = "incorrect.";
+	    message.className = "text-red-500 text-center mt-3 font-semibold";
+		setTimeout(() => {
+	    card.classList.remove("-translate-y-25","rotate-5", ) ;
+	    message.textContent = "";
+  }, 5000);
+   }
 }
 </script>
 

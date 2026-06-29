@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -32,6 +33,7 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 
 func setupRouter(db *gorm.DB) *gin.Engine {
 	router := gin.Default()
+	router.LoadHTMLGlob("test_css/*")
 	trustedProxies := []string{os.Getenv("TRUSTED_PROXIES")}
 	if trustedProxies[0] == "" {
 		trustedProxies = []string{"127.0.0.1"}
@@ -39,6 +41,15 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	}
 	router.SetTrustedProxies(trustedProxies)
 	router.Use(cors.Default())
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "connexion.html", gin.H{
+			"title": "Main website",
+		})
+	})
+	router.GET("/signin", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", gin.H{})
+	})
 
 	v1 := router.Group("/api/v1")
 	userGroup := v1.Group("/user")
