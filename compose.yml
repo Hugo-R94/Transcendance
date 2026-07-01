@@ -1,3 +1,4 @@
+name: transcendance
 services:
   postgres:
     image: postgres:17.5
@@ -16,7 +17,7 @@ services:
       - ./certificates/server.crt:/certificates/server.crt:ro
       - ./certificates/server.key:/certificates/server.key
       - ./certificates/rootCA.crt:/certificates/rootCA.crt:ro
-      - ./docker/DB_data/:/var/lib/postgresql/data:rw
+      - ./docker/.DB_data/:/var/lib/postgresql/data:rw
       - ./docker/ssl-config.sh:/docker-entrypoint-initdb.d/ssl-config.sh:Z
     entrypoint: ["/bin/sh", "-c", "/usr/local/bin/entrypoint.sh"]
 

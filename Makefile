@@ -61,7 +61,10 @@ ${CERT}:
 
 
 db_wipe: check
-	rm -rf ./docker/postgresDB
+	podman-compose -f compose.yml up -d
+	podman exec -u root transcendance_postgres_1 chmod -R a+rwX /var/lib/postgresql/
+	rm -rf ./docker/.DB_data
+	podman-compose -f compose.yml down
 
 check:
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]

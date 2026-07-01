@@ -9,7 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/Hugo-R94/Transcendance/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/internal/apiHandlers/user"
+	"github.com/Hugo-R94/Transcendance/internal/database"
 	"github.com/Hugo-R94/Transcendance/internal/models"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -28,6 +30,9 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 		log.Fatalf("[ERROR] Fatal error, could not get db generic interface: %v", err)
 	}
 	db.AutoMigrate(&models.User{})
+	db.AutoMigrate(&models.Game{})
+	db.AutoMigrate(&models.Developer{})
+	db.AutoMigrate(&models.Publisher{})
 	return db, sqldb
 }
 
@@ -53,7 +58,9 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 
 	v1 := router.Group("/api/v1")
 	userGroup := v1.Group("/user")
+	gameGroup := v1.Group("/game")
 
+	game.GetGameInfo(gameGroup, db)
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
 	return router
@@ -73,6 +80,9 @@ func main() {
 
 	db, sqldb := dbSetup()
 	defer sqldb.Close()
+
+	database.GetAllGames(db)
+	go database.CompleteDB(db)
 
 	router := setupRouter(db)
 	addrString := os.Getenv("ADDR")
