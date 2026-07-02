@@ -1,0 +1,51 @@
+import { useState } from "react";
+import GameCard from "../components/gameCard";
+import Button from "../components/button";
+import NavBar from "../components/navBar";
+import ShaderBackground from "../components/shaderBG";
+
+function Login() {
+
+  return (
+	
+	<div className="relative min-h-screen">
+		
+		<ShaderBackground></ShaderBackground>
+		
+		<div className=" absolute h-100 w-70 bg-white m-auto inset-0">
+			<div id="card"
+    			 className="absolute bg-gray-800 outline-10 outline-gray-400 h-100 w-70 p-2  rounded-2xl transition-all duration-300">
+			<p id="message" className="absolute text-center font-semibold text-white"></p>
+		</div>
+				
+			
+		<div className="absolute  flex flex-col w-70 h-100 bg-[#334b4d] rounded-2xl p-3 focus:shadow-2xl shadow-lg shadow-black outline-10 outline-gray-300  transition"> 
+
+		<a href="http://localhost:5173/signin">
+			<button className="balatro z-15 rounded-full text-gray-300 outline-1  bg-[#00509f]  w-full h-10 text-center font-bold shadow-md shadow-black p-2 hover:scale-105 active:scale-90">
+				SIGNIN
+			</button>
+		</a>
+
+			<img src="https://cdn2.steamgriddb.com/logo/2553761c31ac33576b6030cf1a70a08b.png" className="z-15 scale-70 mt-5"></img>
+
+			<input id="email" className="balatro z-15 bg-[#ed8a00] hover:outline-2 hover:outline-white focus:bg-[#ffaa00] focus:scale-105  w-full h-15  mb-5 rounded-2xl p-2 outline-0 shadow-md shadow-black active:scale-90  text-gray-700" placeholder="Enter your email ...">
+
+			</input>
+
+			<input id="password" type="password" className="balatro hover:outline-2 hover:outline-white z-15 bg-[#fb4740] focus:bg-[#ff3830] focus:scale-105  w-full h-15 mb-5 rounded-2xl p-2 outline-0 active:scale-90   shadow-md shadow-black text-gray-700" placeholder="Enter your password ...">
+
+			</input>
+
+			<button  className="balatro bg-[#3c9b71] w-2/3 h-15 inset-0 mx-auto rounded-2xl text-xl font-bold  shadow-md shadow-black text-gray-300 hover:scale-105 hover:outline-2 active:scale-90 transition ">login</button>
+		</div>
+  
+			
+		</div>
+		
+	</div>
+   
+  );
+}
+
+export default Login;
