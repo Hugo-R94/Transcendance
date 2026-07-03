@@ -24,9 +24,9 @@ function GameCard({ id, name, tag, imgLink }: CardProps) {
       />
 
       {/* OVERLAY */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col shadow-md shadow-black gap-1 bg-gradient-to-t from-black/80 to-transparent p-4">
+      <div className="absolute inset-x-0 bottom-0 flex flex-col shadow-md shadow-black gap-1 bg-gradient-to-t from-black to-transparent p-4">
         
-		<p className="absolute text-2xl  bottom-10 left-3 font-bold text-gray-200 leading-tight ">
+		<p className="absolute text-2xl  bottom-10 left-3 font-bold text-gray-200 leading-tight drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] ">
 		{name}
 		</p>
 

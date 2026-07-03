@@ -115,7 +115,6 @@ code {
 .balatro {
     position: relative;
     overflow: hidden;
-    border-radius: 12px;
   }
 
   @keyframes card-wobble {
@@ -152,6 +151,7 @@ code {
     opacity: 0;
     pointer-events: none;
     transition: opacity .25s ease;
+    
   }
 
   .balatro:hover:not(:focus-within) {
@@ -163,9 +163,13 @@ code {
   .balatro:hover:not(:focus-within)::before {
     opacity: 1;
     animation: holo-shift 2s linear infinite;
+    
   }
-
+.balatro:hover {
+  outline: 2px solid white;
+}
   .balatro:hover::before {
     opacity: 0;
     animation: holo-shift 2s linear infinite;
+
   }

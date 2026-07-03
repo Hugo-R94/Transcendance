@@ -19,23 +19,35 @@ const comments = [
 	{
 		UUID: 25,
 		Nickname: "pedro",
-		comment: "POUR LA DEMOCRATIE!",
+		comment: "Un des meilleurs jeux coop auxquels j'ai joué depuis longtemps. Les combats sont nerveux, les bombardements sont aussi hilarants que dangereux, et chaque mission crée des moments mémorables avec les amis. Les développeurs ajoutent régulièrement du contenu, ce qui donne envie de revenir.",
+		CommentTitle: "AGOUGOU",
+		Likes: 89,
+		Dislikes: 2,
 	},
 	{
 		UUID: 234,
 		Nickname: "Louis",
-		comment: "POUR LA DEMOCRATIE! YES",
+		comment: "L'idée est excellente, mais les serveurs et les bugs m'ont complètement gâché l'expérience. Les ennemis deviennent vite répétitifs et certaines armes semblent inutiles comparées à d'autres. J'espérais beaucoup mieux après tout le buzz.",
+		CommentTitle: "Une critique politise du capitalisme a outrance.",
+		Likes: 89,
+		Dislikes: 2,
 	},
 	{
 		UUID: 23,
 		Nickname: "eliot",
-		comment: "POUR LA DEMOCRATIE! NO",
-	},
+		comment: "Très bon jeu, surtout en coopération. L'ambiance est incroyable et le gameplay est addictif. En revanche, la progression peut sembler un peu lente et certaines missions se ressemblent après plusieurs dizaines d'heures. Malgré ça, je continue d'y jouer régulièrement.",
+		CommentTitle: "JOUER DROLE",
+		Likes: 89,
+		Dislikes: 2,
+},
 	
 	{
 		UUID: 67,
 		Nickname: "XX-Gamerz",
-		comment: "POUR LA DEMOCRATIE! MAYBE",
+		comment: "C'est un jeu amusant, mais il ne plaira pas à tout le monde. Les mécaniques de stratagèmes sont originales, mais demandent une bonne coordination avec l'équipe. En solo, l'expérience est beaucoup moins intéressante. Si vous aimez les jeux coopératifs, ça vaut le détour.",
+		CommentTitle: "Insecte",
+		Likes: 89,
+		Dislikes: 2,
 	}
 ];
 
@@ -97,10 +109,13 @@ function GamePage() {
 				<div className="absolute inset-0  rounded-2xl bg-[#334b4d] shadow-lg" />
 
 				{/* Carte avant */}
-				<div className="absolute inset-x-[10%] -top-[60%] w-[80%] aspect-[6/9] rounded-2xl overflow-hidden shadow-xl">
+				<div className="absolute inset-x-[10%] -top-[60%] w-[80%] aspect-[6/9] rounded-2xl overflow-hidden shadow-xl outline-5 outline-white balatro">
 					<img
 						src={game.cover}
-						className="w-full h-full object-cover"
+					edro
+
+AGOUGOU
+	className="w-full h-full object-cover"
 					/>
 				</div>
 
@@ -123,7 +138,7 @@ function GamePage() {
 			
 			{/* leave a comment */}
 			<div className="bg-black/40 w-full h-fit mt-5 rounded-2xl p-3">
-				<div className="w-full h-15 flex">
+				<div className="w-full h-15 flex items-center gap-3">
 					<div className="bg-gray-400 w-15 h-15 rounded-full"></div>
 					<p className="font-bold inset-x-0 my-auto"> Did you like this game ?</p>
 				</div>
@@ -147,6 +162,9 @@ function GamePage() {
 				Nickname={comment.Nickname}
 				comment={comment.comment}
 				commentRowNb={index}
+				CommentTitle={comment.CommentTitle}
+				Likes={comment.Likes}
+				Dislikes={comment.Dislikes}
 			/>
 			))}
 		</div>

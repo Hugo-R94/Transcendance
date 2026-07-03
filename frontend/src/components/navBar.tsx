@@ -15,10 +15,10 @@ function NavBar() {
   }, []);
 
   return (
-    <div className="flex items-center bg-[#334b4d] w-[90%] sm:h-18 h-15 inset-0 p-1.5 fixed rounded-lg my-4 mx-auto shadow-sm shadow-black ">
+    <div className="flex items-center bg-[#334b4d] w-[90%] sm:h-18 h-15 inset-0 p-1.5 fixed rounded-lg my-4 mx-auto shadow-sm shadow-black  ">
     
 	  <a href="https://c.tenor.com/x8v1oNUOmg4AAAAd/tenor.gif" className="h-full  ">
-        <button className="flex items-center justify-center h-full w-30 bg-[#00509f] balatro mx-2 ml-1.5 rounded-2xl hover:outline-2 hover:outline-white active:scale-90">
+        <button className="flex items-center justify-center h-full w-30 bg-[#00509f] balatro mx-2 ml-1.5 rounded-2xl shadow-sm shadow-black hover:outline-2 hover:outline-white active:scale-90">
           <p className="m-auto font-extrabold sm:text-2xl text-xs transition">
             <span className="text-white">Click</span>
             <span className="text-[#ef4639]">Bet</span>
@@ -109,7 +109,7 @@ function NavBar() {
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-[110%] w-56 origin-top-right rounded-md bg-[#fb4740] outline-1 -outline-offset-1 outline-white/10 shadow-lg overflow-hidden z-50">
+          <div className="absolute right-0 top-[110%] w-56  origin-top-right rounded-md bg-[#fb4740] outline-1 -outline-offset-1 outline-white/10 shadow-lg overflow-hidden z-50">
             <div className="py-1">
               <a href="#" className="balatro block px-4 py-2 text-sm bg-[#fb4740] text-gray-300 hover:bg-[#ed8a00] hover:text-white focus:bg-[#ed8a00] focus:text-white focus:outline-hidden">
                 Account settings
