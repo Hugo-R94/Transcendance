@@ -6,10 +6,10 @@ all:up
 	go build && ./Transcendance
 
 up: ${CERT}
-	docker-compose -f compose.yml up -d
+	podman-compose -f compose.yml up -d
 
 down:
-	docker-compose -f compose.yml down
+	podman-compose -f compose.yml down
 
 clean:
 	rm -rf certificates
@@ -61,10 +61,10 @@ ${CERT}:
 
 
 db_wipe: check
-	docker-compose -f compose.yml up -d
-	docker exec -u root transcendance_postgres_1 chmod -R a+rwX /var/lib/postgresql/
-	rm -rf ./docker/.DB_data
-	docker-compose -f compose.yml down
+	podman-compose -f compose.yml up -d
+	podman exec -u root transcendance_postgres_1 chmod -R a+rwX /var/lib/postgresql/
+	rm -rf ./podman/.DB_data
+	podman-compose -f compose.yml down
 
 check:
 	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]

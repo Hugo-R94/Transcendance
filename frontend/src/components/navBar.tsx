@@ -15,9 +15,9 @@ function NavBar() {
   }, []);
 
   return (
-    <div className="flex items-center bg-[#334b4d] w-[90%] sm:h-18 h-15 inset-0 p-1.5 fixed rounded-lg my-4 mx-auto shadow-sm shadow-black  ">
+    <div className="flex items-center bg-[#334b4d] w-[90%] sm:h-18 h-15 inset-0 p-1.5 fixed rounded-lg my-4 mx-auto shadow-sm shadow-black z-9999  ">
     
-	  <a href="https://c.tenor.com/x8v1oNUOmg4AAAAd/tenor.gif" className="h-full  ">
+	  <a href="http://localhost:5173/games" className="h-full  ">
         <button className="flex items-center justify-center h-full w-30 bg-[#00509f] balatro mx-2 ml-1.5 rounded-2xl shadow-sm shadow-black hover:outline-2 hover:outline-white active:scale-90">
           <p className="m-auto font-extrabold sm:text-2xl text-xs transition">
             <span className="text-white">Click</span>

@@ -17,6 +17,13 @@ type (
 		Publishers            []*Publisher `gorm:"many2many:publisher_games;"`
 	}
 
+	// Gameshort struct{
+	// 	gorm.Model
+	// 	AppID                 uint64       `gorm:"primary_key;uniqueIndex"`
+	// 	Name                  string       `gorm:"index"`
+	// 	Header_image_link     string       `gorm:"type:varchar(500)"`
+	// }
+	
 	Developer struct {
 		gorm.Model
 		Name  string  `gorm:"primary_key;unqueIndex"`

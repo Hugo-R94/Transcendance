@@ -1,40 +1,43 @@
-import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 
 type CardProps = {
-	id: number;
+  id: number;
   name: string;
   tag: string;
   imgLink: string;
+  className?: string;
 };
 
-function GameCard({ id, name, tag, imgLink }: CardProps) {
+function GameCard({ id, name, tag, imgLink, className }: CardProps) {
   const navigate = useNavigate();
 
   return (
-	<div
-		onClick={() => navigate(`/game/${id}`)}
-		className="relative balatro h-96 w-64 cursor-pointer overflow-hidden rounded-2xl outline-10 outline-gray-200"
-		>
+    <div
+      onClick={() => navigate(`/game/${id}`)}
+      className={`balatro relative w-3/5 aspect-[6/9] cursor-pointer overflow-hidden rounded-2xl lg:outline-8 md:outline-7  outline-5 outline-gray-200 ${className}`}
+    >
       {/* IMAGE */}
       <img
         src={imgLink}
         alt={name}
-        className="h-full w-full object-fill"
+        className="h-full w-full object-cover"
       />
 
-      {/* OVERLAY */}
-      <div className="absolute inset-x-0 bottom-0 flex flex-col shadow-md shadow-black gap-1 bg-gradient-to-t from-black to-transparent p-4">
+      {/* OVERLAY FIXE */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent flex items-end p-4">
         
-		<p className="absolute text-2xl  bottom-10 left-3 font-bold text-gray-200 leading-tight drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] ">
-		{name}
-		</p>
+        {/* TEXTE */}
+        <div className="flex flex-col gap-1">
+          <p className="text-xs font-bold text-gray-200 drop-shadow">
+            {name}
+          </p>
 
-		<p className="absolute text-xs bottom-5 text-gray-300 leading-snug">
-		{tag}
-		</p>
+          <p className="text-xs text-gray-300">
+            {tag}
+          </p>
+        </div>
+
       </div>
-
     </div>
   );
 }

@@ -135,41 +135,51 @@ code {
     }
   }
 
-  .balatro::before {
-    content: "";
-    position: absolute;
-    inset: -80%;
-    background: linear-gradient(
-      100deg,
-      transparent 20%,
-      rgba(255, 0, 255, 0.25) 30%,
-      rgba(0, 255, 255, 0.35) 40%,
-      rgba(255, 255, 255, 0.6) 50%,
-      rgba(255, 255, 0, 0.25) 60%,
-      transparent 70%
-    );
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity .25s ease;
-    
-  }
-
-  .balatro:hover:not(:focus-within) {
-    animation: card-wobble 2.4s ease-in-out infinite;
-    z-index: 10;
-  }
+ 
 
 
-  .balatro:hover:not(:focus-within)::before {
-    opacity: 1;
-    animation: holo-shift 2s linear infinite;
-    
-  }
-.balatro:hover {
-  outline: 2px solid white;
+  
+.balatro {
+  position: relative;
+  z-index: 1;
 }
-  .balatro:hover::before {
-    opacity: 0;
-    animation: holo-shift 2s linear infinite;
 
-  }
+
+  .no-spinner::-webkit-inner-spin-button,
+.no-spinner::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
+}
+.balatro::before {
+  content: "";
+  position: absolute;
+  inset: -80%;
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    rgba(255, 0, 255, 0.25) 30%,
+    rgba(0, 255, 255, 0.35) 40%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 0, 0.25) 60%,
+    transparent 70%
+  );
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.balatro:hover:not(:focus-within) {
+  scale: 1.2;
+  animation: card-wobble 2.4s ease-in-out infinite;
+  z-index: 1;
+}
+
+.balatro:hover:not(:focus-within)::before {
+  opacity: 1;
+  animation: holo-shift 2s linear infinite;
+}
