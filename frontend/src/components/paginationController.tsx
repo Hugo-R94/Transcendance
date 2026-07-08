@@ -36,48 +36,44 @@ function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
   }
 
   return (
-    <div className="w-full mt-5 flex justify-center items-center">
+  <div className="w-[95%] sm:w-[90%] my-5 flex items-center justify-center gap-1 sm:gap-3 rounded-2xl">
+    <button
+      onClick={() => onPageChange(Math.max(1, page - 1))}
+      disabled={page === 1}
+      className="hover:-translate-x-3 balatro shrink-0 rounded-lg shadow-md shadow-black bg-black/40 px-2 py-1 text-xs sm:px-4 sm:py-2 sm:text-base hover:outline-2 hover:outline-white active:scale-90 disabled:opacity-30"
+    >
+      <span className="hidden sm:inline">Précédent</span>
+      <span className="sm:hidden">←</span>
+    </button>
 
-      <button
-        onClick={() => onPageChange(Math.max(1, page - 1))}
-        disabled={page === 1}
-        className="balatro hover:outline-2 hover:outline-white active:scale-90 rounded-lg bg-black/40 px-4 py-2 disabled:opacity-30 mr-3"
-      >
-        Précédent
-      </button>
+    <input
+      type="number"
+      min={1}
+      max={totalPages}
+      value={inputPage}
+      onChange={(e) => setInputPage(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          handlePageSubmit();
+        }
+      }}
+      className="bg-black/40 w-8 sm:w-10 p-1 mx-1 sm:mx-2 text-center rounded-xl text-xs sm:text-base no-spinner"
+    />
 
-      <span>
-        Page
-      </span>
+    <span className="text-xs sm:text-base shrink-0">
+      / {totalPages}
+    </span>
 
-      <input
-        type="number"
-        min={1}
-        max={totalPages}
-        value={inputPage}
-        onChange={(e) => setInputPage(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handlePageSubmit();
-          }
-        }}
-        className="bg-black/40 h-full mx-2 text-center rounded-2xl w-14 p-1 no-spinner"
-      />
-
-      <span>
-        / {totalPages}
-      </span>
-
-      <button
-        onClick={() => onPageChange(Math.min(totalPages, page + 1))}
-        disabled={page === totalPages}
-        className="balatro hover:outline-2 hover:outline-white active:scale-90 rounded-lg bg-black/40 px-4 py-2 disabled:opacity-30 ml-3"
-      >
-        Suivant
-      </button>
-
-    </div>
-  );
+    <button
+      onClick={() => onPageChange(Math.min(totalPages, page + 1))}
+      disabled={page === totalPages}
+      className="hover:translate-x-5 balatro shrink-0 rounded-lg bg-black/40 px-2 shadow-md shadow-black py-1 text-xs sm:px-4 sm:py-2 sm:text-base hover:outline-2 hover:outline-white active:scale-90 disabled:opacity-30"
+    >
+      <span className="hidden sm:inline">Suivant</span>
+      <span className="sm:hidden">→</span>
+    </button>
+  </div>
+);
 }
 
 export default Pagination;

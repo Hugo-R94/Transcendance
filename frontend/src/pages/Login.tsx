@@ -1,6 +1,6 @@
 import { useState } from "react";
 import GameCard from "../components/gameCard";
-import Button from "../components/button";
+import Button from "../components/buttonLink";
 import NavBar from "../components/navBar";
 import ShaderBackground from "../components/shaderBG";
 
@@ -10,7 +10,7 @@ function Login() {
 	
 	<div className="relative min-h-screen">
 		
-		<ShaderBackground></ShaderBackground>
+		<ShaderBackground />
 		
 		<div className=" absolute h-100 w-70 bg-white m-auto inset-0">
 			<div id="card"

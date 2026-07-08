@@ -1,9 +1,13 @@
 package game
 
 import (
+	"html"
 	"log"
 	"net/http"
-    "strconv"
+	"regexp"
+	"strconv"
+	"strings"
+
 	"github.com/Hugo-R94/Transcendance/internal/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -15,8 +19,67 @@ type (
 	}
 )
 
+var (
+	aboutHeadingRegex = regexp.MustCompile(`(?is)<h1[^>]*>\s*about the game\s*</h1>`)
+	videoBlockRegex   = regexp.MustCompile(`(?is)<video.*?</video>`)
+	imgTagRegex       = regexp.MustCompile(`(?is)<img[^>]*>`)
+	brTagRegex        = regexp.MustCompile(`(?i)<br\s*/?>`)
+	h2BlockRegex      = regexp.MustCompile(`(?is)<h2[^>]*>(.*?)</h2>`)
+	tagRegex          = regexp.MustCompile(`(?s)<[^>]+>`)
+	multiSpaceRegex   = regexp.MustCompile(`[ \t]+`)
+	multiNewlineRegex = regexp.MustCompile(`\n{3,}`)
+)
+
+// parseDescription nettoie le HTML brut renvoyé par l'API Steam, en pur
+// stdlib (regexp/strings/html), sans dépendance à un parseur HTML externe :
+//   - ignore tout ce qui précède le titre "About the Game" (Digital Deluxe
+//     Edition, bonus de précommande, etc.)
+//   - supprime les balises purement visuelles (<img>, <video>)
+//   - convertit <br> et <h2> en retours à la ligne pour garder une mise en
+//     page lisible
+//   - retourne du texte brut, entités HTML décodées (&amp;, &#39;, ...)
+func parseDescription(rawHTML string) string {
+	if strings.TrimSpace(rawHTML) == "" {
+		return ""
+	}
+
+	content := rawHTML
+
+	// On ne garde que ce qui suit le titre "About the Game"
+	if loc := aboutHeadingRegex.FindStringIndex(content); loc != nil {
+		content = content[loc[1]:]
+	}
+
+	// Supprime les blocs vidéo et les images (purement visuel)
+	content = videoBlockRegex.ReplaceAllString(content, "")
+	content = imgTagRegex.ReplaceAllString(content, "")
+
+	// <br> -> retour à la ligne simple
+	content = brTagRegex.ReplaceAllString(content, "\n")
+
+	// <h2>titre</h2> -> \n\ntitre\n (sous-titre isolé sur sa propre ligne)
+	content = h2BlockRegex.ReplaceAllStringFunc(content, func(match string) string {
+		sub := h2BlockRegex.FindStringSubmatch(match)
+		title := strings.TrimSpace(tagRegex.ReplaceAllString(sub[1], ""))
+		return "\n\n" + title + "\n"
+	})
+
+	// Supprime toutes les balises restantes (p, span, ul, li, br déjà traité, etc.)
+	content = tagRegex.ReplaceAllString(content, "")
+
+	// Décode les entités HTML (&amp;, &#39;, &nbsp;, ...)
+	content = html.UnescapeString(content)
+
+	// Nettoie les espaces et retours à la ligne en trop
+	content = multiSpaceRegex.ReplaceAllString(content, " ")
+	content = multiNewlineRegex.ReplaceAllString(content, "\n\n")
+
+	return strings.TrimSpace(content)
+}
+
 func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 	appid := c.Param("appid")
+
 	var existingGame models.Game
 	err := h.db.Where("app_id = ?", appid).First(&existingGame).Error
 	if err == gorm.ErrRecordNotFound {
@@ -32,13 +95,15 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 		})
 		return
 	}
+
 	response := models.GetGameResponse{
 		AppID:                 existingGame.AppID,
 		Name:                  existingGame.Name,
-		Description:           existingGame.Description,
+		Description:           parseDescription(existingGame.Description),
 		Header_image_link:     existingGame.Header_image_link,
 		Background_image_link: existingGame.Background_image_link,
 	}
+
 	c.JSON(http.StatusOK, response)
 }
 
@@ -113,11 +178,7 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	h := &GameHandler{db: db}
-	router.GET("", h.listGamesHandler)       // "" au lieu de "/"
-	router.GET("/games", h.listGamesPageHandler)       // "" au lieu de "/"
+	router.GET("", h.listGamesHandler)           // "" au lieu de "/"
+	router.GET("/games", h.listGamesPageHandler) // "" au lieu de "/"
 	router.GET("/:appid", h.gameInfoHandler)
 }
-// func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
-// 	h := &GameHandler{db: db}
-// 	router.GET("/:appid", h.gameInfoHandler)
-// }	

@@ -18,7 +18,7 @@ function LikeButton({
       {/* LIKE */}
       <button
         onClick={onLike}
-        className="flex balatro hover:-translate-x-5  hover:outline-2 active:scale-90 items-center gap-2 bg-black/30 w-1/2 h-full p-1 mr-1 rounded-l-2xl"
+        className="flex shadow-md shadow-black/50 hover:shadow-lg balatro hover:-translate-x-6  hover:outline-2 active:scale-90 items-center gap-2 bg-black/30 w-1/2 h-full p-1 mr-1 rounded-l-2xl"
       >
         {state === 1 ? (
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
@@ -31,7 +31,7 @@ function LikeButton({
 			</svg>
         )}
 
-        <p className="mx-auto">
+        <p className="mx-auto ">
           {state === 1 ? Likes + 1 : Likes}
         </p>
       </button>
@@ -39,7 +39,7 @@ function LikeButton({
       {/* DISLIKE */}
       <button
         onClick={onDislike}
-        className="flex hover:translate-x-5 hover:outline-2 balatro active:scale-90 items-center gap-2 bg-black/30 w-1/2 h-full p-1 rounded-r-2xl "
+        className="flex shadow-md shadow-black/50 hover:shadow-lg hover:translate-x-6 hover:outline-2 balatro active:scale-90 items-center gap-2 bg-black/30 w-1/2 h-full p-1 rounded-r-2xl "
       >
         {state === -1 ? (
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">

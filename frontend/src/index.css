@@ -183,3 +183,36 @@ code {
   opacity: 1;
   animation: holo-shift 2s linear infinite;
 }
+@keyframes balatro-star {
+  0% {
+    transform: translateY(0px) rotate(-3deg) scale(1);
+  }
+
+  18% {
+    transform: translateY(-2px) rotate(2deg) scale(1.02);
+  }
+
+  37% {
+    transform: translateY(1px) rotate(-1deg) scale(1);
+  }
+
+  58% {
+    transform: translateY(-1px) rotate(3deg) scale(1.01);
+  }
+
+  76% {
+    transform: translateY(2px) rotate(-2deg) scale(1);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(-3deg) scale(1);
+  }
+}
+
+.balatro-star {
+  animation-name: balatro-star;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  transform-origin: center;
+  will-change: transform;
+}

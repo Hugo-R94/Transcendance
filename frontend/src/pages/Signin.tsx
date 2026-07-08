@@ -1,6 +1,6 @@
 import { useState } from "react";
 import GameCard from "../components/gameCard";
-import Button from "../components/button";
+import Button from "../components/buttonLink";
 import NavBar from "../components/navBar";
 import ShaderBackground from "../components/shaderBG";
 

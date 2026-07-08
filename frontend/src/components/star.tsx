@@ -1,23 +1,30 @@
 interface StarRatingProps {
   rating: number;
   className?: string;
-
 }
 
+const delays = [0, 0.22, 0.51, 0.16, 0.73];
+const durations = [2.8, 3.2, 2.6, 3.5, 2.9];
 
 function StarRating({ rating, className }: StarRatingProps) {
   return (
-    <div 
-	className={`flex gap-1  ${className}`}>
+    <div className={`flex gap-1 ${className}`}>
       {[1, 2, 3, 4, 5].map((star) => {
         const fill = rating >= star ? 100 : rating >= star - 0.5 ? 50 : 0;
 
         return (
-          <div key={star} className="relative w-6 h-6">
-            {/* Étoile grise (fond) */}
+          <div
+            key={star}
+            className="relative w-6 h-6 balatro-star"
+            style={{
+              animationDelay: `${delays[star - 1]}s`,
+              animationDuration: `${durations[star - 1]}s`,
+            }}
+          >
+            {/* Étoile grise */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="absolute inset-0 text-gray-300 size-6"
+              className="absolute inset-0 size-6 text-gray-300"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth="1.5"
@@ -30,11 +37,14 @@ function StarRating({ rating, className }: StarRatingProps) {
               />
             </svg>
 
-            {/* Partie jaune (remplissage), recadrée via overflow-hidden */}
-            <div className="absolute inset-0 overflow-hidden" style={{ width: `${fill}%` }}>
+            {/* Remplissage jaune */}
+            <div
+              className="absolute inset-0 overflow-hidden"
+              style={{ width: `${fill}%` }}
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="text-yellow-400 size-6"
+                className="size-6 text-yellow-400"
                 fill="currentColor"
                 viewBox="0 0 24 24"
                 strokeWidth="1.5"
