@@ -134,32 +134,43 @@ func (h *GameHandler) listGamesHandler(c *gin.Context) {
 
 func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	const pageSize = 15
+
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
 		page = 1
 	}
-	offset := (page - 1) * pageSize
 
 	var total int64
-	if err := h.db.Model(&models.Game{}).Count(&total).Error; err != nil {
-		log.Printf("[ERROR] ListGames count error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+
+	db := h.db.Model(&models.Game{})
+
+	// Compte le nombre total de jeux
+	if err := db.Count(&total).Error; err != nil {
+		log.Printf("[ERROR] Count games error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "something went wrong",
+		})
 		return
 	}
 
 	var games []models.Game
-	err = h.db.
+
+	err = db.
 		Order("id ASC").
 		Limit(pageSize).
-		Offset(offset).
+		Offset((page - 1) * pageSize).
 		Find(&games).Error
+
 	if err != nil {
-		log.Printf("[ERROR] ListGames error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		log.Printf("[ERROR] List games error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "something went wrong",
+		})
 		return
 	}
 
 	response := make([]models.GetGameResponse, 0, len(games))
+
 	for _, g := range games {
 		response = append(response, models.GetGameResponse{
 			AppID:             g.AppID,
@@ -176,9 +187,91 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	})
 }
 
+func (h *GameHandler) searchHandler(c *gin.Context) {
+	query := c.Query("q")
+	
+	if query == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "missing search query",
+		})
+		return
+	}
+
+	var games []models.Game
+
+	err := h.db.
+		Model(&models.Game{}).
+		Where("name ILIKE ?", "%"+query+"%").
+		Limit(15).
+		Order("id ASC").
+		Find(&games).Error
+
+	if err != nil {
+		log.Printf("[ERROR] Search games error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "something went wrong",
+		})
+		return
+	}
+
+	response := make([]models.GetGameResponse, 0, len(games))
+
+	for _, g := range games {
+		response = append(response, models.GetGameResponse{
+			AppID:             g.AppID,
+			Name:              g.Name,
+			Header_image_link: g.Header_image_link,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"games": response,
+	})
+}
+
+func (h *GameHandler) GetCommentsPage(c *gin.Context) {
+    gameID := c.Param("id")
+
+    page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+    if err != nil || page < 1 {
+        page = 1
+    }
+
+    limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+    if err != nil || limit < 1 {
+        limit = 10
+    }
+
+    offset := (page - 1) * limit
+
+    var comments []models.Comment
+
+	err = h.db.
+		Where("game_id = ?", gameID).
+		Offset(offset).
+		Limit(limit).
+		Find(&comments).Error
+
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": err.Error(),
+        })
+        return
+    }
+
+    c.JSON(http.StatusOK, comments)
+}
+
+func CreateComment(db *gorm.DB, comment *models.Comment) error {
+    return db.Create(comment).Error
+}
+
+
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	h := &GameHandler{db: db}
 	router.GET("", h.listGamesHandler)           // "" au lieu de "/"
+	router.GET("/games/:appid/comments", h.GetCommentsPage)
 	router.GET("/games", h.listGamesPageHandler) // "" au lieu de "/"
+	router.GET("/search", h.searchHandler) // "" au lieu de "/"
 	router.GET("/:appid", h.gameInfoHandler)
 }

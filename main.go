@@ -11,6 +11,7 @@ import (
 
 	"github.com/Hugo-R94/Transcendance/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/internal/apiHandlers/user"
+	"github.com/Hugo-R94/Transcendance/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/internal/database"
 	"github.com/Hugo-R94/Transcendance/internal/models"
 	"github.com/gin-contrib/cors"
@@ -32,6 +33,7 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 	db.AutoMigrate(&models.User{})
 	db.AutoMigrate(&models.Game{})
 	db.AutoMigrate(&models.Developer{})
+	db.AutoMigrate(&models.Comment{})
 	db.AutoMigrate(&models.Publisher{})
 	return db, sqldb
 }
@@ -59,10 +61,11 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	v1 := router.Group("/api/v1")
 	userGroup := v1.Group("/user")
 	gameGroup := v1.Group("/game")
-
+	
 	game.GetGameInfo(gameGroup, db)
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
+	comment.CommentRoutes(gameGroup, db)
 	return router
 }
 

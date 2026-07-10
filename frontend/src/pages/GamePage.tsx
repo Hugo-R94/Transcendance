@@ -65,7 +65,7 @@ function GamePage() {
       <div className="sm: sm:mx-[20%] min-h-screen sm:w-3/5 p-4 z-10">
         <div className="h-fit sm:mt-100 mt-0 rounded-xl flex flex-col">
 			<GameDescription name={game.name} description={game.description} developer="devs" tag="tag1,tag2"/>
-			<PostComment />
+			<PostComment  gameId={game.appid}/>
 			<CommentSection gameID={game.appid} commentsPerPage={10} star={3.4} />
         </div>
 

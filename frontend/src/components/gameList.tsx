@@ -14,11 +14,12 @@ function gameList({ games }: GameFanGridProps) {
   return (
     <>
       {/* Desktop / Tablette */}
-      <div className="hidden sm:block w-full h-[70%] ">
+      <div className="hidden sm:block w-full h-[70%]">
+		
         {[0, 1, 2].map((row) => (
           <div
             key={row}
-            className="h-1/3 w-full flex justify-center items-center p-10"
+            className="h-1/3 w-full flex justify-center items-center p-10 translate-x-10"
           >
             {games.slice(row * 5, row * 5 + 5).map((game, index) => {
               const center = 2;

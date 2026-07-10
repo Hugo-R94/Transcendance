@@ -15,7 +15,7 @@ type (
 		Owners_string         string       `gorm:"type:varchar(255)"`
 		Developers            []*Developer `gorm:"many2many:developer_games;"`
 		Publishers            []*Publisher `gorm:"many2many:publisher_games;"`
-		comments			  []*Comment    `gorm:"many2many:comment_games;"`
+		Comments			  []Comment `gorm:"foreignKey:GameID"`
 	}
 
 	// Gameshort struct{
@@ -25,6 +25,8 @@ type (
 	// 	Header_image_link     string       `gorm:"type:varchar(500)"`
 	// }
 	
+
+
 	Developer struct {
 		gorm.Model
 		Name  string  `gorm:"primary_key;unqueIndex"`

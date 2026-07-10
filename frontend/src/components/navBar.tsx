@@ -27,7 +27,7 @@ function NavBar() {
         </p>
 	</ButtonLink>
 
-      <div className="relative balatro m-auto h-10 rounded-lg group hover:outline-2 hover:outline-white active:scale-90 active:rotate-3">
+      <div className="relative overflow-visible m-auto h-10 rounded-lg group hover:outline-2 hover:outline-white active:scale-90 ">
 		<SearchBar></SearchBar>
       </div>
 	  

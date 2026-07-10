@@ -6,6 +6,8 @@ import NavBar from "../components/navBar";
 import ShaderBackground from "../components/shaderBG";
 import Pagination from "../components/paginationController";
 import GameList from "../components/gameList";
+import Research from "../components/research";
+
 interface GameListItem {
   appid: number;
   name: string;
@@ -84,17 +86,17 @@ function Games() {
     <div className="min-h-screen text-white">
       <ShaderBackground />
 
-      <div className="sm:fixed sm:mx-[20%] h-full sm:-mt-2 mt-5 top-22.5 sm:w-3/5">
+      <div className="sm:fixed sm:left-1/2 sm:-translate-x-1/2 sm:w-3/5 h-full mt-5 sm:mt-0 top-22.5">
 
-        <div className="w-full h-15 items-center justify-center p-5">
-          <p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-            WHAT'S HOT ?
-          </p>
-        </div>
+	<div className="w-full flex justify-center py-5 ">
+	<p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+		WHAT'S HOT ?
+	</p>
+	</div>
 
 		<GameList games={games}></GameList>
        
-        <div className="w-full mt-5 flex justify-center items-center ">
+        <div className="w-full mt-3 flex justify-center items-center ">
 		  <Pagination page={page} totalPages={totalPages} onPageChange={changePage}></Pagination>
         </div>
 

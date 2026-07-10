@@ -2,9 +2,11 @@
 
 CERT = ./certificates
 
-all:up
-	go build && ./Transcendance
-
+all: up
+	go build
+	./Transcendance &
+	cd frontend && npm run dev
+	
 up: ${CERT}
 	podman-compose -f compose.yml up -d
 
