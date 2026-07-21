@@ -156,7 +156,7 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	var games []models.Game
 
 	err = db.
-		Order("id ASC").
+		Order("app_id ASC").
 		Limit(pageSize).
 		Offset((page - 1) * pageSize).
 		Find(&games).Error
