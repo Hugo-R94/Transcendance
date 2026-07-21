@@ -20,8 +20,8 @@ function NavBar() {
   return (
     <div className="flex items-center bg-[#334b4d] w-[90%] sm:h-18 h-15 inset-0 p-1.5 fixed rounded-lg my-4 mx-auto shadow-sm shadow-black z-9999  ">
     
-	<ButtonLink link="http://localhost:5173/games" color="bg-[#00509f]">
-	    <p className="m-auto font-extrabold sm:text-2xl text-xs transition">
+	<ButtonLink link="http://localhost:5173/games" color="bg-[#00509f]" className="m-auto font-extrabold lg:text-xl md:text-sm sm:text-sm text-xs transition mr-5" >
+	    <p >
             <span className="text-white">Click</span>
             <span className="text-[#ef4639]">Bet</span>
         </p>
@@ -31,7 +31,7 @@ function NavBar() {
 		<SearchBar></SearchBar>
       </div>
 	  
-	<ButtonLink link="https://youtube.com" color="bg-[#fb4740]">
+	<ButtonLink link="https://youtube.com" color="bg-[#fb4740]" className="hidden sm:flex">
 			<svg
 			xmlns="http://www.w3.org/2000/svg"
 			fill="none"
@@ -49,7 +49,7 @@ function NavBar() {
 			<p className="my-auto text-xl text-white sm:inline hidden font-bold">Gamble</p>
 	</ButtonLink>
 		
-	<ButtonLink link="http://localhost:5173/profil" color="bg-[#3c9b71]">
+	<ButtonLink link="http://localhost:5173/profil" color="bg-[#3c9b71]" className="hidden sm:flex">
 		<svg
 		xmlns="http://www.w3.org/2000/svg"
 		fill="none"
@@ -113,23 +113,50 @@ function NavBar() {
           </div>
         )}
       </div> */}
-	   <DropdownMenu
-      items={[
-        {
-          label: "Account settings",
-          href: "/account",
-        },
-        {
-          label: "Support",
-          href: "/support",
-        },
-        {
-          label: "License",
-          href: "/license",
-        },
-      ]}
-    />
-    </div>
+		<DropdownMenu
+		className=" rounded-2xl ml-3 shadow-black/50 shadow-md 
+			sm:w-[10%]
+			w-20
+			flex
+			items-center
+			justify-center
+			h-full
+		"
+		color="bg-bred"
+		items={[
+			{ label: "Home", href: "/" },
+			{ label: "Profil", href: "/profil" },
+			{ label: "Support", href: "/support" },
+			{ label: "Logout", href: "/logout" },
+		]}
+		>
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			fill="none"
+			viewBox="0 0 24 24"
+			strokeWidth={1.5}
+			stroke="currentColor"
+			className="size-8 shrink-0 stroke-white"
+		>
+			<path
+			strokeLinecap="round"
+			strokeLinejoin="round"
+			d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+			/>
+		</svg>
+
+		<p className="
+		hidden
+		lg:block
+		text-white
+		font-bold
+		text-xl
+		whitespace-nowrap
+		">
+			MENU
+			</p>
+		</DropdownMenu>
+	</div>
   );
 }
 

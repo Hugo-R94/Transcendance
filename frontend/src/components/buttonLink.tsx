@@ -4,12 +4,13 @@ type ButtonProps = {
   link?: string;
   color: string;
   children?: ReactNode;
+  className?: string;
 };
 
-function ButtonLink({ link, children, color }: ButtonProps) {
+function ButtonLink({ link, children, color, className }: ButtonProps) {
   return (
-    <a href={link} className="h-full w-30 ml-1.5 mr-1.5">
-      <button className={`flex items-center hover:z-999 justify-center h-full w-30 ${color} balatro mx-2 ml-1.5 rounded-xl shadow-sm shadow-black hover:outline-2 hover:outline-white active:scale-90`}>
+    <a href={link} className={`h-full sm:w-[10%]   ml-1.5  ${className}`}>
+      <button className={`flex items-center hover:scale-105  justify-center h-full w-full ${color} balatro ml-1.5 rounded-xl shadow-sm shadow-black hover:outline-2 hover:outline-white active:scale-90 `}>
         {children}
       </button>
     </a>

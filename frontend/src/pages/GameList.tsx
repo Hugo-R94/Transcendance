@@ -7,6 +7,8 @@ import ShaderBackground from "../components/shaderBG";
 import Pagination from "../components/paginationController";
 import GameList from "../components/gameList";
 import Research from "../components/research";
+import Grid from "../components/grid";
+import Leaderboard from "../components/leaderboard";
 
 interface GameListItem {
   appid: number;
@@ -85,25 +87,34 @@ function Games() {
   return (
     <div className="min-h-screen text-white">
       <ShaderBackground />
+    <div className="sm:fixed sm:left-1/2 sm:-translate-x-1/2 sm:w-3/5 h-full mt-5 sm:mt-0 top-22.5 bg-gray-500/0 ">
 
-      <div className="sm:fixed sm:left-1/2 sm:-translate-x-1/2 sm:w-3/5 h-full mt-5 sm:mt-0 top-22.5">
-
-	<div className="w-full flex justify-center py-5 ">
-	<p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
-		WHAT'S HOT ?
-	</p>
-	</div>
+		<div className="w-full flex justify-center py-5">
+		<p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">
+			WHAT'S HOT ?
+		</p>
+		</div>
 
 		<GameList games={games}></GameList>
-       
-        <div className="w-full mt-3 flex justify-center items-center ">
-		  <Pagination page={page} totalPages={totalPages} onPageChange={changePage}></Pagination>
-        </div>
+	
+		<div className="w-full mt-3 flex justify-center items-center">
+		<Pagination page={page} totalPages={totalPages} onPageChange={changePage}></Pagination>
+		</div>
 
-      </div>
-
-
-      <NavBar />
+	</div>
+		
+		{/* <div className="bg-white w-1/5 h-100" /> */}
+		{/* <div className="absolute bg-gray-300/20 w-1/5 h-full  ">
+			
+		</div> */}
+	
+		<div className="absolute w-1/5 right-0 h-full p-2  ">
+			<Leaderboard>
+			</Leaderboard>
+			
+		</div>
+		
+	<NavBar />
 
     </div>
   );

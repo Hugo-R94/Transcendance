@@ -15,7 +15,7 @@ function SearchCard({ appid, name, header, index }: Game) {
 
   return (
 	<a href={`http://localhost:5173/game/${appid}`}>
-    <div className={`flex ${color} w-full h-15 rounded-2xl p-1 transition overflow-x-auto hover:scale-105 shadow-sm shadow-black`}>
+    <div className={`flex ${color} w-full h-15 rounded-2xl p-1 transition overflow-x-auto hover:scale-105 shadow-sm shadow-black hover:outline-3`}>
 
       <div className="bg-gray-600 h-full aspect-square rounded-2xl mr-1 overflow-hidden">
         <img

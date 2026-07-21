@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, ReactNode } from "react";
 
 type MenuItem = {
   label: string;
@@ -6,15 +6,31 @@ type MenuItem = {
 };
 
 type DropdownMenuProps = {
-  title?: string;
   items: MenuItem[];
+  children: ReactNode;
+  className?: string;
+  menuClassName?: string;
+  color: string;
 };
 
-function DropdownMenu({ title = "Menu", items }: DropdownMenuProps) {
+const colors = [
+  "bg-bblue",
+  "bg-bred",
+  "bg-bgreen",
+  "bg-byellow",
+  "bg-bdarkgreen",
+];
+
+function DropdownMenu({
+  items,
+  children,
+  className = "",
+  menuClassName = "",
+  color,
+}: DropdownMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Fermer le menu quand on clique dehors
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -33,44 +49,45 @@ function DropdownMenu({ title = "Menu", items }: DropdownMenuProps) {
   }, []);
 
   return (
-    <div className="relative flex h-full w-30 ml-3 overflow-visible" ref={dropdownRef}>
-      <button
-        onClick={() => setMenuOpen((prev) => !prev)}
-        className="flex items-center justify-center balatro hover:outline-2 hover:outline-white bg-[#00509f] w-30 h-full rounded-lg shadow-black shadow-sm"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="stroke-white sm:size-8 size-6 mr-1"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-          />
-        </svg>
-
-        <p className="mr-3 my-auto text-xl text-white sm:inline hidden font-bold">
-          {title}
-        </p>
-      </button>
+	<div ref={dropdownRef} className={`relative ${className}`}>
+	{/* Ce wrapper porte l'effet holo, PAS le positionnement du menu */}
+	<div className={` w-full h-full rounded-2xl ${color} balatro outline-white hover:outline-2`}>
+		<button
+		type="button"
+		onClick={() => setMenuOpen((prev) => !prev)}
+		className="w-full h-full flex items-center justify-center
+					appearance-none border-none p-0 bg-transparent cursor-pointer"
+		>
+		{children}
+		</button>
+	</div>
 
       {menuOpen && (
-        <div className="absolute right-0 top-[110%] w-56 rounded-md bg-[#fb4740] outline-1 overflow-visible -outline-offset-1 outline-white/10 shadow-lg z-50">
-          <div className="py-1 ">
-            {items.map((item, index) => (
-              <a
-                key={index}
-                href={item.href ?? "#"}
-                className="balatro rounded-2xl hover:z-9999 w-full block px-4 py-2 text-sm bg-[#fb4740] text-gray-300 hover:bg-[#ed8a00] hover:text-white focus:bg-[#ed8a00] focus:text-white focus:outline-hidden"
-              >
-                {item.label}
-              </a>
-            ))}
-          </div>
+        <div
+          className={`flex flex-col gap-y-2 absolute right-0 top-[110%] sm:w-100 w-[500%] mt-2 rounded-xl overflow-visible shadow-lg p-3 bg-bdarkgreen z-50 ${menuClassName}`}
+        >
+          {items.map((item, index) => (
+            <a
+              key={index}
+              href={item.href ?? "#"}
+              className={`
+                block
+                px-4
+                py-3
+                text-white
+                font-bold
+                transition
+                hover:brightness-110
+				shadow-black/75 shadow-md rounded-2xl
+				hover:outline-3 hover:outline-white
+				balatro
+                ${colors[index % colors.length]}
+              `}
+              onClick={() => setMenuOpen(false)}
+            >
+              {item.label}
+            </a>
+          ))}
         </div>
       )}
     </div>

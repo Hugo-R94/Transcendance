@@ -5,6 +5,7 @@ import GamePage from "./pages/GamePage";
 import Login from "./pages/Login";
 import Signin from "./pages/Signin";
 import Profil from "./pages/profil";
+import Support from "./pages/support";
 
 function App() {
   return (
@@ -14,9 +15,10 @@ function App() {
       <Route path="/game/:appid" element={<GamePage />} />
 	  <Route path="/" element={<Home />} />
 	  <Route path="/profil" element={<Profil/>} />
-	  <Route path="/games" element={<Games />} />
+	  <Route path="/games" element={<Games />} />	
       <Route path="/login" element={<Login />} />
       <Route path="/signin" element={<Signin />} />
+      <Route path="/support" element={<Support />} />
     </Routes>
   );
 }

@@ -119,10 +119,10 @@ code {
 
   @keyframes card-wobble {
     0%, 100% {
-      transform: scale(1.2) rotate(-3deg);
+      transform: scale(1.1) rotate(-3deg);
     }
     50% {
-      transform: scale(1.2) rotate(3deg);
+      transform: scale(1.1) rotate(3deg);
     }
   }
 
@@ -136,12 +136,8 @@ code {
   }
 
  
-
-
-  
 .balatro {
   position: relative;
-  z-index: 1;
 }
 
 
@@ -154,6 +150,7 @@ code {
 .no-spinner {
   -moz-appearance: textfield;
 }
+
 .balatro::before {
   content: "";
   position: absolute;
@@ -174,15 +171,17 @@ code {
 }
 
 .balatro:hover:not(:focus-within) {
-  scale: 1.2;
+  scale: 1.05;
   animation: card-wobble 2.4s ease-in-out infinite;
-  z-index: 1;
+  z-index: 9999;
 }
 
 .balatro:hover:not(:focus-within)::before {
   opacity: 1;
   animation: holo-shift 2s linear infinite;
 }
+
+
 @keyframes balatro-star {
   0% {
     transform: translateY(0px) rotate(-3deg) scale(1);
@@ -215,4 +214,24 @@ code {
   animation-iteration-count: infinite;
   transform-origin: center;
   will-change: transform;
+}
+
+.bg-bblue{
+	background: #00509f;
+}
+
+.bg-bred{
+	background: #fb4740;
+}
+
+.bg-bgreen{
+	background: #3c9b71;
+}
+
+.bg-byellow{
+	background: #ed8a00;
+}
+
+.bg-bdarkgreen{
+	background: #334b4d;
 }

@@ -7,8 +7,8 @@ interface PostCommentProps {
 
 function PostComment({ gameId }: PostCommentProps) {
 	const [comment, setComment] = useState("");
-	const [rating, setRating] = useState(3);
-
+	const [rating, setRating] = useState(0);
+	
 	const postComment = async () => {
 		if (!comment.trim()) {
 			return;
@@ -32,7 +32,7 @@ function PostComment({ gameId }: PostCommentProps) {
 			}
 
 			setComment("");
-			setRating(3);
+			setRating(0);
 
 			console.log("Comment posted");
 		} catch (error) {
@@ -55,13 +55,7 @@ function PostComment({ gameId }: PostCommentProps) {
 				className="w-full h-50 my-3 rounded-2xl bg-gray-200 text-gray-800 p-3 resize-none overflow-y-auto focus:outline-none"
 				placeholder="Write your comment..."
 			/>
-
-			<StarRating 
-				rating={rating}
-				setRating={setRating}
-				className="justify-center"
-			/>
-
+			<StarRating className="justify-center" rating={rating} onChange={(note) => setRating(note)} />
 			<button
 				onClick={postComment}
 				className="bg-[#00509f] w-30 h-15 mt-3 rounded-2xl balatro shadow-md shadow-black font-bold active:scale-90 hover:outline-2 hover:outline-white"

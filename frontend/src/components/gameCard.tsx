@@ -14,7 +14,7 @@ function GameCard({ id, name, tag, imgLink, className }: CardProps) {
   return (
     <div
       onClick={() => navigate(`/game/${id}`)}
-      className={`balatro relative w-3/5 aspect-[6/9] cursor-pointer overflow-hidden rounded-2xl lg:outline-8 md:outline-7  outline-5 outline-gray-200 ${className}`}
+      className={`balatro relative 2xl:w-5/10 lg:w-6/10 md:10/10 sm:w-8/10 w-7/10 aspect-[6/9] cursor-pointer overflow-hidden rounded-2xl lg:outline-8 md:outline-7  outline-5 outline-gray-200 ${className}`}
     >
       {/* IMAGE */}
       <img
@@ -42,4 +42,4 @@ function GameCard({ id, name, tag, imgLink, className }: CardProps) {
   );
 }
 
-export default GameCard;
+export default GameCard;	

@@ -1,30 +1,83 @@
+import { useState } from "react";
+
 interface StarRatingProps {
-  rating: number;
+  /** La note actuelle sur 10 (ex: 5 -> 2.5 étoiles, 6 -> 3 étoiles, 6.8 -> 3.5 étoiles) */
+  rating?: number;
+  /** Callback appelée quand l'utilisateur clique (renvoie une note de 1 à 10) */
+  onChange?: (rating10: number) => void;
+  /** Mode lecture seule pour désactiver l'interactivité */
+  readOnly?: boolean;
   className?: string;
 }
 
 const delays = [0, 0.22, 0.51, 0.16, 0.73];
 const durations = [2.8, 3.2, 2.6, 3.5, 2.9];
 
-function StarRating({ rating, className }: StarRatingProps) {
+function StarRating({
+  rating = 0,
+  onChange,
+  readOnly = false,
+  className = "",
+}: StarRatingProps) {
+  const [hoverRating, setHoverRating] = useState<number | null>(null);
+
+  // La note courante sur 10 (survolée ou enregistrée)
+  const currentRating10 = hoverRating !== null ? hoverRating : rating;
+
+  const handleMouseMove = (
+    e: React.MouseEvent<HTMLDivElement>,
+    starIndex: number
+  ) => {
+    if (readOnly) return;
+
+    const { left, width } = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.clientX - left;
+
+    // Moitié gauche = -1 sur la note sur 10 (ex: étoile 3 -> 5/10 = 2.5 étoiles)
+    // Moitié droite = note entière (ex: étoile 3 -> 6/10 = 3 étoiles)
+    const isLeftHalf = mouseX < width / 2;
+    const computedRating = isLeftHalf ? starIndex * 2 - 1 : starIndex * 2;
+
+    setHoverRating(computedRating);
+  };
+
+  const handleClick = (value10: number) => {
+    if (readOnly) return;
+    onChange?.(value10);
+  };
+
   return (
-    <div className={`flex gap-1 ${className}`}>
-      {[1, 2, 3, 4, 5].map((star) => {
-        const fill = rating >= star ? 100 : rating >= star - 0.5 ? 50 : 0;
+    <div
+      className={`flex gap-1 items-center ${
+        readOnly ? "" : "cursor-pointer select-none"
+      } ${className}`}
+      onMouseLeave={() => !readOnly && setHoverRating(null)}
+    >
+      {[1, 2, 3, 4, 5].map((starIndex) => {
+        const starsValue = currentRating10 / 2;
+
+        let fill = 0;
+        if (starsValue >= starIndex - 0.25) {
+          fill = 100;
+        } else if (starsValue >= starIndex - 0.75) {
+          fill = 50;
+        }
 
         return (
           <div
-            key={star}
-            className="relative w-6 h-6 balatro-star"
+            key={starIndex}
+            className="relative w-6 h-6 balatro-star transition-transform active:scale-95"
             style={{
-              animationDelay: `${delays[star - 1]}s`,
-              animationDuration: `${durations[star - 1]}s`,
+              animationDelay: `${delays[starIndex - 1]}s`,
+              animationDuration: `${durations[starIndex - 1]}s`,
             }}
+            onMouseMove={(e) => handleMouseMove(e, starIndex)}
+            onClick={() => handleClick(hoverRating ?? starIndex * 2)}
           >
-            {/* Étoile grise */}
+            {/* Étoile grise (fond) */}
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              className="absolute inset-0 size-6 text-gray-300"
+              className="absolute inset-0 size-6 text-gray-300 pointer-events-none"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth="1.5"
@@ -39,7 +92,7 @@ function StarRating({ rating, className }: StarRatingProps) {
 
             {/* Remplissage jaune */}
             <div
-              className="absolute inset-0 overflow-hidden"
+              className="absolute inset-0 overflow-hidden transition-[width] duration-75 pointer-events-none"
               style={{ width: `${fill}%` }}
             >
               <svg
