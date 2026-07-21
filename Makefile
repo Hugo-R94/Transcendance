@@ -64,7 +64,7 @@ ${CERT}:
 db_wipe: check
 	podman-compose -f compose.yml up -d
 	podman exec -u root transcendance_postgres_1 chmod -R a+rwX /var/lib/postgresql/
-	rm -rf ./podman/.DB_data
+	rm -rf ./docker/.DB_data
 	podman-compose -f compose.yml down
 
 check:

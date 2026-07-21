@@ -1,5 +1,6 @@
 .env
 backend/.env
+backend/backend
 *.swp
 Transcendance
 certificates
