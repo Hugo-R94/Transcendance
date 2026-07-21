@@ -3,8 +3,7 @@
 CERT = ./certificates
 
 all: up
-	go build
-	./Transcendance &
+	cd backend && go build && ./backend &
 	cd frontend && npm run dev
 	
 up: ${CERT}
