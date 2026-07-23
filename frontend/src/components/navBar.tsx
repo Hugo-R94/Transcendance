@@ -18,7 +18,7 @@ function NavBar() {
   }, []);
 
   return (
-    <div className="flex items-center bg-[#334b4d] w-[90%] sm:h-18 h-15 inset-0 p-1.5 fixed rounded-lg my-4 mx-auto shadow-sm shadow-black z-9999  ">
+    <div className="flex items-center bg-bdarkgreen w-[90%] sm:h-18 h-15 inset-0 p-1.5 fixed rounded-lg my-4 mx-auto shadow-sm shadow-black z-9999  ">
     
 	<ButtonLink link="http://localhost:5173/games" color="bg-[#00509f]" className="m-auto font-extrabold lg:text-xl md:text-sm sm:text-sm text-xs transition mr-5" >
 	    <p >
@@ -31,7 +31,7 @@ function NavBar() {
 		<SearchBar></SearchBar>
       </div>
 	  
-	<ButtonLink link="https://youtube.com" color="bg-[#fb4740]" className="hidden sm:flex">
+	<ButtonLink link="http://localhost:5173/clicker" color="bg-[#fb4740]" className="hidden sm:flex">
 			<svg
 			xmlns="http://www.w3.org/2000/svg"
 			fill="none"

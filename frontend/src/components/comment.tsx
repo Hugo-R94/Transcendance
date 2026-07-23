@@ -1,6 +1,7 @@
 import { useState } from "react";
 import LikeButton from "./LikeButton";
 import StarRating from "./star";
+import Rating from "./getRating";
 
 type CommentProps = {
   UUID: number;
@@ -55,7 +56,7 @@ function Comment({
         </div>
 
         <div>
-          <p className="font-bold text-left text-gray-900">{Nickname}</p>
+          <p className="font-bold text-left text-gray-300">{Nickname}</p>
           <p className="text-xs text-left font-semibold text-gray-300/75">
             {CommentTitle}
           </p>
@@ -63,12 +64,12 @@ function Comment({
       </div>
 
       {/* COMMENT */}
-      <div className="mt-4 text-small bg-black/10 rounded-2xl p-3 font-semibold whitespace-pre-wrap break-words text-gray-800">
+      <div className="mt-4 text-small bg-white/10 rounded-2xl p-3 font-semibold whitespace-pre-wrap break-words text-gray-300">
         {comment}
       </div>
 
       <hr className="my-3 border-black/30" />
-		<StarRating rating={star} className=" my-3 justify-center"></StarRating>
+		<Rating rating={star} className=" my-3 justify-center"></Rating>
       {/* LIKE BUTTON */}
       <LikeButton
         Likes={Likes}

@@ -19,7 +19,7 @@ interface CommentSectionProps {
 
 function CommentSection({
   gameID,
-  commentsPerPage = 10,
+  commentsPerPage = 5,
 }: CommentSectionProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const [comments, setComments] = useState<CommentData[]>([]);
@@ -33,18 +33,33 @@ function CommentSection({
       setLoading(true);
 
       try {
-        const response = await fetch(
-          `/games/${gameID}/comments?page=${currentPage}&limit=${commentsPerPage}`
-        );
-
+		const response = await fetch(
+		`http://localhost:8080/api/v1/comments/${gameID}/comments?page=${currentPage}`
+		);
+		
         if (!response.ok) {
           throw new Error("Failed to fetch comments");
         }
 
         const data = await response.json();
 
-        setComments(data.comments);
-        setTotalPages(data.totalPages);
+        const formattedComments: CommentData[] = data.comments.map(
+          (item: any) => ({
+            UUID: item.ID,
+            Nickname: `User ${item.userID}`,
+            comment: item.comment,
+            CommentTitle: item.commentTitle,
+            Likes: item.likes,
+            Dislikes: item.dislikes,
+            rating: item.rating,
+          })
+        );
+
+        setComments(formattedComments);
+
+		setTotalPages(
+		Math.max(1, Math.ceil(data.total / commentsPerPage))
+		);
 
       } catch (error) {
         console.error("Error fetching comments:", error);
@@ -59,7 +74,6 @@ function CommentSection({
   }, [gameID, currentPage, commentsPerPage]);
 
 
-  // Reset la pagination quand on change de jeu
   useEffect(() => {
     setCurrentPage(1);
   }, [gameID]);
@@ -79,6 +93,9 @@ function CommentSection({
   };
 
 
+
+
+
   return (
     <div id="comment-section" className="flex flex-col gap-4">
 
@@ -96,13 +113,15 @@ function CommentSection({
       ) : (
 
         <>
-          {comments.map((comment, index) => (
+         {comments.map((comment, index) => (
             <Comment
               key={comment.UUID}
               UUID={comment.UUID}
               Nickname={comment.Nickname}
               comment={comment.comment}
-              commentRowNb={(currentPage - 1) * commentsPerPage + index}
+              commentRowNb={
+                (currentPage - 1) * commentsPerPage + index
+              }
               CommentTitle={comment.CommentTitle}
               Likes={comment.Likes}
               Dislikes={comment.Dislikes}

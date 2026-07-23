@@ -13,8 +13,8 @@ type Comment struct {
 
 	Comment      string `json:"comment"`
 	CommentTitle string `json:"commentTitle"`
+	Rating       float64    `json:"rating"`
 
 	Likes        int    `json:"likes"`
 	Dislikes     int    `json:"dislikes"`
-	Rating       float64    `json:"rating"`
 }

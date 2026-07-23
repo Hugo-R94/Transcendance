@@ -203,7 +203,7 @@ func (h *GameHandler) searchHandler(c *gin.Context) {
 		Model(&models.Game{}).
 		Where("name ILIKE ?", "%"+query+"%").
 		Limit(15).
-		Order("id ASC").
+		Order("app_id ASC").
 		Find(&games).Error
 
 	if err != nil {
@@ -268,9 +268,9 @@ func CreateComment(db *gorm.DB, comment *models.Comment) error {
 
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	h := &GameHandler{db: db}
-	router.GET("", h.listGamesHandler) // "" au lieu de "/"
+	router.GET("", h.listGamesHandler)
 	router.GET("/games/:appid/comments", h.GetCommentsPage)
-	router.GET("/games", h.listGamesPageHandler) // "" au lieu de "/"
-	router.GET("/search", h.searchHandler)       // "" au lieu de "/"
+	router.GET("/games", h.listGamesPageHandler) 
+	router.GET("/search", h.searchHandler)
 	router.GET("/:appid", h.gameInfoHandler)
 }

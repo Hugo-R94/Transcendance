@@ -37,9 +37,18 @@ services:
       - ./certificates/client_pgadmin.crt:/home/pgadmin/.postgresql/client.crt:ro
       - ./docker/entrypoint_ad.sh:/usr/local/bin/entrypoint.sh:Z
     user: root
-    entrypoint: ["/bin/sh", "-c", "chown 5050:5050 /home/pgadmin/.postgresql/client.key && /entrypoint.sh" ]
+    entrypoint: ["/bin/sh", "-c", "chown 5050:5050 /home/pgadmin/.postgresql/client.key && /entrypoint.sh"]
 
-      
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
 
 volumes:
   postgresDB:

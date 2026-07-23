@@ -35,6 +35,7 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 	db.AutoMigrate(&models.Developer{})
 	db.AutoMigrate(&models.Comment{})
 	db.AutoMigrate(&models.Publisher{})
+	db.AutoMigrate(&models.CommentVote{})
 	return db, sqldb
 }
 
@@ -61,11 +62,13 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	v1 := router.Group("/api/v1")
 	userGroup := v1.Group("/user")
 	gameGroup := v1.Group("/game")
-
+	commentGroup := v1.Group("/comments")
+	commentVoteGroup := v1.Group("/commentVote")
+	comment.CommentRoutes(commentGroup, db)
 	game.GetGameInfo(gameGroup, db)
+
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
-	comment.CommentRoutes(gameGroup, db)
 	return router
 }
 

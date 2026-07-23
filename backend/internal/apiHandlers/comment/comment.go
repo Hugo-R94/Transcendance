@@ -3,6 +3,7 @@ package comment
 import (
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
@@ -18,8 +19,8 @@ func CommentRoutes(router *gin.RouterGroup, db *gorm.DB) {
 		db: db,
 	}
 
-	router.POST("/comment/post", h.commentPost)
-	router.GET("/game/comment", h.commentGet)
+	router.POST("/post", h.commentPost)
+	router.GET("/:gameID/comments", h.commentGet)
 }
 
 // POST /comment/post
@@ -50,34 +51,43 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 	})
 }
 
+func atoi(value string) int {
+	i, _ := strconv.Atoi(value)
+	return i
+}
 // GET /game/comment?game_id=ID
 func (h *CommentHandler) commentGet(c *gin.Context) {
-	gameID := c.Query("game_id")
-
-	if gameID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "missing game_id",
-		})
-		return
-	}
+	gameID := c.Param("gameID")
 
 	var comments []models.Comment
+	var total int64
+
+	h.db.
+		Model(&models.Comment{}).
+		Where("game_id = ?", gameID).
+		Count(&total)
+
+	limit := atoi(c.DefaultQuery("limit", "5"))
+	page := atoi(c.DefaultQuery("page", "1"))
+
+	offset := (page - 1) * limit
 
 	err := h.db.
 		Where("game_id = ?", gameID).
 		Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
 		Find(&comments).Error
 
 	if err != nil {
-		log.Printf("[ERROR] Get comments error: %v", err)
-
-		c.JSON(http.StatusInternalServerError, gin.H{
+		c.JSON(500, gin.H{
 			"error": "something went wrong",
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
+	c.JSON(200, gin.H{
 		"comments": comments,
+		"total": total,
 	})
 }

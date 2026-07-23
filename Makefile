@@ -3,11 +3,10 @@
 CERT = ./certificates
 
 all: up
-	cd backend && go build && ./backend &
-	cd frontend && npm run dev
-	
+	cd backend && go build && ./backend
+
 up: ${CERT}
-	podman-compose -f compose.yml up -d
+	podman-compose -f compose.yml up -d --build
 
 down:
 	podman-compose -f compose.yml down

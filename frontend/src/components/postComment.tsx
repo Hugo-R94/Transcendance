@@ -1,30 +1,33 @@
 import { useState } from "react";
 import StarRating from "./star";
-
+	
 interface PostCommentProps {
 	gameId: number;
 }
 
 function PostComment({ gameId }: PostCommentProps) {
 	const [comment, setComment] = useState("");
+	const [title, setTitle] = useState("");
 	const [rating, setRating] = useState(0);
-	
+	// const gameidd = 130
 	const postComment = async () => {
 		if (!comment.trim()) {
 			return;
 		}
 
 		try {
-			const response = await fetch("http://localhost:8080/api/v1/game/comment/post", {
+			const response = await fetch("http://localhost:8080/api/v1/comments/post", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({
-					game_id: gameId,
-					content: comment,
-					rating: rating,
-				}),
+			body: JSON.stringify({
+				gameID: gameId,
+				userID: 1,
+				comment: comment,
+				commentTitle: title	,
+				rating: rating,
+			}),
 			});
 
 			if (!response.ok) {
@@ -48,11 +51,17 @@ function PostComment({ gameId }: PostCommentProps) {
 					Did you like this game ?
 				</p>
 			</div>
+			<textarea value={title}
+			onChange={(e) => setTitle(e.target.value)}
+			 className="bg-gray-200 w-[75%] h-10 mt-3 rounded-2xl bg-gray-200 text-gray-800 p-2 resize-none overflow-y-auto focus:outline-none"
+			placeholder="Write your title...">
+				
+			</textarea>
 
 			<textarea
 				value={comment}
 				onChange={(e) => setComment(e.target.value)}
-				className="w-full h-50 my-3 rounded-2xl bg-gray-200 text-gray-800 p-3 resize-none overflow-y-auto focus:outline-none"
+				className="w-full h-50 m-3 rounded-2xl bg-gray-200 text-gray-800 p-3 resize-none overflow-y-auto focus:outline-none"
 				placeholder="Write your comment..."
 			/>
 			<StarRating className="justify-center" rating={rating} onChange={(note) => setRating(note)} />
