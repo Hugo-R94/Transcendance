@@ -14,11 +14,12 @@ services:
       timeout: 10s
     volumes:
       - ./docker/entrypoint_db.sh:/usr/local/bin/entrypoint.sh:Z
-      - ./certificates/server.crt:/certificates/server.crt:ro
-      - ./certificates/server.key:/certificates/server.key
-      - ./certificates/rootCA.crt:/certificates/rootCA.crt:ro
-      - ./docker/.DB_data/:/var/lib/postgresql/data:rw
+      - ./certificates/server.crt:/certificates/server.crt:Z
+      - ./certificates/server.key:/certificates/server.key:Z
+      - ./certificates/rootCA.crt:/certificates/rootCA.crt:Z
+      - ./docker/.DB_data/:/var/lib/postgresql/data:Z
       - ./docker/ssl-config.sh:/docker-entrypoint-initdb.d/ssl-config.sh:Z
+    restart: unless-stopped
     entrypoint: ["/bin/sh", "-c", "/usr/local/bin/entrypoint.sh"]
 
   pgAdmin:
@@ -33,8 +34,8 @@ services:
         restart: true
     volumes:
       - ./certificates/rootCA.crt:/home/pgadmin/.postgresql/root.crt:ro
-      - ./certificates/client_pgadmin.key:/home/pgadmin/.postgresql/client.key
-      - ./certificates/client_pgadmin.crt:/home/pgadmin/.postgresql/client.crt:ro
+      - ./certificates/client_pgadmin.key:/home/pgadmin/.postgresql/client.key:Z
+      - ./certificates/client_pgadmin.crt:/home/pgadmin/.postgresql/client.crt:Z
       - ./docker/entrypoint_ad.sh:/usr/local/bin/entrypoint.sh:Z
     user: root
     entrypoint: ["/bin/sh", "-c", "chown 5050:5050 /home/pgadmin/.postgresql/client.key && /entrypoint.sh"]
