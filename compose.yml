@@ -33,7 +33,7 @@ services:
         condition: service_healthy
         restart: true
     volumes:
-      - ./certificates/rootCA.crt:/home/pgadmin/.postgresql/root.crt:ro
+      - ./certificates/rootCA.crt:/home/pgadmin/.postgresql/root.crt:Z
       - ./certificates/client_pgadmin.key:/home/pgadmin/.postgresql/client.key:Z
       - ./certificates/client_pgadmin.crt:/home/pgadmin/.postgresql/client.crt:Z
       - ./docker/entrypoint_ad.sh:/usr/local/bin/entrypoint.sh:Z

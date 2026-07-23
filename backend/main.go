@@ -60,7 +60,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	//	})
 
 	v1 := router.Group("/api/v1")
-	userGroup := v1.Group("/user")
+	userGroup := router.Group("/")
 	gameGroup := v1.Group("/game")
 	commentGroup := v1.Group("/comments")
 	//	commentVoteGroup := v1.Group("/commentVote")
@@ -69,6 +69,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
+	user.LogoutUser(userGroup, db)
 	return router
 }
 

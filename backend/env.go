@@ -39,4 +39,7 @@ func envCheck() {
 	if os.Getenv("JWT_SECRET") == "" {
 		log.Fatal("[ERROR] JWT_SECRET not found in env")
 	}
+	if os.Getenv("REFRESH_SECRET") == "" {
+		log.Fatal("[ERROR] REFRESH_SECRET not found in env")
+	}
 }
