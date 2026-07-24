@@ -1,7 +1,9 @@
 package database
 
 import (
+	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -10,83 +12,93 @@ import (
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
-func fetchAndUpdate(g *models.Game) error {
-	urlString := fmt.Sprintf("https://store.steampowered.com/api/appdetails?appids=%v", g.AppID)
-	resp, err_req := http.Get(urlString)
-	if err_req != nil {
-		log.Printf("Get request failed: %v", err_req)
-		return err_req
+func fetchAndUpdate(ctx context.Context, game *models.Game) error {
+
+	if game == nil {
+		return errors.New("game is nil")
+	}
+
+	client := &http.Client{Timeout: 1500 * time.Millisecond}
+	urlString := fmt.Sprintf("https://store.steampowered.com/api/appdetails?appids=%v&l=english", game.AppID)
+	req, err := http.NewRequestWithContext(ctx, "GET", urlString, nil)
+	if err != nil {
+		return fmt.Errorf("failed to create request: %w", err)
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("request failed: %w", err)
 	}
 	defer resp.Body.Close()
-	body, err_body := io.ReadAll(resp.Body)
-	if err_body != nil {
-		log.Printf("Error while reading body: %v", err_body)
-		return err_body
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("error reading response body: %w", err)
+	}
+
 	var response map[string]models.SteamAppdetails
-	err_um := json.Unmarshal(body, &response)
-	if err_um != nil {
-		log.Printf("Error while unmarshal: %v", err_um)
-		return err_um
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return fmt.Errorf("error unmarshaling JSON: %w", err)
 	}
-	appIDstr := fmt.Sprintf("%v", g.AppID)
-	steamGame := response[appIDstr]
-	if steamGame.Success != true {
-		g.Name = "%"
-		return fmt.Errorf("Failed to find the game with AppID")
+
+	appIDstr := fmt.Sprintf("%v", game.AppID)
+	steamGame, exists := response[appIDstr]
+	if !exists || !steamGame.Success {
+		game.Name = "%"
+		return fmt.Errorf("Failed to find the game with AppID %d", game.AppID)
 	}
-	g.Name = steamGame.Data.Name
-	g.Description = steamGame.Data.Description
-	g.Header_image_link = steamGame.Data.Header
-	g.Background_image_link = steamGame.Data.Background
+	game.Name = steamGame.Data.Name
+	game.Description = steamGame.Data.Description
+	game.Header_image_link = steamGame.Data.Header
+	game.Background_image_link = steamGame.Data.Background
 	return nil
 }
 
-func CompleteDB(db *gorm.DB) {
+func CompleteDB(db *gorm.DB, ctx context.Context) error {
+
 	ticker := time.NewTicker(1500 * time.Millisecond)
 	defer ticker.Stop()
-	done := make(chan bool, 1)
 
 	for {
-		select {
-		case <-done:
-			return
-		default:
-			log.Print("[INFO] Updating games info")
-			db.Transaction(func(tx *gorm.DB) error {
-				var games []models.Game
-				err_lock := db.Clauses(clause.Locking{Strength: "UPDATE"}).
-					Where("name = ?", "").
-					Limit(100).
-					Find(&games).
-					Error
-				if err_lock != nil {
-					log.Printf("[ERROR] Error while locking the DB: %v", err_lock)
-					done <- true
-					return err_lock
-				}
-				if len(games) == 0 {
-					log.Print("[INFO] The database finished updating")
-					done <- true
-					return nil
-				}
-				for i := range games {
-					err := fetchAndUpdate(&games[i])
-					if err != nil {
-						log.Printf("[WARNING] Updating failed for game AppID %v: %v", games[i].AppID, err)
+		var games []models.Game
+
+		if err := db.WithContext(ctx).
+			Where("name = ?", "").
+			Limit(100).
+			Find(&games).
+			Error; err != nil {
+			log.Printf("[ERROR] Query failed: %v", err)
+			return err
+		}
+
+		if len(games) == 0 {
+			log.Printf("[INFO] Database update complete")
+			return nil
+		}
+
+		err := db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+			for i := range games {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-ticker.C:
+					if err := fetchAndUpdate(ctx, &games[i]); err != nil {
+						log.Printf("[WARNING] Update failed for AppID %v: %v", games[i].AppID, err)
 					}
-					<-ticker.C
 				}
-				err_save := tx.Save(games).Error
-				if err_save != nil {
-					done <- true
-					log.Printf("[ERROR] Save failed while updating DB: %v", err_save)
-				}
-				return err_save
-			})
+			}
+			return tx.Save(games).Error
+		})
+		if err != nil {
+			log.Printf("[ERROR] DB transaction failed: %v", err)
+			return err
 		}
 	}
 }

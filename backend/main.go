@@ -1,10 +1,10 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
-	//"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -14,6 +14,7 @@ import (
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
 	"github.com/Hugo-R94/Transcendance/backend/internal/database"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
+	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
@@ -60,6 +61,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	//	})
 
 	v1 := router.Group("/api/v1")
+	v1.Use(utils.AuthMiddleware())
 	userGroup := router.Group("/")
 	gameGroup := v1.Group("/game")
 	commentGroup := v1.Group("/comments")
@@ -76,6 +78,8 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 func main() {
 	sigCh := make(chan os.Signal, 1)
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	go func() {
 		<-sigCh
@@ -89,7 +93,7 @@ func main() {
 	defer sqldb.Close()
 
 	database.GetAllGames(db)
-	go database.CompleteDB(db)
+	go database.CompleteDB(db, ctx)
 
 	router := setupRouter(db)
 	addrString := os.Getenv("ADDR")
