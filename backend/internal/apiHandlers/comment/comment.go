@@ -1,7 +1,6 @@
 package comment
 
 import (
-	"log"
 	"net/http"
 	"strconv"
 
@@ -28,28 +27,51 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 	var comment models.Comment
 
 	if err := c.ShouldBindJSON(&comment); err != nil {
-		log.Printf("[ERROR] Invalid comment body: %v", err)
-
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "invalid request body",
 		})
 		return
 	}
 
-	if err := h.db.Create(&comment).Error; err != nil {
-		log.Printf("[ERROR] Create comment error: %v", err)
+	// Récupération de l'UUID depuis le JWT
+	userID, exists := c.Get("id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "missing user id",
+		})
+		return
+	}
 
+	// Recherche de l'utilisateur
+	var user models.User
+	if err := h.db.First(&user, "id = ?", userID).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "user not found",
+		})
+		return
+	}
+
+	// Association du commentaire à l'utilisateur connecté
+	comment.UserID = user.Id
+
+	// Si tu veux stocker le nickname dans Comment (pas forcément conseillé)
+	comment.Username = user.Username
+
+	if err := h.db.Create(&comment).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "something went wrong",
 		})
 		return
 	}
+	
+	
 
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "comment created",
 		"comment": comment,
 	})
 }
+
 
 func atoi(value string) int {
 	i, _ := strconv.Atoi(value)

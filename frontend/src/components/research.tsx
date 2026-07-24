@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import SearchCard from "./searchCard";
+import { searchGames } from "../api/games";
 
 interface Game {
   appid: number;
@@ -17,15 +18,8 @@ useEffect(() => {
 
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/game/search?q=${encodeURIComponent(input)}&limit=15`
-        );
+        const data = await searchGames(input, 15);
 
-        if (!res.ok) {
-          throw new Error("Erreur lors de la récupération des jeux");
-        }
-
-        const data = await res.json();
         setGames(data.games);
 
       } catch (err) {
@@ -35,7 +29,13 @@ useEffect(() => {
     }, 300);
 
     return () => clearTimeout(timer);
+
   }, [input]);
+
+
+  if (games.length === 0) {
+    return null;
+  }
 
   // Ne rien afficher si aucun jeu trouvé
   if (games.length === 0) {
@@ -56,6 +56,6 @@ console.log("games state:", games);
 		
 		</div>
 		);
-}
+}	
 
 export default Research;

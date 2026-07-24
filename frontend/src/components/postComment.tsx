@@ -1,6 +1,8 @@
 import { useState } from "react";
 import StarRating from "./star";
-	
+import { postComment } from "../api/comments";
+import type { PostCommentRequest } from "../api/comments";
+
 interface PostCommentProps {
 	gameId: number;
 }
@@ -10,38 +12,28 @@ function PostComment({ gameId }: PostCommentProps) {
 	const [title, setTitle] = useState("");
 	const [rating, setRating] = useState(0);
 	// const gameidd = 130
-	const postComment = async () => {
-		if (!comment.trim()) {
-			return;
-		}
+	const handlePostComment = async () => {
+  if (!comment.trim()) {
+    return;
+  }
 
-		try {
-			const response = await fetch("http://localhost:8080/api/v1/comments/post", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			body: JSON.stringify({
-				gameID: gameId,
-				userID: 1,
-				comment: comment,
-				commentTitle: title	,
-				rating: rating,
-			}),
-			});
+  try {
+    await postComment({
+      gameID: gameId,
+      comment: comment,
+      commentTitle: title,
+      rating,
+    });
 
-			if (!response.ok) {
-				throw new Error("Failed to post comment");
-			}
+    setComment("");
+    setTitle("");
+    setRating(0);
 
-			setComment("");
-			setRating(0);
-
-			console.log("Comment posted");
-		} catch (error) {
-			console.error("Error posting comment:", error);
-		}
-	};
+    console.log("Comment posted");
+  } catch (error) {
+    console.error("Error posting comment:", error);
+  }
+};
 
 	return (
 		<div className="bg-black/40 w-full h-fit mt-5 rounded-2xl p-3">
@@ -66,7 +58,7 @@ function PostComment({ gameId }: PostCommentProps) {
 			/>
 			<StarRating className="justify-center" rating={rating} onChange={(note) => setRating(note)} />
 			<button
-				onClick={postComment}
+				onClick={handlePostComment}
 				className="bg-[#00509f] w-30 h-15 mt-3 rounded-2xl balatro shadow-md shadow-black font-bold active:scale-90 hover:outline-2 hover:outline-white"
 			>
 				SUBMIT

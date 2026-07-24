@@ -51,9 +51,10 @@ function GamePage() {
       <ShaderBackground />
       <img
         src={game.background_image}
-        className="absolute -z-1 fixed object-cover  h-full w-full -top-15 m-auto mask-b-from-40% mask-b-to-70% sm:mask-l-from-85% sm:mask-l-to-95% sm:mask-r-from-85% sm:mask-r-to-95%"
+        // className="absolute -z-1 fixed object-cover  h-full w-full -top-15 m-auto mask-b-from-40% mask-b-to-70% "
+        className="absolute -z-1 fixed object-cover  h-full w-full -top-15 m-auto mask-b-from-50% sm:mask-radial-[50%_90%] sm:mask-radial-from-80% "
+        // className="absolute -z-1 fixed object-cover  h-full w-full -top-15 m-auto -mask-linear-205 mask-linear-from-60% mask-linear-to-80% "
       />
-
       {/* Barre latérale (sur grand écran) ou conteneur du haut (sur mobile) */}
       <div className="sm:fixed md:top-25 sm:top-0 sm:mt-0 mt-100 sm:w-[18%] w-full sm:h-screen h-150 rounded-2xl z-20 ">
         {/* Conteneur de référence positionné au centre de la zone de la barre latérale */}

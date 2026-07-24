@@ -12,3 +12,14 @@ export interface GameInfo {
   header_image: string;
   background_image: string;
 }
+
+export interface GameListItem {
+  appid: number;
+  name: string;
+  header_image: string;
+}
+
+export interface GamesPageResponse {
+  games: GameListItem[];
+  total_pages: number;
+}

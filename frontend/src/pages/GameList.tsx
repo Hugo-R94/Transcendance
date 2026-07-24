@@ -1,28 +1,13 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import axios from "axios";
-import GameCard from "../components/gameCard";
 import NavBar from "../components/navBar";
 import ShaderBackground from "../components/shaderBG";
 import Pagination from "../components/paginationController";
 import GameList from "../components/gameList";
-import Research from "../components/research";
 import Grid from "../components/grid";
 import Leaderboard from "../components/leaderboard";
-import api from "../api/api";
-
-interface GameListItem {
-  appid: number;
-  name: string;
-  header_image: string;
-}
-
-interface GamesPageResponse {
-  games: GameListItem[];
-  total: number;
-  page: number;
-  total_pages: number;
-}
+import { getGamesList } from "../api/games";
+import type { GameListItem } from "../api/client";
 
 function Games() {
   const [games, setGames] = useState<GameListItem[]>([]);
@@ -35,34 +20,28 @@ function Games() {
 
   const [totalPages, setTotalPages] = useState(1);
 
-  useEffect(() => {
-    setLoading(true);
+ useEffect(() => {
+  setLoading(true);
 
-	api.get<GamesPageResponse>("/game/games", {
-	params: {
-		page,
-	},
-	
-	})
+  getGamesList(page)
+		.then((data) => {
+		setGames(data.games);
+		setTotalPages(data.total_pages);
+		})
+		.catch((err) => {
+		console.error(err);
+		setError("Impossible de charger les jeux");
+		})
+		.finally(() => setLoading(false));
 
-      .then((res) => {
-        setGames(res.data.games);
-        setTotalPages(res.data.total_pages);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Impossible de charger les jeux");
-      })
-      .finally(() => setLoading(false));
-
-  }, [page]);
+	}, [page]);
 
 
-  function changePage(newPage: number) {
-    setSearchParams({
-      page: String(newPage),
-    });
-  }
+	function changePage(newPage: number) {
+		setSearchParams({
+		page: String(newPage),
+		});
+	}
 
 
   if (loading) {

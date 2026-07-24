@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Comment from "./comment";
 import Pagination from "./paginationController";
+import { getComments } from "../api/comments";
 
 export interface CommentData {
   UUID: number;
@@ -29,45 +30,38 @@ function CommentSection({
   useEffect(() => {
     if (!gameID) return;
 
-    const fetchComments = async () => {
-      setLoading(true);
+   const fetchComments = async () => {
+  setLoading(true);
 
-      try {
-		const response = await fetch(
-		`http://localhost:8080/api/v1/comments/${gameID}/comments?page=${currentPage}`
+	try {
+		const data = await getComments(gameID, currentPage);
+
+		const formattedComments: CommentData[] = data.comments.map(
+		(item: any) => ({
+			UUID: item.ID,
+			Nickname: item.username,
+			comment: item.comment,
+			CommentTitle: item.commentTitle,
+			Likes: item.likes,
+			Dislikes: item.dislikes,
+			rating: item.rating,
+		})
 		);
-		
-        if (!response.ok) {
-          throw new Error("Failed to fetch comments");
-        }
 
-        const data = await response.json();
-
-        const formattedComments: CommentData[] = data.comments.map(
-          (item: any) => ({
-            UUID: item.ID,
-            Nickname: `User ${item.userID}`,
-            comment: item.comment,
-            CommentTitle: item.commentTitle,
-            Likes: item.likes,
-            Dislikes: item.dislikes,
-            rating: item.rating,
-          })
-        );
-
-        setComments(formattedComments);
+		setComments(formattedComments);
 
 		setTotalPages(
 		Math.max(1, Math.ceil(data.total / commentsPerPage))
 		);
 
-      } catch (error) {
-        console.error("Error fetching comments:", error);
-        setComments([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+	} catch (error) {
+		console.error("Error fetching comments:", error);
+		setComments([]);
+
+	} finally {
+		setLoading(false);
+	}
+	};
 
     fetchComments();
 

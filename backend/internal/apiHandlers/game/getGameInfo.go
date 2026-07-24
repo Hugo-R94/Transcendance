@@ -278,6 +278,7 @@ func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	router.GET("", h.listGamesHandler)
 	router.GET("/games/:appid/comments", h.GetCommentsPage)
 	router.GET("/games", h.listGamesPageHandler) 
+	router.OPTIONS("/games", h.optHandler)
 	router.GET("/search", h.searchHandler)
 	router.GET("/:appid", h.gameInfoHandler)
 	router.OPTIONS("/:appid", h.optHandler)
