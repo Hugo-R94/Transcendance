@@ -266,11 +266,19 @@ func CreateComment(db *gorm.DB, comment *models.Comment) error {
 	return db.Create(comment).Error
 }
 
+func (h *GameHandler) optHandler(c *gin.Context) {
+	log.Println("optHANDLER")
+	c.JSON(http.StatusOK, gin.H{"message": "ca marche"})
+}
+
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	h := &GameHandler{db: db}
+	log.Println("gamerouter")
+	
 	router.GET("", h.listGamesHandler)
 	router.GET("/games/:appid/comments", h.GetCommentsPage)
 	router.GET("/games", h.listGamesPageHandler) 
 	router.GET("/search", h.searchHandler)
 	router.GET("/:appid", h.gameInfoHandler)
+	router.OPTIONS("/:appid", h.optHandler)
 }

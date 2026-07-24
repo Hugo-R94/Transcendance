@@ -9,6 +9,7 @@ import GameList from "../components/gameList";
 import Research from "../components/research";
 import Grid from "../components/grid";
 import Leaderboard from "../components/leaderboard";
+import api from "../api/api";
 
 interface GameListItem {
   appid: number;
@@ -37,15 +38,13 @@ function Games() {
   useEffect(() => {
     setLoading(true);
 
-    axios
-      .get<GamesPageResponse>(
-        `${import.meta.env.VITE_API_URL}/game/games`,
-        {
-          params: {
-            page,
-          },
-        }
-      )
+	api.get<GamesPageResponse>("/game/games", {
+	params: {
+		page,
+	},
+	
+	})
+
       .then((res) => {
         setGames(res.data.games);
         setTotalPages(res.data.total_pages);

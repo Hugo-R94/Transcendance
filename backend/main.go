@@ -41,6 +41,8 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 }
 
 func setupRouter(db *gorm.DB) *gin.Engine {
+	
+	log.Printf("tamere???")
 	router := gin.Default()
 	//router.LoadHTMLGlob("test_css/*")
 	trustedProxies := []string{os.Getenv("TRUSTED_PROXIES")}
@@ -49,7 +51,23 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 		log.Printf("[INFO] No trusted proxies detected in env, using default 127.0.0.1")
 	}
 	router.SetTrustedProxies(trustedProxies)
-	router.Use(cors.Default())
+	router.Use(cors.New(cors.Config{
+		AllowOrigins: []string{
+			"http://localhost:5173",
+		},
+		AllowMethods: []string{
+			"GET",
+			"POST",
+			"PUT",
+			"DELETE",
+			"OPTIONS",
+		},
+		AllowHeaders: []string{
+			"Origin",
+			"Content-Type",
+			"Authorization",
+		},
+	}))
 
 	//	router.GET("/", func(c *gin.Context) {
 	//		c.HTML(http.StatusOK, "connexion.html", gin.H{
@@ -80,7 +98,7 @@ func main() {
 	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
+	
 	go func() {
 		<-sigCh
 		log.Printf("[INFO] Shutting down the server ...")
