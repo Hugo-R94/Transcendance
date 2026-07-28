@@ -12,7 +12,7 @@ function GameDescription({ name, tag, className, description, developer }: CardP
   const navigate = useNavigate();
 
   return (
-        <div className="h-fit mt-15 sm:mt-0 rounded-xl flex flex-col">
+        <div className="h-fit mt-15 sm:mt-0 rounded-xl flex flex-col backdrop-blur-md">
           <div className="w-full h-fit rounded-2xl p-5 text-left bg-black/40">
             <p className="text-3xl top-0 left-0 font-bold">{name}</p>
 			<p className="font-semibold opacity-70 mt-0">by: ${developer}</p>

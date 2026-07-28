@@ -10,6 +10,8 @@ export default function ShaderBackground() {
     const gl = canvas.getContext("webgl");
     if (!gl) return;
 
+    let animationFrameId: number; // 1. On stocke l'ID de la frame
+
     const CONFIG = {
       SPIN_ROTATION: -2.0,
       SPIN_SPEED: 7.0,
@@ -106,9 +108,11 @@ export default function ShaderBackground() {
       return s;
     }
 
+    const vs = compile(gl.VERTEX_SHADER, vertexSrc);
+    const fs = compile(gl.FRAGMENT_SHADER, fragmentSrc);
     const program = gl.createProgram()!;
-    gl.attachShader(program, compile(gl.VERTEX_SHADER, vertexSrc));
-    gl.attachShader(program, compile(gl.FRAGMENT_SHADER, fragmentSrc));
+    gl.attachShader(program, vs);
+    gl.attachShader(program, fs);
     gl.linkProgram(program);
     gl.useProgram(program);
 
@@ -149,18 +153,28 @@ export default function ShaderBackground() {
       gl.uniform1f(timeLoc, t);
 
       gl.drawArrays(gl.TRIANGLES, 0, 6);
-      requestAnimationFrame(render);
+      animationFrameId = requestAnimationFrame(render); // 2. On récupère l'ID
     }
 
     render();
 
+    // 3. Nettoyage complet
     return () => {
       window.removeEventListener("resize", resize);
+      cancelAnimationFrame(animationFrameId); // Stoppe la boucle WebGL
+
+      // Libère les ressources du GPU
+      gl.deleteBuffer(buffer);
+      gl.deleteProgram(program);
+      gl.deleteShader(vs);
+      gl.deleteShader(fs);
     };
   }, []);
-	return (
-	<canvas className="fixed inset-0 -z-1 w-[100%] h-[100%] pointer-events-none"
-		ref={canvasRef}
-	/>
-	);
+
+  return (
+    <canvas 
+      className="fixed inset-0 -z-1 w-[100%] h-[100%] pointer-events-none"
+      ref={canvasRef}
+    />
+  );
 }

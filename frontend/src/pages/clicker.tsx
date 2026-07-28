@@ -4,8 +4,6 @@ import ShaderBackground from "../components/shaderBG"
 function Clicker(){
 	return(
 		<div className="flex relative min-h-screen">
-			<ShaderBackground/>
-			<NavBar/>
 			<div className="sm:flex gap-5 w-[90%] mx-auto h-150 mt-30 ">
 				
 				<div className="bg-bdarkgreen w-[80%] h-full card">

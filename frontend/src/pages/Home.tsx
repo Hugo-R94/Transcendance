@@ -5,7 +5,6 @@ import ShaderBackground from "../components/shaderBG";
 function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center text-white">
-      <ShaderBackground />
       <NavBar />
       <div className="w-full h-fit translate-y-10 flex flex-col items-center justify-center text-center">
         {/* Titre avec le style exact demandé */}

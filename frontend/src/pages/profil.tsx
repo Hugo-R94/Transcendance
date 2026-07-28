@@ -6,7 +6,6 @@ import ShaderBackground from "../components/shaderBG";
 function Profil() {
   return (
     <div className="relative min-h-screen flex flex-col">
-      <ShaderBackground />
       <NavBar />
 
 
@@ -33,7 +32,7 @@ function Profil() {
           </div>
 
           {/* About */}
-          <div className="flex-1 bg-black/50 rounded-2xl shadow-md shadow-black p-3 overflow-auto">
+          <div className="flex-1 bg-black/50 rounded-2xl shadow-md shadow-black p-3 overflow-auto backdrop-blur-md">
             <p className="font-bold md:text-md text-sm text-gray-300">
               ABOUT ME :
             </p>
@@ -83,7 +82,7 @@ function Profil() {
         </div>
 
         {/* Contenu */}
-        <div className="flex-1 bg-black/50 rounded-2xl my-2 overflow-auto">
+        <div className="flex-1 bg-black/50 rounded-2xl my-2 overflow-auto backdrop-blur-md">
           {/* contenu */}
         </div>
 

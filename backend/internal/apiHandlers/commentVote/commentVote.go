@@ -1,4 +1,4 @@
-package commentVote
+package comment
 
 import (
 	"log"
@@ -10,91 +10,128 @@ import (
 	"gorm.io/gorm"
 )
 
-func (h *CommentHandler) voteComment(c *gin.Context) {
+type CommentHandler struct {
+	db *gorm.DB
+}
 
-	commentID := c.Param("id")
+func CommentRoutes(router *gin.RouterGroup, db *gorm.DB) {
+	h := &CommentHandler{
+		db: db,
+	}
 
-	var vote models.CommentVote
+	router.POST("/post", h.commentPost)
+	router.GET("/:gameID/comments", h.commentGet)
+}
 
-	if err := c.ShouldBindJSON(&vote); err != nil {
-		c.JSON(400, gin.H{"error":"invalid body"})
+// POST /comment/post
+func (h *CommentHandler) commentPost(c *gin.Context) {
+	var input struct {
+		GameID       uint   `json:"gameID"`
+		CommentTitle string `json:"commentTitle"`
+		Comment      string `json:"comment"`
+		Rating       int    `json:"rating"`
+		UserID       uint   `json:"userID"` // Optionnel si récupéré depuis le JWT
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		log.Printf("[ERROR] Invalid comment body: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "format de requête invalide",
+		})
 		return
 	}
 
+	// 1. Récupération du UserID (Exemple si mis dans le context par un middleware Auth)
+	// userIDCtx, _ := c.Get("userID")
+	// userID := userIDCtx.(uint)
 
-	var existing models.CommentVote
+	userID := input.UserID
 
-	result := h.db.
-		Where(
-		  "user_id = ? AND comment_id = ?",
-		  vote.UserID,
-		  commentID,
-		).
-		First(&existing)
-
-
-	// L'utilisateur a déjà voté
-	if result.Error == nil {
-
-		// même vote => on retire
-		if existing.Vote == vote.Vote {
-
-			h.db.Delete(&existing)
-
-			if vote.Vote == 1 {
-				h.db.Model(&models.Comment{}).
-					Where("id = ?", commentID).
-					UpdateColumn("likes", gorm.Expr("likes - ?", 1))
-			} else {
-				h.db.Model(&models.Comment{}).
-					Where("id = ?", commentID).
-					UpdateColumn("dislikes", gorm.Expr("dislikes - ?", 1))
-			}
-
-			c.JSON(200, gin.H{"message":"vote removed"})
-			return
-		}
-
-
-		// changement like -> dislike
-		h.db.Model(&models.Comment{}).
-			Where("id = ?", commentID).
-			Updates(map[string]interface{}{
-				"likes": gorm.Expr("likes - ?", 1),
-				"dislikes": gorm.Expr("dislikes + ?", 1),
-			})
-
-
-		existing.Vote = vote.Vote
-		h.db.Save(&existing)
-
-		c.JSON(200, gin.H{"message":"vote changed"})
+	// 2. VÉRIFICATION STRICTE : Un user_id vaut 0 si non fourni ou non authentifié
+	if userID == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Utilisateur non valide ou non authentifié",
+		})
 		return
 	}
 
+	comment := models.Comment{
+		GameID:       input.GameID,
+		UserID:       userID,
+		CommentTitle: input.CommentTitle,
+		Comment:      input.Comment,
+		Rating:       input.Rating,
+	}
 
-	// nouveau vote
-	vote.CommentID, _ = strconv.ParseUint(commentID,10,64)
+	// On exécute l'opération avec GORM
+	res := h.db.Where(models.Comment{
+		GameID: comment.GameID,
+		UserID: comment.UserID,
+	}).Assign(models.Comment{
+		Rating:       comment.Rating,
+		CommentTitle: comment.CommentTitle,
+		Comment:      comment.Comment,
+	}).FirstOrCreate(&comment)
 
-	h.db.Create(&vote)
+	if res.Error != nil {
+		log.Printf("[ERROR] Save/Update comment error: %v", res.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "impossible d'enregistrer le commentaire",
+		})
+		return
+	}
 
-
-	if vote.Vote == 1 {
-		h.db.Model(&models.Comment{}).
-			Where("id = ?", commentID).
-			UpdateColumn(
-				"likes",
-				gorm.Expr("likes + ?",1),
-			)
+	var responseMessage string
+	if res.RowsAffected > 0 {
+		responseMessage = "Commentaire publié avec succès !"
 	} else {
-		h.db.Model(&models.Comment{}).
-			Where("id = ?", commentID).
-			UpdateColumn(
-				"dislikes",
-				gorm.Expr("dislikes + ?",1),
-			)
+		responseMessage = "Commentaire mis à jour avec succès !"
 	}
 
+	c.JSON(http.StatusOK, gin.H{
+		"message": responseMessage,
+		"comment": comment,
+	})
+}
 
-	c.JSON(200, gin.H{"message":"vote added"})
+func atoi(value string) int {
+	i, _ := strconv.Atoi(value)
+	return i
+}
+
+// GET /game/comment?game_id=ID
+func (h *CommentHandler) commentGet(c *gin.Context) {
+	gameID := c.Param("gameID")
+
+	var comments []models.Comment
+	var total int64
+
+	h.db.
+		Model(&models.Comment{}).
+		Where("game_id = ?", gameID).
+		Count(&total)
+
+	limit := atoi(c.DefaultQuery("limit", "5"))
+	page := atoi(c.DefaultQuery("page", "1"))
+
+	offset := (page - 1) * limit
+
+	err := h.db.
+		Where("game_id = ?", gameID).
+		Order("created_at DESC").
+		Limit(limit).
+		Offset(offset).
+		Find(&comments).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "something went wrong",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"comments": comments,
+		"total":    total,
+	})
 }

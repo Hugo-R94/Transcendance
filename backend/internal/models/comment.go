@@ -1,22 +1,23 @@
 package models
 
-
 import (
-	"gorm.io/gorm"
 	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Comment struct {
-	gorm.Model
+    gorm.Model
 
-	GameID       uint64 `json:"gameID"`
-	UserID       uuid.UUID `json:"userID"`
-	Username	string `json:"username"`
-	
-	Comment      string `json:"comment"`
-	CommentTitle string `json:"commentTitle"`
-	Rating       float64    `json:"rating"`
+    GameID       uint64    `gorm:"not null;uniqueIndex:idx_user_game" json:"gameID"`
+    UserID       uuid.UUID `gorm:"type:uuid;not null;uniqueIndex:idx_user_game" json:"userID"`
+    
+    // 👈 Relation vers User (foreignKey pointe vers UserID de Comment)
+    User         User      `gorm:"foreignKey:UserID;references:ID" json:"user,omitempty"`
 
-	Likes        int    `json:"likes"`
-	Dislikes     int    `json:"dislikes"`
+    Comment      string    `gorm:"type:text" json:"comment"`
+    CommentTitle string    `json:"commentTitle"`
+    Rating       float64   `gorm:"not null" json:"rating"`
+
+    Likes    int `gorm:"default:0" json:"likes"`
+    Dislikes int `gorm:"default:0" json:"dislikes"`
 }

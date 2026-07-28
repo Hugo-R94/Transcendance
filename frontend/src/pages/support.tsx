@@ -20,7 +20,6 @@ function support() {
 
   return (
     <div className="relative min-h-screen items-center justify-center">
-      <ShaderBackground />
       <NavBar />
       {content}
     </div>

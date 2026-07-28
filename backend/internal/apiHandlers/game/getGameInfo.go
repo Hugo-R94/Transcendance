@@ -229,6 +229,35 @@ func (h *GameHandler) searchHandler(c *gin.Context) {
 	})
 }
 
+type GameStats struct {
+	AverageRating float64 `json:"average_rating"`
+	TotalReviews  int64   `json:"total_reviews"`
+}
+
+// Transformé en méthode de GameHandler pour Gin
+func (h *GameHandler) GetGameRatingStats(c *gin.Context) {
+	appIDParam := c.Param("appid")
+	appID, err := strconv.ParseUint(appIDParam, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "AppID invalide"})
+		return
+	}
+
+	var stats GameStats
+
+	err = h.db.Model(&models.Comment{}).
+		Select("COALESCE(AVG(rating), 0) as average_rating, COUNT(*) as total_reviews").
+		Where("game_id = ?", appID).
+		Scan(&stats).Error
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur serveur"})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
+
 func (h *GameHandler) GetCommentsPage(c *gin.Context) {
 	gameID := c.Param("id")
 
@@ -271,6 +300,83 @@ func (h *GameHandler) optHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "ca marche"})
 }
 
+func (h *GameHandler) VoteComment(c *gin.Context) {
+	commentID := c.Param("id")
+
+	var vote models.CommentVote
+	if err := c.ShouldBindJSON(&vote); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+		return
+	}
+
+	var existing models.CommentVote
+	result := h.db.Where("user_id = ? AND comment_id = ?", vote.UserID, commentID).First(&existing)
+
+	// --- 1. L'utilisateur a DÉJÀ un vote enregistré ---
+	if result.Error == nil {
+
+		// Cas A : Reclic sur le même vote OU demande explicite d'annulation (vote == 0)
+		if existing.Vote == vote.Vote || vote.Vote == 0 {
+			h.db.Delete(&existing)
+
+			if existing.Vote == 1 {
+				h.db.Model(&models.Comment{}).Where("id = ?", commentID).
+					UpdateColumn("likes", gorm.Expr("GREATEST(0, likes - 1)"))
+			} else if existing.Vote == -1 {
+				h.db.Model(&models.Comment{}).Where("id = ?", commentID).
+					UpdateColumn("dislikes", gorm.Expr("GREATEST(0, dislikes - 1)"))
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": "vote removed"})
+			return
+		}
+
+		// Cas B : Changement de vote (ex: Like -> Dislike ou Dislike -> Like)
+		if vote.Vote == 1 {
+			// De Dislike (-1) à Like (1)
+			h.db.Model(&models.Comment{}).Where("id = ?", commentID).
+				Updates(map[string]interface{}{
+					"likes":    gorm.Expr("likes + 1"),
+					"dislikes": gorm.Expr("GREATEST(0, dislikes - 1)"),
+				})
+		} else if vote.Vote == -1 {
+			// De Like (1) à Dislike (-1)
+			h.db.Model(&models.Comment{}).Where("id = ?", commentID).
+				Updates(map[string]interface{}{
+					"likes":    gorm.Expr("GREATEST(0, likes - 1)"),
+					"dislikes": gorm.Expr("dislikes + 1"),
+				})
+		}
+
+		existing.Vote = vote.Vote
+		h.db.Save(&existing)
+
+		c.JSON(http.StatusOK, gin.H{"message": "vote changed"})
+		return
+	}
+
+	// --- 2. NOUVEAU VOTE ---
+	if vote.Vote == 0 {
+		c.JSON(http.StatusOK, gin.H{"message": "no action"})
+		return
+	}
+
+	parsedID, _ := strconv.ParseUint(commentID, 10, 64)
+	vote.CommentID = parsedID
+
+	h.db.Create(&vote)
+
+	if vote.Vote == 1 {
+		h.db.Model(&models.Comment{}).Where("id = ?", commentID).
+			UpdateColumn("likes", gorm.Expr("likes + 1"))
+	} else if vote.Vote == -1 {
+		h.db.Model(&models.Comment{}).Where("id = ?", commentID).
+			UpdateColumn("dislikes", gorm.Expr("dislikes + 1"))
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "vote added"})
+}
+
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	h := &GameHandler{db: db}
 	log.Println("gamerouter")
@@ -278,8 +384,10 @@ func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	router.GET("", h.listGamesHandler)
 	router.GET("/games/:appid/comments", h.GetCommentsPage)
 	router.GET("/games", h.listGamesPageHandler) 
-	router.OPTIONS("/games", h.optHandler)
 	router.GET("/search", h.searchHandler)
 	router.GET("/:appid", h.gameInfoHandler)
+	router.GET("/:appid/rating", h.GetGameRatingStats)
 	router.OPTIONS("/:appid", h.optHandler)
+	router.POST("comment/:id/vote", h.VoteComment)
+	
 }
