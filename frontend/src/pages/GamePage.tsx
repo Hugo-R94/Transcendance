@@ -64,16 +64,13 @@ function GamePage() {
         className="absolute -z-1 fixed object-cover h-full w-full -top-15 m-auto mask-b-from-40% mask-b-to-70% sm:mask-l-from-85% sm:mask-l-to-95% sm:mask-r-from-85% sm:mask-r-to-95%"
         alt={game.name}
       />
-
       {/* Barre latérale (Desktop) / En-tête (Mobile) */}
       <div className="sm:fixed md:top-25 sm:top-0 sm:mt-0 mt-6 sm:w-[18%] w-full sm:h-screen h-auto z-20">
-
         {/* Vue Desktop */}
         <div className="hidden sm:flex relative left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:w-[90%] max-w-[280px] flex-col items-center">
           <GameCard
             id={game.appid}
             name={game.name}
-            tag="Tags"
             imgLink={game.header_image}
             className="w-[85%] z-20 shadow-xl"
           />
@@ -91,7 +88,8 @@ function GamePage() {
                   />
                 </div>
               </div>
-              <Rating rating={5} />
+              <Rating rating={game.steam_score-0.05} />
+			  <p className="text-[10px] text-gray-400"> {game.total_reviews} avis</p>
             </div>
 
             <hr className="bg-gray-300/75 my-1.5 w-[90%] mx-auto" />
@@ -121,7 +119,6 @@ function GamePage() {
           <GameCard
             id={game.appid}
             name={game.name}
-            tag="Tags"
             imgLink={game.header_image}
             className="w-2/3 z-1" 
           />
@@ -162,7 +159,7 @@ function GamePage() {
       {/* Contenu principal */}
       <div className="sm:mx-[20%] min-h-screen sm:w-3/5 p-4 z-10">
         <div className="h-fit sm:mt-100 -mt-10 rounded-xl flex flex-col">
-            <GameDescription name={game.name} description={game.description} developer="devs" tag="tag1,tag2"/>
+            <GameDescription name={game.name} releaseDate={game.release_date} description={game.description}  developers={game.developers} publishers={game.publishers} genres={game.genres}/>
             
             {/* Formulaire de publication de commentaire avec callback de rafraîchissement */}
             <PostComment gameId={game.appid} onCommentPosted={handleCommentPosted} />

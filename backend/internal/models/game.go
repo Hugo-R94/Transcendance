@@ -14,12 +14,12 @@ type (
 		Header_image_link     string         `gorm:"type:varchar(500)" json:"header_image_link"`
 		Background_image_link string         `gorm:"type:varchar(500)" json:"background_image_link"`
 		Owners_string         string         `gorm:"type:varchar(255)" json:"owners_string"`
-		Developers            []Developer    `gorm:"many2many:developer_games;" json:"developpers,omitempty"`
+		Developers            []Developer    `gorm:"many2many:developer_games;" json:"developers,omitempty"`
 		Publishers            []Publisher    `gorm:"many2many:publisher_games;" json:"publishers,omitempty"`
 		Genres                []Genre        `gorm:"many2many:genre_games;" json:"genres,omitempty"`
 		ComingSoon            bool           `json:"coming_soon"`
 		Date                  string         `gorm:"type:varchar(50)" json:"date"`
-		TotalReview           uint64         `json:"total_review"`
+		TotalReviews           uint64         `json:"total_reviews"`
 		SteamScore            float64        `json:"steam_score"`
 		Comments              []Comment      `gorm:"foreignKey:GameID" json:"comments,omitempty"`
 		CreatedAt             time.Time      `json:"-"`
@@ -54,6 +54,12 @@ type (
 		Description           string `json:"description"`
 		Header_image_link     string `json:"header_image"`
 		Background_image_link string `json:"background_image"`
+		ReleaseDate string           `json:"release_date"`
+		SteamScore	float64          `json:"steam_score"`
+		Genres                []string`json:"genres,omitempty"`
+		Developers           []string`json:"developers,omitempty"`
+		Publishers            []string`json:"publishers,omitempty"`
+		TotalReviews				uint64`json:"total_reviews"`
 	}
 
 	SteamAppdetails struct {

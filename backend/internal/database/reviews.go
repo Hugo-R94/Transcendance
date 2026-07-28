@@ -48,7 +48,7 @@ func updateReviews(ctx context.Context, game *models.Game) error {
 	if response.Success == 0 {
 		return fmt.Errorf("Failed to update reviews for the game %d", game.AppID)
 	}
-	game.TotalReview = response.Query.Total
+	game.TotalReviews = response.Query.Total
 	game.SteamScore = float64(response.Query.Positive) / float64(response.Query.Total) * 100
 	return nil
 }
