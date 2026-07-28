@@ -5,9 +5,11 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
@@ -31,20 +33,15 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 	if err != nil {
 		log.Fatalf("[ERROR] Fatal error, could not get db generic interface: %v", err)
 	}
-	db.AutoMigrate(&models.User{})
-	db.AutoMigrate(&models.Game{})
-	db.AutoMigrate(&models.Developer{})
-	db.AutoMigrate(&models.Comment{})
-	db.AutoMigrate(&models.Publisher{})
-	db.AutoMigrate(&models.CommentVote{})
+	if err := db.AutoMigrate(&models.User{}, &models.Game{}, &models.Developer{}, &models.Publisher{}, &models.Comment{}, &models.CommentVote{}); err != nil {
+		log.Fatalf("[ERROR] Fatal error, Failed to automigrate: %v", err)
+	}
 	return db, sqldb
 }
 
 func setupRouter(db *gorm.DB) *gin.Engine {
-	
-	log.Printf("tamere???")
+
 	router := gin.Default()
-	//router.LoadHTMLGlob("test_css/*")
 	trustedProxies := []string{os.Getenv("TRUSTED_PROXIES")}
 	if trustedProxies[0] == "" {
 		trustedProxies = []string{"127.0.0.1"}
@@ -91,21 +88,15 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
 	user.LogoutUser(userGroup, db)
-	
+	user.RefreshUser(userGroup, db)
 	return router
 }
 
 func main() {
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, os.Interrupt, syscall.SIGTERM)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	
-	go func() {
-		<-sigCh
-		log.Printf("[INFO] Shutting down the server ...")
-		os.Exit(0)
-	}()
 
 	envCheck()
 
@@ -116,10 +107,28 @@ func main() {
 	go database.CompleteDB(db, ctx)
 
 	router := setupRouter(db)
-	addrString := os.Getenv("ADDR")
+	server := &http.Server{
+		Addr:              os.Getenv("ADDR"),
+		Handler:           router,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+
+	go func() {
+		<-quit
+		cancel()
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer shutdownCancel()
+		if err := server.Shutdown(shutdownCtx); err != nil {
+			log.Printf("[ERROR] Shutting down error: %v", err)
+		}
+	}()
+
 	log.Println("[INFO] Starting server ...")
-	err_run := router.Run(addrString)
-	if err_run != nil {
-		log.Fatalf("[ERROR] Fatal error on server: %v", err_run)
+	if err := server.ListenAndServe(); err != nil {
+		if err == http.ErrServerClosed {
+			log.Println("[INFO] Shutting down server ...")
+		} else {
+			log.Fatalf("[ERROR] Fatal error on server: %v", err)
+		}
 	}
 }

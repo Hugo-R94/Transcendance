@@ -1,7 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   login.go                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: ldescamp <ldescamp@learner.42.tech>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/28 00:20:18 by ldescamp          #+#    #+#             */
+/*   Updated: 2026/07/28 02:25:17 by ldescamp         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 package user
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
@@ -32,51 +43,7 @@ func (h *UserHandler) login(c *gin.Context) {
 		})
 		return
 	}
-
-	token, err := utils.GenerateJWT(user.Id.String())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Login failed",
-		})
-		log.Printf("[ERROR] Login Failed (tokenGen): %v", err.Error())
-		return
-	}
-	refreshToken, err := utils.GenerateRefreshToken(user.Id.String())
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Login failed",
-		})
-		log.Printf("[ERROR] Login Failed (refreshTokenGen): %v", err.Error())
-		return
-	}
-	refreshTokenHash, err := utils.HashReToken(refreshToken)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Login failed",
-		})
-		log.Printf("[ERROR] Login Failed (refreshTokenHash): %v", err.Error())
-		return
-	}
-
-	err = h.db.Transaction(func(tx *gorm.DB) error {
-		user.RefreshTokenHash = refreshTokenHash
-		return tx.Save(&user).Error
-	})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Login failed",
-		})
-		log.Printf("[ERROR] Login Failed (db save error refreshTokenHash): %v", err.Error())
-		return
-	}
-
-	resp := models.LoginResponse{
-		Token:            token,
-		ExpiresIn:        3600,
-		RefreshToken:     refreshToken,
-		RefreshExpiresIn: 604800,
-	}
-	c.JSON(http.StatusOK, resp)
+	genNewTokens(c, user, h)
 }
 
 func LoginUser(router *gin.RouterGroup, db *gorm.DB) {

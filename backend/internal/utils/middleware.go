@@ -2,13 +2,20 @@ package utils
 
 import (
 	"net/http"
-	"os"
 	"strings"
 
+	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 )
+
+func invalidTokenResponse(c *gin.Context) {
+	c.JSON(http.StatusUnauthorized, gin.H{
+		"error": "Invalid Token",
+	})
+	c.Abort()
+}
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -23,38 +30,23 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
-		token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (any, error) {
-			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-				return nil, jwt.ErrSignatureInvalid
-			}
-			return []byte(os.Getenv("JWT_SECRET")), nil
-		})
-		if err != nil || token == nil || !token.Valid {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Invalid token",
-			})
-			c.Abort()
+		claims := &models.TokenClaims{}
+		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (any, error) {
+			return JwtSecret, nil
+		}, jwt.WithValidMethods([]string{"HS256"}))
+		if err != nil || token == nil {
+			invalidTokenResponse(c)
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
+		if claims.ID == "" {
+			invalidTokenResponse(c)
 			return
 		}
 
-		idStr, exists := claims["id"].(string)
-		if !exists {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
-			return
-		}
-
-		userID, err := uuid.Parse(idStr)
+		userID, err := uuid.Parse(claims.ID)
 		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-			c.Abort()
+			invalidTokenResponse(c)
 			return
 		}
 		c.Set("id", userID)

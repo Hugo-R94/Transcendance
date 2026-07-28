@@ -10,6 +10,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var JwtSecret = []byte(os.Getenv("JWT_SECRET"))
+var RefreshSecret = []byte(os.Getenv("JWT_SECRET"))
+
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
@@ -28,6 +31,9 @@ func CheckPasswordHash(password, hash string) bool {
 }
 
 func CheckTokenHash(token, hash string) bool {
+	if hash == "" {
+		return false
+	}
 	hashSum := sha256.Sum256([]byte(token))
 	tokenHash := hex.EncodeToString(hashSum[:])
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(tokenHash))
@@ -39,13 +45,13 @@ func GenerateJWT(id string) (string, error) {
 		"id":  id,
 		"exp": time.Now().Add(time.Hour * 1).Unix(),
 	})
-	return token.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	return token.SignedString(JwtSecret)
 }
 
-func GenerateRefreshToken(uuid string) (string, error) {
+func GenerateRefreshToken(id string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"uuid": uuid,
-		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"id":  id,
+		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
-	return token.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
+	return token.SignedString(RefreshSecret)
 }

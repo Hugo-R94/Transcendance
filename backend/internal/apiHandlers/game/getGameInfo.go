@@ -380,10 +380,10 @@ func (h *GameHandler) VoteComment(c *gin.Context) {
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	h := &GameHandler{db: db}
 	log.Println("gamerouter")
-	
+
 	router.GET("", h.listGamesHandler)
 	router.GET("/games/:appid/comments", h.GetCommentsPage)
-	router.GET("/games", h.listGamesPageHandler) 
+	router.GET("/games", h.listGamesPageHandler)
 	router.GET("/search", h.searchHandler)
 	router.GET("/:appid", h.gameInfoHandler)
 	router.GET("/:appid/rating", h.GetGameRatingStats)
