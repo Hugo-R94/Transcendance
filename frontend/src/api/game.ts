@@ -9,14 +9,14 @@ export async function getGameInfo(appid: string | number): Promise<GameInfo> {
 
 export interface GameRatingStats {
   average_rating: number;
-  total_reviews: number;
+  total_review: number;
 }
 
 // src/api/game.ts
 
 export interface GameRatingStats {
   average_rating: number;
-  total_reviews: number;
+  total_review: number;
 }
 
 export async function getGameRatingStats(appid: string): Promise<GameRatingStats> {

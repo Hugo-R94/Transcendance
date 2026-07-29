@@ -6,7 +6,6 @@ interface LikeButtonProps {
   initialLikes?: number;
   initialDislikes?: number;
   initialState?: number;
-  userId: number;
 }
 
 function LikeButton({
@@ -14,21 +13,37 @@ function LikeButton({
   initialLikes = 0,
   initialDislikes = 0,
   initialState = 0,
-  userId,
 }: LikeButtonProps) {
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [userState, setUserState] = useState<number>(Number(initialState));
   const [isPending, setIsPending] = useState<boolean>(false);
 
+  // Synchronisation des props vers le state interne
   useEffect(() => {
     setLikes(initialLikes);
     setDislikes(initialDislikes);
-    setUserState(Number(initialState));
-  }, [initialLikes, initialDislikes, initialState]);
+    
+    // Si un vote est déjà mis en cache localement, il prévaut
+    const savedVote = localStorage.getItem(`vote_${commentId}`);
+    if (savedVote !== null) {
+      setUserState(Number(savedVote));
+    } else {
+      setUserState(Number(initialState));
+    }
+  }, [initialLikes, initialDislikes, initialState, commentId]);
 
   const handleVote = async (targetVote: number) => {
     if (isPending) return;
+
+    // 1. Récupération du token depuis le localStorage
+    const token = localStorage.getItem("token") || localStorage.getItem("jwt");
+
+    if (!token) {
+      alert("Vous devez être connecté pour pouvoir voter.");
+      return;
+    }
+
     setIsPending(true);
 
     const prevLikes = likes;
@@ -53,29 +68,32 @@ function LikeButton({
       if (targetVote === -1) newDislikes = newDislikes + 1;
     }
 
-    // 1. Mise à jour immédiate de l'interface (Optimistic UI)
+    // 2. Mise à jour optimiste de l'interface
     setUserState(newVote);
     setLikes(newLikes);
     setDislikes(newDislikes);
-
-    // 2. Sauvegarde immédiate du vote en local (persistance F5)
-    localStorage.setItem(`vote_${commentId}_${userId}`, String(newVote));
+    localStorage.setItem(`vote_${commentId}`, String(newVote));
 
     try {
-      // ✅ Remplacement minimal de fetch par ton instance api
-      await api.post(`/game/comment/${commentId}/vote`, {
-        user_id: userId,
-        vote: newVote,
-      });
+      // 3. Envoi au serveur en passant le Token dans les Headers (Bearer Authorization)
+      await api.post(
+        `/game/comment/${commentId}/vote`,
+        { vote: newVote },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     } catch (error: any) {
       console.error("❌ Échec du vote :", error);
       alert(`Erreur lors du vote : ${error.response?.data?.message || error.message}`);
 
-      // Restauration de l'état précédent en cas d'erreur de serveur
+      // Restauration de l'état local en cas d'erreur API
       setUserState(prevState);
       setLikes(prevLikes);
       setDislikes(prevDislikes);
-      localStorage.setItem(`vote_${commentId}_${userId}`, String(prevState));
+      localStorage.setItem(`vote_${commentId}`, String(prevState));
     } finally {
       setIsPending(false);
     }
@@ -162,4 +180,4 @@ function LikeButton({
   );
 }
 
-export default LikeButton;                                                                                                                                                                                                                                                                                                                        
+export default LikeButton;

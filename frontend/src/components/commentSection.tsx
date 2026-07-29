@@ -5,7 +5,7 @@ import { getComments } from "../api/comments";
 
 export interface CommentData {
   id: number;
-  userID: string; // 👈 Modifié : UUID sous forme de string
+  userID: string; // UUID de l'auteur du commentaire
   Nickname: string;
   comment: string;
   CommentTitle: string;
@@ -18,8 +18,8 @@ export interface CommentData {
 interface CommentSectionProps {
   gameID?: string | number;
   commentsPerPage?: number;
-  currentUserId?: string | number; // 👈 Acceptation de l'UUID string
-  currentUsername?: string;        // 👈 Ajout du username courant si besoin
+  currentUserId?: string | number;
+  currentUsername?: string;
 }
 
 function CommentSection({
@@ -33,6 +33,9 @@ function CommentSection({
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  // Normalisation du userID de l'utilisateur connecté en string (UUID)
+  const normalizedCurrentUserId = String(currentUserId || "");
+
   useEffect(() => {
     if (!gameID) return;
 
@@ -40,17 +43,27 @@ function CommentSection({
       setLoading(true);
 
       try {
-        const data = await getComments(gameID, currentPage, currentUserId);
+        const data = await getComments(gameID, currentPage, normalizedCurrentUserId);
 
         const formattedComments: CommentData[] = (data.comments || []).map(
           (item: any, index: number) => {
             const rawId = item.ID ?? item.id ?? item.CommentID ?? item.comment_id;
             const parsedId = Number(rawId);
 
+            // Extraction robuste de l'UUID de l'auteur (gestion des structures imbriquées GORM)
+            const authorUUID = String(
+              item.userID ??
+              item.user_id ??
+              item.UserID ??
+              item.user?.id ??
+              item.user?.ID ??
+              item.user?.uuid ??
+              ""
+            );
+
             return {
               id: !isNaN(parsedId) && parsedId !== 0 ? parsedId : index + 1,
-              // 👈 Récupération du userID (UUID) en string
-              userID: String(item.userID ?? item.user_id ?? item.UserID ?? ""),
+              userID: authorUUID,
               Nickname:
                 item.user?.nickname ||
                 item.user?.username ||
@@ -80,9 +93,8 @@ function CommentSection({
     };
 
     fetchComments();
-  }, [gameID, currentPage, commentsPerPage, currentUserId]);
+  }, [gameID, currentPage, commentsPerPage, normalizedCurrentUserId]);
 
-  // Revenir à la page 1 si le jeu change
   useEffect(() => {
     setCurrentPage(1);
   }, [gameID]);
@@ -110,8 +122,8 @@ function CommentSection({
       ) : (
         <>
           {comments.map((com, index) => {
-            // Clé du cache local avec le userID/UUID
-            const savedVote = localStorage.getItem(`vote_${com.id}_${currentUserId}`);
+            // Utilisation du normalizedCurrentUserId pour la clé de localStorage
+            const savedVote = localStorage.getItem(`vote_${com.id}_${normalizedCurrentUserId}`);
             const effectiveVote =
               savedVote !== null ? Number(savedVote) : (com.userVote ?? 0);
 
@@ -119,9 +131,9 @@ function CommentSection({
               <Comment
                 key={com.id || index}
                 commentId={com.id}
-                userId={currentUserId} // Transmis aux props de Comment (UUID ou ID)
-                UUID={com.userID}       // Transmet l'UUID du commentaire
-                Nickname={com.Nickname}  // Transmet le nom d'utilisateur/pseudo
+                userId={normalizedCurrentUserId} // ID / UUID de l'utilisateur connecté
+                UUID={com.userID}                // UUID de l'auteur du commentaire
+                Nickname={com.Nickname}
                 CommentTitle={com.CommentTitle}
                 comment={com.comment}
                 commentRowNb={(currentPage - 1) * commentsPerPage + index}

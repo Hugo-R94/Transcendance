@@ -1,9 +1,19 @@
-import DropdownMenu from "../components/DropdownMenu";
+import DropdownFilter from "../components/dropdownFilter";
 import NavBar from "../components/navBar";
 import ShaderBackground from "../components/shaderBG";
 
-
+type menuOptions = {
+  label: string;
+  value: string;
+};
 function Profil() {
+  const menuOption = "genre";
+	
+	const menuOptions=[
+		{label:"PROFIL", value:"profil"},
+		{label:"GAMES", value:"game"},
+		{label:"CLICKER", value:"CLICKER"},
+	]
   return (
     <div className="relative min-h-screen flex flex-col">
       <NavBar />
@@ -82,7 +92,7 @@ function Profil() {
         </div>
 
         {/* Contenu */}
-        <div className="flex-1 bg-black/50 rounded-2xl my-2 overflow-auto backdrop-blur-md">
+        <div className="flex-1 bg-black/50 rounded-2xl my-2 overflow-auto ">
           {/* contenu */}
         </div>
 
@@ -108,8 +118,9 @@ function Profil() {
 		 </div>
 		
 		{/* menu deroulant */}
-		<div className="bg-bred w-[80%] mx-auto h-20 my-3 rounded-2xl shadow-black shadow-md">
-		</div>
+		<DropdownFilter className="bg-bred w-[80%] mx-auto h-fit my-3 rounded-2xl shadow-black shadow-md"
+		  Name="SELECTION" color="bg-bred"  items={menuOptions} value={menuOption} >
+		</DropdownFilter>
 		
 		<div className="bg-black/50 rounded-2xl mt-5 w-[95%] mx-auto h-200 mb-5">
 			
