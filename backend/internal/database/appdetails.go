@@ -14,6 +14,17 @@ import (
 	"gorm.io/gorm"
 )
 
+func ParseAndFormatDate(input string) (string, error) {
+	const inputLayout = "02 Jan, 2006"
+
+	t, err := time.Parse(inputLayout, input)
+	if err != nil {
+		return "", fmt.Errorf("erreur de conversion: %w", err)
+	}
+
+	return t.Format(time.DateOnly), nil
+}
+
 func fetchAndUpdate(ctx context.Context, game *models.Game, tx *gorm.DB) error {
 
 	if game == nil {

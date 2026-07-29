@@ -65,7 +65,6 @@ function Comment({
 
       {/* RATING */}
       <Rating rating={star} className="my-3 justify-center" />
-
       {/* LIKE BUTTON */}
       <LikeButton
         commentId={commentId}

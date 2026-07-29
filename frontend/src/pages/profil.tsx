@@ -1,4 +1,4 @@
-import DropdownMenu from "../components/dropdownFilter";
+import DropdownFilter from "../components/dropdownFilter";
 import NavBar from "../components/navBar";
 import ShaderBackground from "../components/shaderBG";
 
@@ -118,9 +118,9 @@ function Profil() {
 		 </div>
 		
 		{/* menu deroulant */}
-		<DropdownMenu className="bg-bred w-[80%] mx-auto h-fit my-3 rounded-2xl shadow-black shadow-md"
+		<DropdownFilter className="bg-bred w-[80%] mx-auto h-fit my-3 rounded-2xl shadow-black shadow-md"
 		  Name="SELECTION" color="bg-bred"  items={menuOptions} value={menuOption} >
-		</DropdownMenu>
+		</DropdownFilter>
 		
 		<div className="bg-black/50 rounded-2xl mt-5 w-[95%] mx-auto h-200 mb-5">
 			

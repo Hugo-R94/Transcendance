@@ -37,11 +37,17 @@ function Games() {
 
 
   const genres = [
-    { label: "Action", value: "action" },
-    { label: "Aventure", value: "adventure" },
-    { label: "FPS", value: "fps" },
-    { label: "RPG", value: "rpg" },
-    { label: "Sport", value: "sport" },
+    { label: "Action", value: "Action" },
+    { label: "Sport", value: "Sport" },
+    { label: "Aventure", value: "Adventure" },
+    { label: "Strategie", value: "Strategy" },
+    { label: "Indie", value: "Indie" },
+    { label: "Simulation", value: "Simulation" },
+    { label: "RPG", value: "RPG" },
+    { label: "Free To Play", value: "Free To Play" },
+    { label: "Casual", value: "Casual" },
+    { label: "Racing", value: "Racing" },
+	
   ];
 
 
@@ -55,11 +61,11 @@ function Games() {
       value: "release_date_desc",
     },
     {
-      label: "Meilleure note ↑",
+      label: "Moins bien note sur steam",
       value: "rating_asc",
     },
     {
-      label: "Meilleure note ↓",
+      label: "Mieux note sur steam",
       value: "rating_desc",
     },
     {

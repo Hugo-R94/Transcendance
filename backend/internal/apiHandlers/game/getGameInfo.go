@@ -145,9 +145,11 @@ func (h *GameHandler) listGamesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+
 func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	const pageSize = 15
 
+	
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
 		page = 1
@@ -157,6 +159,44 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 
 	db := h.db.Model(&models.Game{})
 
+	genre := c.Query("genre")
+	
+	if genre != "" {
+		db = db.Where(
+			"games.app_id IN (?)",
+			h.db.
+				Table("genre_games").
+				Select("game_app_id").
+				Joins("JOIN genres ON genres.id = genre_games.genre_id").
+				Where("genres.name = ?", genre),
+		)
+	}
+	
+	orderBy := c.DefaultQuery("orderBy", "app_id")
+	
+	switch orderBy {
+	case "release_date_asc":
+		db = db.Order("Date ASC")
+	case "release_date_desc":
+		db = db.Order("Date DESC")
+	case "rating_asc":
+		db = db.Order("steam_score ASC")
+	case "rating_desc":
+		db = db.Order("steam_score DESC")
+	case "most_played":
+		db = db.Order("TotalReviews DESC")
+	case "less_played":
+		db = db.Order("TotalReviews ASC")
+	case "name_asc":
+		db = db.Order("Name ASC")
+	case "name_desc":
+		db = db.Order("Name ASC")
+	default:
+		db = db.Order("app_id ASC")
+	}
+	
+	log.Printf("\ngenre = %v\n", genre)
+	
 	// Compte le nombre total de jeux
 	if err := db.Count(&total).Error; err != nil {
 		log.Printf("[ERROR] Count games error: %v", err)
@@ -199,6 +239,7 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 		"total_pages": (total + pageSize - 1) / pageSize,
 	})
 }
+
 
 func (h *GameHandler) searchHandler(c *gin.Context) {
 	query := c.Query("q")
