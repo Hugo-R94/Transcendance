@@ -18,7 +18,7 @@ type (
 		Publishers            []Publisher    `gorm:"many2many:publisher_games;" json:"publishers,omitempty"`
 		Genres                []Genre        `gorm:"many2many:genre_games;" json:"genres,omitempty"`
 		ComingSoon            bool           `json:"coming_soon"`
-		Date                  string         `gorm:"type:varchar(50)" json:"date"`
+		Date                  time.Time      `json:"date"`
 		TotalReview           uint64         `json:"total_review"`
 		SteamScore            float64        `json:"steam_score"`
 		Comments              []Comment      `gorm:"foreignKey:GameID" json:"comments,omitempty"`
