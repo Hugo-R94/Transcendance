@@ -28,7 +28,7 @@ const buttonClass = `
   items-center
   justify-center
   px-4
-  py-5
+  py-3
   rounded-2xl
   text-white
   font-bold
@@ -39,6 +39,7 @@ const buttonClass = `
   hover:outline-white
   hover:brightness-110
   transition
+  shrink-0
 `;
 
 function DropdownMenu({
@@ -53,6 +54,7 @@ function DropdownMenu({
   const [menuOpen, setMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Fermer le menu lors d'un clic à l'extérieur
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -68,25 +70,38 @@ function DropdownMenu({
       document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Empêcher le scroll du body en arrière-plan sur mobile quand le menu est ouvert
+  useEffect(() => {
+    if (menuOpen && window.innerWidth < 640) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   const selectedItem = items.find((item) => item.value === value);
 
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
+      {/* Bouton de déclenchement */}
       <div
         className={`rounded-2xl ${color} balatro outline-white hover:outline-2`}
       >
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="flex w-full items-center justify-between bg-transparent px-2 py-2 cursor-pointer"
+          className="flex w-full items-center justify-between bg-transparent px-4 py-3 cursor-pointer"
         >
-          <span className="font-bold text-white">
+          <span className="font-bold text-white truncate mr-2">
             {selectedItem?.label ?? Name}
           </span>
 
           <span
-            className={`ml-3 text-xs text-white transition-transform duration-200 ${
-              menuOpen ? "translate-y-0.5 rotate-180" : ""
+            className={`text-xs text-white transition-transform duration-200 shrink-0 ${
+              menuOpen ? "rotate-180" : ""
             }`}
           >
             ▲
@@ -94,27 +109,29 @@ function DropdownMenu({
         </button>
       </div>
 
+      {/* Popover / Menu déroulant */}
       <div
         className={`
-          absolute
-          right-0
-          top-[calc(100%+0.5rem)]
+          /* Positionnement Mobile First (centré / plein écran adaptatif) */
+          fixed left-4 right-4 top-1/2 -translate-y-1/2
+          
+          /* Switch vers Desktop (Dropdown sous le bouton) */
+          sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+0.5rem)] sm:translate-y-0
+          sm:w-64
+
           z-50
           flex
-          w-full
-          sm:w-64
           flex-col
-          gap-2
+          gap-2.5
           rounded-xl
           bg-bdarkgreen
-		  h-100
-          p-6 card
-          shadow-lg
-          shadow-black/75
-          origin-top
+          p-4
+          card
+          shadow-xl
+          shadow-black/80
           overflow-y-auto
           overscroll-contain
-          max-h-[min(34rem,calc(100vh-6rem))]
+          max-h-[75vh] sm:max-h-[28rem]
           transition-all
           duration-200
           ease-out
@@ -145,9 +162,7 @@ function DropdownMenu({
               onChange(item.value);
               setMenuOpen(false);
             }}
-            className={`${buttonClass} justify-center items-center  ${
-              colors[index % colors.length]
-            }`}
+            className={`${buttonClass} ${colors[index % colors.length]}`}
           >
             {item.label}
           </button>
