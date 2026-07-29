@@ -18,6 +18,7 @@ type (
 		CreatedAt        time.Time      `json:"-"`
 		UpdatedAt        time.Time      `json:"-"`
 		DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
+		Comments         []Comment      `gorm:"foreignKey:UserID" json:"comments,omitempty"`
 	}
 
 	RegisterRequest struct {
