@@ -14,15 +14,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func ParseAndFormatDate(input string) (string, error) {
-	const inputLayout = "02 Jan, 2006"
-
-	t, err := time.Parse(inputLayout, input)
-	if err != nil {
-		return "", fmt.Errorf("erreur de conversion: %w", err)
-	}
-
-	return t.Format(time.DateOnly), nil
+func timeParser(timeString string) (time.Time, error) {
+	layout := "2 Jan, 2006"
+	return time.Parse(layout, timeString)
 }
 
 func fetchAndUpdate(ctx context.Context, game *models.Game, tx *gorm.DB) error {
@@ -65,12 +59,13 @@ func fetchAndUpdate(ctx context.Context, game *models.Game, tx *gorm.DB) error {
 		game.Name = "%"
 		return fmt.Errorf("Failed to find the game with AppID %d", game.AppID)
 	}
+	releaseDate, _ := timeParser(steamGame.Data.ReleaseDate.Date)
 	game.Name = steamGame.Data.Name
 	game.Description = steamGame.Data.Description
 	game.Header_image_link = steamGame.Data.Header
 	game.Background_image_link = steamGame.Data.Background
 	game.ComingSoon = steamGame.Data.ReleaseDate.ComingSoon
-	game.Date = steamGame.Data.ReleaseDate.Date
+	game.Date = releaseDate
 	for _, steamGenre := range steamGame.Data.Genres {
 		genre := models.Genre{
 			ID:   steamGenre.ID,
