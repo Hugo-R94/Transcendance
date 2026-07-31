@@ -3,7 +3,7 @@ package user
 import (
 	"errors"
 	"net/http"
-
+	"log"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -37,7 +37,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 	var user models.User
 
 	err := db.Model(&models.User{}).
-		Select("username", "description", "title_1", "title_2").
+		Select("username", "description", "title_1", "title_2", "ProfilePic").
 		Where("id = ? AND deleted_at IS NULL", userID).
 		First(&user).Error
 
@@ -45,16 +45,16 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 		return nil, err
 	}
 
-	t1 := user.Title_1
+	t1 := user.Title1
 	if t1 == "" {
-		t1 = "9" // Default: "New"
+		t1 = "9"
 	}
 
-	t2 := user.Title_2
+	t2 := user.Title2
 	if t2 == "" {
-		t2 = "10" // Default: "Player"
+		t2 = "10"
 	}
-
+	log.Printf("profil pic = %v\n", user.ProfilePic)
 	return &UserProfileResponse{
 		Username:    user.Username,
 		Description: user.Description,

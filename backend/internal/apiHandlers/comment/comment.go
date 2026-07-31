@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"github.com/google/uuid"
-	"fmt"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -26,40 +25,29 @@ func CommentRoutes(router *gin.RouterGroup, db *gorm.DB) {
 
 // POST /comment/post
 func (h *CommentHandler) commentPost(c *gin.Context) {
-	rawUserID, exists := c.Get("id")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Utilisateur non authentifié",
-		})
-		return
-	}
-
-	var currentUserID uuid.UUID
-
-	// Conversion du type récupéré depuis le contexte
-	switch v := rawUserID.(type) {
-	case uuid.UUID:
-		currentUserID = v
-	case string:
-		parsed, err := uuid.Parse(v)
-		if err == nil {
-			currentUserID = parsed
-		}
-	default:
-		// Tente une conversion en string puis parse UUID
-		parsed, err := uuid.Parse(fmt.Sprintf("%v", v))
-		if err == nil {
-			currentUserID = parsed
-		}
-	}
-
-	if currentUserID == uuid.Nil {
+	idRaw, exists := c.Get("id")
+	if exists == false {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "UUID utilisateur invalide",
+			"error": "User id missing",
+		})
+		return
+	}
+	id, ok := idRaw.(uuid.UUID)
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid user ID",
 		})
 		return
 	}
 
+	var user models.User
+	if err := h.db.Where("id = ?", id).First(&user).Error; err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "User not found",
+		})
+		return
+	}
+	
 	var comment models.Comment
 	if err := c.ShouldBindJSON(&comment); err != nil {
 		log.Printf("[ERROR] Invalid comment body: %v", err)
@@ -68,20 +56,37 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 		})
 		return
 	}
-
-	// Assignation de l'UUID extrait du token
-	comment.UserID = currentUserID
-	log.Printf("👉 Commentaire posté par UserID: %s sur GameID: %d", comment.UserID.String(), comment.GameID)
-
 	res := h.db.Where(models.Comment{
 		GameID: comment.GameID,
-		UserID: comment.UserID,
+		UserID: id,
 	}).Assign(models.Comment{
 		Rating:       comment.Rating,
 		CommentTitle: comment.CommentTitle,
 		Comment:      comment.Comment,
+		Author:			user.Username,
+		UserID:			id,
+		GameID:		comment.GameID,
+		Title1:		user.Title1,
+		Title2:		user.Title2,
 	}).FirstOrCreate(&comment)
+	// newCom := models.Comment{
+	// 	Rating:       comment.Rating,
+	// 	CommentTitle: comment.CommentTitle,
+	// 	Comment:      comment.Comment,
+	// 	UserID:			id,
+	//  	GameID:		comment.GameID,
+		
+	// }
+	log.Printf("comment title = %s\n UserID = %v\n", comment.CommentTitle, comment.UserID)
+	// if err := h.db.Create(&newCom).Error; err != nil {
+	// 	log.Printf("[ERROR] Save/Update comment error: %v", err)
+	// 	c.JSON(http.StatusInternalServerError, gin.H{
+	// 		"error": "impossible d'enregistrer le commentaire",
+	// 	})
+	// 	return
+	// }
 
+	
 	if res.Error != nil {
 		log.Printf("[ERROR] Save/Update comment error: %v", res.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{

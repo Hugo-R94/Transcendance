@@ -30,9 +30,9 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
 
         try {
             await postComment({
-                gameID: gameId,
+                game_id: gameId,
                 comment: comment,
-                commentTitle: title,
+                comment_title: title,
                 rating,
             });
 

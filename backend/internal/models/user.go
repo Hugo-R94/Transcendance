@@ -20,8 +20,8 @@ type (
 		UpdatedAt        time.Time      `json:"-"`
 		DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
 		Description		 string 		` json:"description"`
-		Title_1			 string
-		Title_2			 string
+		Title1			 string
+		Title2			 string
 		Comments         []Comment      `gorm:"foreignKey:UserID" json:"comments,omitempty"`
 	}
 

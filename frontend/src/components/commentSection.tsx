@@ -64,14 +64,9 @@ function CommentSection({
             return {
               id: !isNaN(parsedId) && parsedId !== 0 ? parsedId : index + 1,
               userID: authorUUID,
-              Nickname:
-                item.user?.nickname ||
-                item.user?.username ||
-                item.nickname ||
-                item.username ||
-                "Joueur anonyme",
+              Nickname: item.author,
               comment: item.comment || "",
-              CommentTitle: item.commentTitle || item.CommentTitle || "",
+              CommentTitle: item.comment_title,
               Likes: Number(item.likes ?? item.Likes ?? 0),
               Dislikes: Number(item.dislikes ?? item.Dislikes ?? 0),
               rating: Number(item.rating ?? item.Rating ?? 0),

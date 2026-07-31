@@ -15,6 +15,10 @@ type Comment struct {
 	Dislikes     int       `gorm:"default:0" json:"dislikes"`
 	UserID       uuid.UUID `json:"user_id"`
 	GameID       uint64    `json:"game_id"`
+	Author       string	   `json:"author"`
 	User         User      `gorm:"foreignKey:UserID;references:ID"`
+	Title1		 string	   `json:"title_1"`
+	Title2		 string	   `json:"title_2"`
 	Game         Game      `gorm:"foreignKey:GameID;references:AppID"`
+	
 }
