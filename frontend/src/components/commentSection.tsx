@@ -141,6 +141,8 @@ function CommentSection({
                 Dislikes={com.Dislikes}
                 star={com.rating ?? 0}
                 initialUserVote={effectiveVote}
+				title1={com.userID}
+				title2=""
               />
             );
           })}

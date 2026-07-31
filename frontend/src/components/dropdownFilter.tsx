@@ -10,8 +10,9 @@ type DropdownMenuProps = {
   color: string;
   className?: string;
   menuClassName?: string;
-  Name: string;
+  Name?: string; // Rend la prop optionnelle
   value?: string;
+  neutralValue?: boolean;
   onChange: (value: string) => void;
 };
 
@@ -49,6 +50,7 @@ function DropdownMenu({
   menuClassName = "",
   Name,
   value,
+  neutralValue = true,
   onChange,
 }: DropdownMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -72,15 +74,18 @@ function DropdownMenu({
 
   // Empêcher le scroll du body en arrière-plan sur mobile quand le menu est ouvert
   useEffect(() => {
+    if (!neutralValue) return;
+
     if (menuOpen && window.innerWidth < 640) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
+
     return () => {
       document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [menuOpen, neutralValue]);
 
   const selectedItem = items.find((item) => item.value === value);
 
@@ -93,10 +98,10 @@ function DropdownMenu({
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="flex w-full items-center justify-between bg-transparent px-4 py-3 cursor-pointer"
+          className="flex w-fit items-center justify-between bg-transparent px-4 py-3 cursor-pointer"
         >
           <span className="font-bold text-white truncate mr-2">
-            {selectedItem?.label ?? Name}
+            {selectedItem?.label ?? Name ?? items[0]?.label}
           </span>
 
           <span
@@ -143,17 +148,21 @@ function DropdownMenu({
           ${menuClassName}
         `}
       >
-        <button
-          type="button"
-          onClick={() => {
-            onChange("");
-            setMenuOpen(false);
-          }}
-          className={`${buttonClass} bg-byellow`}
-        >
-          {Name}
-        </button>
+        {/* Affiche le bouton neutre UNIQUEMENT si Name est fourni */}
+        {Name && (
+          <button
+            type="button"
+            onClick={() => {
+              onChange("");
+              setMenuOpen(false);
+            }}
+            className={`${buttonClass} bg-byellow`}
+          >
+            {Name}
+          </button>
+        )}
 
+        {/* Liste des options */}
         {items.map((item, index) => (
           <button
             key={item.value}

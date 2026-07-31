@@ -124,7 +124,7 @@ function NavBar() {
 		"
 		color="bg-bred"
 		items={[
-			{ label: "Home", href: "/" },
+			{ label: "Home", href: "/games" },
 			{ label: "Profil", href: "/profil" },
 			{ label: "Support", href: "/support" },
 			{ label: "Logout", href: "/logout" },

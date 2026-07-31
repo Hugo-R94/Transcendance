@@ -84,7 +84,8 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	//	commentVoteGroup := v1.Group("/commentVote")
 	comment.CommentRoutes(commentGroup, db)
 	game.GetGameInfo(gameGroup, db)
-
+	user.GetUserInfo(userGroup, v1, db)
+	
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
 	user.LogoutUser(userGroup, db)
