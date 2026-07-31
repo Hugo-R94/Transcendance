@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"gorm.io/gorm"
-	
 )
 
 type (
@@ -19,8 +18,8 @@ type (
 		Publishers            []Publisher    `gorm:"many2many:publisher_games;" json:"publishers,omitempty"`
 		Genres                []Genre        `gorm:"many2many:genre_games;" json:"genres,omitempty"`
 		ComingSoon            bool           `json:"coming_soon"`
-		Date                  string         `gorm:"type:varchar(50)" json:"date"`
-		TotalReviews           uint64         `json:"total_reviews"`
+		Date                  time.Time      `json:"date"`
+		TotalReviews          uint64         `json:"total_reviews"`
 		SteamScore            float64        `json:"steam_score"`
 		Comments              []Comment      `gorm:"foreignKey:GameID" json:"comments,omitempty"`
 		CreatedAt             time.Time      `json:"-"`
@@ -50,17 +49,17 @@ type (
 	}
 
 	GetGameResponse struct {
-		AppID                 uint64 `json:"appid"`
-		Name                  string `json:"name"`
-		Description           string `json:"description"`
-		Header_image_link     string `json:"header_image"`
-		Background_image_link string `json:"background_image"`
-		ReleaseDate string           `json:"release_date"`
-		SteamScore	float64          `json:"steam_score"`
-		Genres                []string`json:"genres,omitempty"`
-		Developers           []string`json:"developers,omitempty"`
-		Publishers            []string`json:"publishers,omitempty"`
-		TotalReviews				uint64`json:"total_reviews"`
+		AppID                 uint64    `json:"appid"`
+		Name                  string    `json:"name"`
+		Description           string    `json:"description"`
+		Header_image_link     string    `json:"header_image"`
+		Background_image_link string    `json:"background_image"`
+		ReleaseDate           time.Time `json:"release_date"`
+		SteamScore            float64   `json:"steam_score"`
+		Genres                []string  `json:"genres,omitempty"`
+		Developers            []string  `json:"developers,omitempty"`
+		Publishers            []string  `json:"publishers,omitempty"`
+		TotalReviews          uint64    `json:"total_reviews"`
 	}
 
 	SteamAppdetails struct {

@@ -11,6 +11,7 @@ import (
 type (
 	User struct {
 		ID               uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
+		ProfilePic       string         `gorm:"typevarchar(100)" json:"profile_picture"`
 		Email            string         `gorm:"uniqueIndex;typevarchar(250)" json:"email"`
 		Username         string         `gorm:"uniqueIndex;typevarchar(20)" json:"username"`
 		PassHash         string         `gorm:"type:varchar(60);not null" json:"-"`
@@ -21,6 +22,7 @@ type (
 		Description		 string 		` json:"description"`
 		Title_1			 string
 		Title_2			 string
+		Comments         []Comment      `gorm:"foreignKey:UserID" json:"comments,omitempty"`
 	}
 
 	RegisterRequest struct {

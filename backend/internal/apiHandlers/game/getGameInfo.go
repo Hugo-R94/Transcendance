@@ -102,11 +102,10 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 		Description:           parseDescription(existingGame.Description),
 		Header_image_link:     existingGame.Header_image_link,
 		Background_image_link: existingGame.Background_image_link,
-		ReleaseDate:			existingGame.Date,
-		SteamScore:				existingGame.SteamScore/10,
-		TotalReviews:			existingGame.TotalReviews,
+		ReleaseDate:           existingGame.Date,
+		SteamScore:            existingGame.SteamScore / 10,
+		TotalReviews:          existingGame.TotalReviews,
 	}
-	log.Printf("total review - %v", existingGame.TotalReviews)
 	for _, genre := range existingGame.Genres {
 		response.Genres = append(response.Genres, genre.Name)
 	}
@@ -145,11 +144,9 @@ func (h *GameHandler) listGamesHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-
 func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	const pageSize = 15
 
-	
 	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
 	if err != nil || page < 1 {
 		page = 1
@@ -160,7 +157,7 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	db := h.db.Model(&models.Game{})
 
 	genre := c.Query("genre")
-	
+
 	if genre != "" {
 		db = db.Where(
 			"games.app_id IN (?)",
@@ -171,9 +168,9 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 				Where("genres.name = ?", genre),
 		)
 	}
-	
+
 	orderBy := c.DefaultQuery("orderBy", "app_id")
-	
+
 	switch orderBy {
 	case "release_date_asc":
 		db = db.Order("Date ASC")
@@ -194,9 +191,9 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	default:
 		db = db.Order("app_id ASC")
 	}
-	
+
 	log.Printf("\ngenre = %v\n", genre)
-	
+
 	// Compte le nombre total de jeux
 	if err := db.Count(&total).Error; err != nil {
 		log.Printf("[ERROR] Count games error: %v", err)
@@ -239,7 +236,6 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 		"total_pages": (total + pageSize - 1) / pageSize,
 	})
 }
-
 
 func (h *GameHandler) searchHandler(c *gin.Context) {
 	query := c.Query("q")
@@ -443,5 +439,5 @@ func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	router.GET("/:appid/rating", h.GetGameRatingStats)
 	router.OPTIONS("/:appid", h.optHandler)
 	router.POST("comment/:id/vote", h.VoteComment)
-	
+
 }

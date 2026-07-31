@@ -32,9 +32,10 @@ func (h *UserHandler) register(c *gin.Context) {
 
 	err = h.db.Transaction(func(tx *gorm.DB) error {
 		newUser := models.User{
-			Email:    req.Email,
-			Username: req.Username,
-			PassHash: hashedPassword,
+			Email:      req.Email,
+			Username:   req.Username,
+			PassHash:   hashedPassword,
+			ProfilePic: "avatars/avatar_default.png",
 		}
 		return tx.Create(&newUser).Error
 	})
