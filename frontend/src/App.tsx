@@ -30,11 +30,11 @@ function App() {
         {/* --- ROUTES PUBLIQUES --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/signin" element={<Signin />} />
+        <Route path="/" element={<Home />} />
 
         {/* --- ROUTES PROTÉGÉES --- */}
         <Route element={<ProtectedRoute redirectTo="/login" />}>
           <Route element={<ProtectedLayout />}>
-            <Route path="/" element={<Home />} />
             <Route path="/game/:appid" element={<GamePage />} />
             <Route path="/profil" element={<Profil />} />
             <Route path="/games" element={<Games />} />

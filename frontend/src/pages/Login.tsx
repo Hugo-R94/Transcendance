@@ -49,7 +49,7 @@ function Login() {
 
       // Redirection vers Home après un court délai pour laisser le temps de voir la notif
       setTimeout(() => {
-        navigate("/");
+        navigate("/games");
       }, 1000);
 
     } catch (error: any) {

@@ -215,7 +215,7 @@ function Games() {
             className="mx-5"
 
             items={orderOptions}
-
+			
             value={orderBy}
 
             onChange={(value) =>

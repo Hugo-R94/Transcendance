@@ -13,6 +13,8 @@ type CommentProps = {
   Dislikes: number;
   star: number;
   initialUserVote?: number;
+  title1: string;
+  title2: string;
 };
 
 function Comment({
@@ -26,6 +28,8 @@ function Comment({
   Dislikes,
   star,
   initialUserVote = 0,
+  title1,
+  title2,
 }: CommentProps) {
   const colors = [
     "bg-[#00509f]",
