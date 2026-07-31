@@ -89,6 +89,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	user.LoginUser(userGroup, db)
 	user.LogoutUser(userGroup, db)
 	user.RefreshUser(userGroup, db)
+	user.ChangePP(userGroup, db)
 	return router
 }
 
