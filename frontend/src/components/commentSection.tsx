@@ -3,6 +3,7 @@ import Comment from "./comment";
 import Pagination from "./paginationController";
 import { getComments } from "../api/comments";
 
+
 export interface CommentData {
   id: number;
   userID: string; // UUID de l'auteur du commentaire
@@ -13,6 +14,9 @@ export interface CommentData {
   Dislikes: number;
   rating?: number;
   userVote?: number;
+  title_1: string;
+  title_2: string;
+  profile_picture: string;
 }
 
 interface CommentSectionProps {
@@ -71,6 +75,10 @@ function CommentSection({
               Dislikes: Number(item.dislikes ?? item.Dislikes ?? 0),
               rating: Number(item.rating ?? item.Rating ?? 0),
               userVote: Number(item.user_vote ?? item.userVote ?? 0),
+              title_1: String(item.title_1 ?? item.title1 ?? item.Title1 ?? 9),
+              title_2: String(item.title_2 ?? item.title2 ?? item.Title2 ?? 10),
+              profile_picture: String(item.profile_picture),
+
             };
           }
         );
@@ -136,8 +144,9 @@ function CommentSection({
                 Dislikes={com.Dislikes}
                 star={com.rating ?? 0}
                 initialUserVote={effectiveVote}
-				title1={com.userID}
-				title2=""
+				        title1={com.title_1}
+				        title2={com.title_2}
+                profilPic={com.profile_picture}
               />
             );
           })}

@@ -18,6 +18,8 @@ export interface GameInfo {
   developers:	string[];
   publishers:	string[];
   total_review: number;
+  list_state: number;
+
 }
 
 export interface GameListItem {

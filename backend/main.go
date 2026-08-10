@@ -92,6 +92,13 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	user.RefreshUser(userGroup, db)
 	user.ChangePP(v1, db)
 	user.GetPP(v1, db)
+	user.GetUserComments(v1, db)
+	user.UserDescriptionRoutes(v1, db)
+	user.AddGameToList(v1, db)
+	user.GetUserGameList(v1, db)
+	for _, route := range router.Routes() {
+		log.Printf("Route enregistrée: %s %s", route.Method, route.Path)
+	}
 	return router
 }
 

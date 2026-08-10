@@ -25,6 +25,7 @@ type (
 		CreatedAt             time.Time      `json:"-"`
 		UpdatedAt             time.Time      `json:"-"`
 		DeletedAt             gorm.DeletedAt `gorm:"index" json:"-"`
+		
 	}
 
 	Developer struct {
@@ -60,6 +61,7 @@ type (
 		Developers            []string  `json:"developers,omitempty"`
 		Publishers            []string  `json:"publishers,omitempty"`
 		TotalReviews          uint64    `json:"total_reviews"`
+		ListState			  int  `json:"list_state"`
 	}
 
 	SteamAppdetails struct {

@@ -173,7 +173,6 @@ code {
 .balatro:hover:not(:focus-within) {
   scale: 1.05;
   animation: card-wobble 2.4s ease-in-out infinite;
-  z-index: 9999;
 }
 
 .balatro:hover:not(:focus-within)::before {

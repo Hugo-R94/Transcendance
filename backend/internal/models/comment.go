@@ -20,5 +20,6 @@ type Comment struct {
 	Title1		 string	   `json:"title_1"`
 	Title2		 string	   `json:"title_2"`
 	Game         Game      `gorm:"foreignKey:GameID;references:AppID"`
+	ProfilePic   string         `gorm:"typevarchar(100)" json:"profile_picture"`
 	
 }

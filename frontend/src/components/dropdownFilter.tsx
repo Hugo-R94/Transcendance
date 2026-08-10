@@ -10,9 +10,10 @@ type DropdownMenuProps = {
   color: string;
   className?: string;
   menuClassName?: string;
-  Name?: string; // Rend la prop optionnelle
+  Name?: string;
   value?: string;
   neutralValue?: boolean;
+  pos?: -1 | 1; // -1 pour ouverture vers le haut, 1 (ou défaut) pour le bas
   onChange: (value: string) => void;
 };
 
@@ -51,6 +52,7 @@ function DropdownMenu({
   Name,
   value,
   neutralValue = true,
+  pos = 1,
   onChange,
 }: DropdownMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -89,6 +91,20 @@ function DropdownMenu({
 
   const selectedItem = items.find((item) => item.value === value);
 
+  // Gestion dynamique du positionnement sur desktop selon la prop pos
+  const positionClasses =
+    pos === -1
+      ? "sm:top-auto sm:bottom-[calc(100%+0.5rem)]" // Ouverture vers le HAUT
+      : "sm:top-[calc(100%+0.5rem)] sm:bottom-auto"; // Ouverture vers le BAS
+
+  // Gestion de la rotation de la flèche (inversée si pos === -1)
+  const getArrowRotation = () => {
+    if (pos === -1) {
+      return menuOpen ? "rotate-180" : "rotate-0"; // Flèche ▲ par défaut, tourne vers le bas au clic
+    }
+    return menuOpen ? "rotate-180" : "rotate-0";
+  };
+
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
       {/* Bouton de déclenchement */}
@@ -105,11 +121,9 @@ function DropdownMenu({
           </span>
 
           <span
-            className={`text-xs text-white transition-transform duration-200 shrink-0 ${
-              menuOpen ? "rotate-180" : ""
-            }`}
+            className={`text-xs text-white transition-transform duration-200 shrink-0 ${getArrowRotation()}`}
           >
-            ▲
+            {pos === -1 ? "▲" : "▼"}
           </span>
         </button>
       </div>
@@ -120,9 +134,10 @@ function DropdownMenu({
           /* Positionnement Mobile First (centré / plein écran adaptatif) */
           fixed left-4 right-4 top-1/2 -translate-y-1/2
           
-          /* Switch vers Desktop (Dropdown sous le bouton) */
-          sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+0.5rem)] sm:translate-y-0
+          /* Switch vers Desktop (positionnement haut/bas dynamique) */
+          sm:absolute sm:left-auto sm:right-0 sm:translate-y-0
           sm:w-64
+          ${positionClasses}
 
           z-50
           flex

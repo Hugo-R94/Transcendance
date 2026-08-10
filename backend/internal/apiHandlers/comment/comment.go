@@ -68,6 +68,7 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 		GameID:		comment.GameID,
 		Title1:		user.Title1,
 		Title2:		user.Title2,
+		ProfilePic: user.ProfilePic,
 	}).FirstOrCreate(&comment)
 	// newCom := models.Comment{
 	// 	Rating:       comment.Rating,

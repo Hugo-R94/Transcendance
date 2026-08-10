@@ -16,6 +16,7 @@ type UserProfileResponse struct {
 	Description string `json:"description"`
 	Title1      string `json:"title_1"`
 	Title2      string `json:"title_2"`
+	ProfilePic string `json:"profile_pic"`
 }
 
 // Liste officielle des titres autorisés côté Backend
@@ -36,8 +37,9 @@ var TitleMap = map[string]string{
 func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, error) {
 	var user models.User
 
+
 	err := db.Model(&models.User{}).
-		Select("username", "description", "title_1", "title_2", "ProfilePic").
+		Select("username", "description", "title1", "title2", "ProfilePic").
 		Where("id = ? AND deleted_at IS NULL", userID).
 		First(&user).Error
 
@@ -47,6 +49,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 
 	t1 := user.Title1
 	if t1 == "" {
+		log.Printf("titre mal setup\n")
 		t1 = "9"
 	}
 
@@ -60,6 +63,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 		Description: user.Description,
 		Title1:      t1,
 		Title2:      t2,
+		ProfilePic: user.ProfilePic,
 	}, nil
 }
 
@@ -94,7 +98,7 @@ func UpdateUserTitleHandler(db *gorm.DB) gin.HandlerFunc {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Titre 1 invalide ou non autorisé"})
 				return
 			}
-			updates["title_1"] = title1
+			updates["title1"] = title1
 		}
 
 		// --- SÉCURITÉ : Validation de Title 2 ---
@@ -103,7 +107,7 @@ func UpdateUserTitleHandler(db *gorm.DB) gin.HandlerFunc {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Titre 2 invalide ou non autorisé"})
 				return
 			}
-			updates["title_2"] = title2
+			updates["title2"] = title2
 		}
 
 		// Mise à jour sécurisée
@@ -173,7 +177,8 @@ func GetMyProfileHandler(db *gorm.DB) gin.HandlerFunc {
 }
 
 func GetUserInfo(publicGroup *gin.RouterGroup, protectedGroup *gin.RouterGroup, db *gorm.DB) {
-	publicGroup.GET("/profil/:id", GetUserProfileByIDHandler(db))
+	protectedGroup.GET("/profil/:id", GetUserProfileByIDHandler(db))
 	protectedGroup.GET("/profil", GetMyProfileHandler(db))
 	protectedGroup.POST("/profil/title", UpdateUserTitleHandler(db))
+
 }
