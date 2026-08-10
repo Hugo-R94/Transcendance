@@ -20,6 +20,7 @@ type (
 		UpdatedAt        time.Time      `json:"-"`
 		DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
 		Comments         []Comment      `gorm:"foreignKey:UserID" json:"comments,omitempty"`
+		Conversations    []Conversation `gorm:"many2many:user_convs;" json:"conversations,omitempty"`
 	}
 
 	RegisterRequest struct {

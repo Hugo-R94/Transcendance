@@ -14,6 +14,7 @@ import (
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
+	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/Hugo-R94/Transcendance/backend/internal/database"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
@@ -66,15 +67,6 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 		},
 	}))
 
-	//	router.GET("/", func(c *gin.Context) {
-	//		c.HTML(http.StatusOK, "connexion.html", gin.H{
-	//			"title": "Main website",
-	//		})
-	//	})
-	//	router.GET("/signin", func(c *gin.Context) {
-	//		c.HTML(http.StatusOK, "index.html", gin.H{})
-	//	})
-
 	v1 := router.Group("/api/v1")
 	v1.Use(utils.AuthMiddleware())
 	userGroup := router.Group("/")
@@ -90,6 +82,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	user.LogoutUser(userGroup, db)
 	user.RefreshUser(userGroup, db)
 	user.ChangePP(v1, db)
+	chat.ChatSetup(userGroup, db)
 	return router
 }
 
