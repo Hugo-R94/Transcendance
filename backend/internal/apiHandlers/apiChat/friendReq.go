@@ -51,6 +51,23 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 		return
 	}
 
+	var count int64
+	if err := h.db.
+		Where("user_id = ? AND blocked_user_id = ?", user.ID, id).
+		Count(&count).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to send friend request",
+		})
+		log.Printf("[ERROR] Failed to send friend request: %v", err.Error())
+		return
+	}
+	if count > 0 {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "Blocked",
+		})
+		return
+	}
+
 	err := h.db.Transaction(func(tx *gorm.DB) error {
 		user1id := id
 		user2id := user.ID
