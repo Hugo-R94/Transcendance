@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import LikeGameButton from "./likeGameButton";
 import WishlistGameButton from "./wishlistGameButton";
 import DislikeGameButton from "./dislikeGameButton";
+import api from "../api/api";
 
 type ListState = 0 | 1 | 2 | 3;
 
@@ -11,9 +12,15 @@ interface GameInteractionBarProps {
   initialState?: ListState; // 0: Aucune, 1: Like, 2: Wishlist, 3: Dislike
 }
 
+const STATE_TO_LIST_PARAM: Record<Exclude<ListState, 0>, string> = {
+  1: "likes",
+  2: "wishlist",
+  3: "dislikes",
+};
+
 function GameInteractionBar({
   className = "",
-  gameId: _gameId,
+  gameId,
   initialState = 0,
 }: GameInteractionBarProps) {
   const [listState, setListState] = useState<ListState>(initialState);
@@ -23,12 +30,20 @@ function GameInteractionBar({
     setListState(initialState);
   }, [initialState]);
 
-  const handleListChange = (targetState: ListState) => {
-    // Si on clique sur le bouton déjà actif -> retour à 0
-    // Si on clique sur un autre bouton -> passe directement à la nouvelle valeur (1, 2 ou 3)
-    setListState((currentState) =>
-      currentState === targetState ? 0 : targetState
-    );
+  const handleListChange = (targetState: Exclude<ListState, 0>) => {
+    const previousState = listState;
+    const nextState: ListState = listState === targetState ? 0 : targetState;
+
+    setListState(nextState);
+
+    const listName = STATE_TO_LIST_PARAM[targetState];
+    
+    api.post(`/addToList?appID=${gameId}&list=${listName}`)
+      .catch((error) => {
+        console.error("Erreur lors de l'ajout à la liste :", error);
+        // Rollback visuel uniquement en cas d'erreur de la requête
+        setListState(previousState);
+      });
   };
 
   const buttonStyle =
@@ -60,4 +75,4 @@ function GameInteractionBar({
   );
 }
 
-export default GameInteractionBar;
+export default GameInteractionBar;          

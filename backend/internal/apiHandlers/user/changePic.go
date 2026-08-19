@@ -54,7 +54,7 @@ func (h *UserHandler) uploadPic(c *gin.Context) {
 		return
 	}
 
-	fileDir := fmt.Sprintf("/uploads/users/%s", id.String())
+	fileDir := fmt.Sprintf("uploads/users/%s", id.String())
 	if err := os.MkdirAll(fileDir, 0755); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not save file",
@@ -76,7 +76,7 @@ func (h *UserHandler) uploadPic(c *gin.Context) {
 	err = h.db.Transaction(func(tx *gorm.DB) error {
 		return tx.Model(&models.User{}).
 			Where("id = ?", id).
-			Update("profile_picture", filePath).Error
+			Update("profile_pic", filePath).Error
 	})
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -98,5 +98,5 @@ func isValidImageType(filename string) bool {
 
 func ChangePP(router *gin.RouterGroup, db *gorm.DB) {
 	h := &UserHandler{db: db}
-	router.POST("/changePP", h.login)
+	router.POST("/changePP", h.uploadPic)
 }

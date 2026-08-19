@@ -71,14 +71,15 @@ function GamePage() {
       <div className="sm:fixed md:top-25 sm:top-0 sm:mt-0 mt-6 sm:w-[18%] w-full sm:h-screen h-auto z-20">
         
         {/* --- VUE DESKTOP --- */}
-        <div className="hidden sm:flex relative left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 sm:w-[90%] max-w-[280px] flex-col items-center">
+        <div className="hidden sm:flex relative left-1/2  top-1/2 -translate-x-1/2 -translate-y-1/2 sm:w-[90%] max-w-[280px] flex-col items-center">
+        <div className="bg-white w-[75%]">
           <GameCard
             id={game.appid}
             name={game.name}
             imgLink={game.header_image}
             className="w-[85%] z-20 shadow-xl"
           />
-
+          </div>
           <div className="w-full -mt-[10%] rounded-2xl bg-bdarkgreen p-3 pt-[14%] shadow-lg card flex flex-col justify-between z-10 border border-white/5">
             {/* Note Steam */}
             <div className="flex flex-col justify-center items-center w-full py-1">
@@ -119,7 +120,7 @@ function GamePage() {
             {/* Barre d'interaction */}
             <GameInteractionBar
               gameId={game.appid}
-              initialState={0}
+              initialState={game.list_state}
               className="flex bg-white/10 rounded-xl h-10 xl:h-12 w-full my-1 items-center justify-around overflow-visible"
             />
           </div>
@@ -127,13 +128,14 @@ function GamePage() {
 
         {/* --- VUE MOBILE --- */}
         <div className="sm:hidden flex flex-col items-center gap-4 px-4 mt-50 h-200">
+          <div className="w-[75%]">
           <GameCard
             id={game.appid}
             name={game.name}
             imgLink={game.header_image}
             className="w-2/3 z-1"
           />
-
+          </div>
           <div className="absolute w-[90%] rounded-2xl bg-bdarkgreen p-4 shadow-lg card translate-y-85 border border-white/5">
             {/* Note Steam */}
             <div className="flex flex-col items-center mt-15">
@@ -173,7 +175,7 @@ function GamePage() {
             {/* Barre d'interaction */}
             <GameInteractionBar
               gameId={game.appid}
-              initialState={0}
+              initialState={game.list_state}
               className="flex bg-white/10 rounded-xl h-15 xl:h-12 w-full my-1 items-center justify-around overflow-visible"
             />
           </div>

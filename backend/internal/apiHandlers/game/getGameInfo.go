@@ -3,11 +3,13 @@ package game
 import (
 	"html"
 	"log"
+	"time"
 	"net/http"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
-
+	"github.com/google/uuid"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -77,71 +79,113 @@ func parseDescription(rawHTML string) string {
 	return strings.TrimSpace(content)
 }
 
-func (h *GameHandler) gameInfoHandler(c *gin.Context) {
-	appid := c.Param("appid")
+func FormatGameDate(t time.Time) string {
+    // Si la date est vide (0001-01-01)
+    if t.IsZero() || t.Year() <= 1 {
+        return "Date inconnue"
+    }
 
-	var existingGame models.Game
-	err := h.db.Where("app_id = ?", appid).Preload("Genres").Preload("Developers").Preload("Publishers").First(&existingGame).Error
-	if err == gorm.ErrRecordNotFound {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "game not found",
-		})
-		return
-	}
-	if err != nil {
-		log.Printf("[ERROR] GetGameInfo error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "something went wrong",
-		})
-		return
-	}
+    months := map[time.Month]string{
+        time.January: "janvier", time.February: "février", time.March: "mars",
+        time.April: "avril", time.May: "mai", time.June: "juin",
+        time.July: "juillet", time.August: "août", time.September: "septembre",
+        time.October: "octobre", time.November: "novembre", time.December: "décembre",
+    }
 
-	response := models.GetGameResponse{
-		AppID:                 existingGame.AppID,
-		Name:                  existingGame.Name,
-		Description:           parseDescription(existingGame.Description),
-		Header_image_link:     existingGame.Header_image_link,
-		Background_image_link: existingGame.Background_image_link,
-		ReleaseDate:           existingGame.Date,
-		SteamScore:            existingGame.SteamScore / 10,
-		TotalReviews:          existingGame.TotalReviews,
-	}
-	for _, genre := range existingGame.Genres {
-		response.Genres = append(response.Genres, genre.Name)
-	}
-	for _, dev := range existingGame.Developers {
-		response.Developers = append(response.Developers, dev.Name)
-	}
-	for _, pub := range existingGame.Publishers {
-		response.Publishers = append(response.Publishers, pub.Name)
-	}
-
-	c.JSON(http.StatusOK, response)
+    return fmt.Sprintf("%d %s %d", t.Day(), months[t.Month()], t.Year())
 }
 
-func (h *GameHandler) listGamesHandler(c *gin.Context) {
-	var games []models.Game
-	err := h.db.Order("id ASC").Find(&games).Error // ordre = ordre d'insertion dans la db
-	if err != nil {
-		log.Printf("[ERROR] ListGames error: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "something went wrong",
-		})
-		return
-	}
+func (h *GameHandler) gameInfoHandler(c *gin.Context) {
+    appid := c.Param("appid")
 
-	response := make([]models.GetGameResponse, 0, len(games))
-	for _, g := range games {
-		response = append(response, models.GetGameResponse{
-			AppID:                 g.AppID,
-			Name:                  g.Name,
-			Description:           g.Description,
-			Header_image_link:     g.Header_image_link,
-			Background_image_link: g.Background_image_link,
-		})
-	}
+    var existingGame models.Game
+    err := h.db.Where("app_id = ?", appid).Preload("Genres").Preload("Developers").Preload("Publishers").First(&existingGame).Error
+    if err == gorm.ErrRecordNotFound {
+        c.JSON(http.StatusNotFound, gin.H{
+            "error": "game not found",
+        })
+        return
+    }
+    if err != nil {
+        log.Printf("[ERROR] GetGameInfo error: %v", err)
+        c.JSON(http.StatusInternalServerError, gin.H{
+            "error": "something went wrong",
+        })
+        return
+    }
 
-	c.JSON(http.StatusOK, response)
+// --- Calcul du ListState (0 par défaut) ---
+    listState := 0
+
+    if idRaw, exists := c.Get("id"); exists {
+        var userID uuid.UUID
+        var validUser bool
+
+        switch v := idRaw.(type) {
+        case uuid.UUID:
+            userID = v
+            validUser = true
+        case string:
+            if parsed, err := uuid.Parse(v); err == nil {
+                userID = parsed
+                validUser = true
+            }
+        }
+
+        if validUser {
+            var count int64
+
+            // 1. Check dans la table des Likes
+            h.db.Table("user_liked_games").
+                Where("user_id = ? AND game_app_id = ?", userID, existingGame.AppID).
+                Count(&count)
+
+            if count > 0 {
+                listState = 1
+            } else {
+                // 2. Check dans la table des Dislikes
+                h.db.Table("user_disliked_games").
+                    Where("user_id = ? AND game_app_id = ?", userID, existingGame.AppID).
+                    Count(&count)
+
+                if count > 0 {
+                    listState = -1
+                } else {
+                    // 3. Check dans la table des Wishlists
+                    h.db.Table("user_wishlisted_games").
+                        Where("user_id = ? AND game_app_id = ?", userID, existingGame.AppID).
+                        Count(&count)
+
+                    if count > 0 {
+                        listState = 2
+                    }
+                }
+            }
+        }
+    }
+	
+    response := models.GetGameResponse{
+        AppID:                 existingGame.AppID,
+        Name:                  existingGame.Name,
+        Description:           parseDescription(existingGame.Description),
+        Header_image_link:     existingGame.Header_image_link,
+        Background_image_link: existingGame.Background_image_link,
+        ReleaseDate:           FormatGameDate(existingGame.Date),
+        SteamScore:            existingGame.SteamScore / 10,
+        TotalReviews:          existingGame.TotalReviews,
+        ListState:             listState,
+    }
+    for _, genre := range existingGame.Genres {
+        response.Genres = append(response.Genres, genre.Name)
+    }
+    for _, dev := range existingGame.Developers {
+        response.Developers = append(response.Developers, dev.Name)
+    }
+    for _, pub := range existingGame.Publishers {
+        response.Publishers = append(response.Publishers, pub.Name)
+    }
+
+    c.JSON(http.StatusOK, response)
 }
 
 func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
@@ -173,21 +217,25 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 
 	switch orderBy {
 	case "release_date_asc":
-		db = db.Order("Date ASC")
-	case "release_date_desc":
-		db = db.Order("Date DESC")
+        db = db.Where("date > ?", time.Time{}) 
+        db = db.Order("date ASC")
+    case "release_date_desc":
+        db = db.Where("date > ?", time.Time{})
+        db = db.Order("date DESC")
 	case "rating_asc":
 		db = db.Order("steam_score ASC")
 	case "rating_desc":
 		db = db.Order("steam_score DESC")
 	case "most_played":
-		db = db.Order("TotalReviews DESC")
+		db = db.Order("total_reviews DESC")
 	case "less_played":
-		db = db.Order("TotalReviews ASC")
+		db = db.Order("total_reviews ASC")
 	case "name_asc":
-		db = db.Order("Name ASC")
-	case "name_desc":
-		db = db.Order("Name ASC")
+        db = db.Where("name != ?", "%")
+        db = db.Order("name ASC")
+    case "name_desc":
+        db = db.Where("name != ?", "%")
+        db = db.Order("name DESC")
 	default:
 		db = db.Order("app_id ASC")
 	}
@@ -428,16 +476,16 @@ func (h *GameHandler) VoteComment(c *gin.Context) {
 }
 
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
-	h := &GameHandler{db: db}
-	log.Println("gamerouter")
+    h := &GameHandler{db: db}
+    log.Println("gamerouter")
 
-	router.GET("", h.listGamesHandler)
-	router.GET("/games/:appid/comments", h.GetCommentsPage)
-	router.GET("/games", h.listGamesPageHandler)
-	router.GET("/search", h.searchHandler)
-	router.GET("/:appid", h.gameInfoHandler)
-	router.GET("/:appid/rating", h.GetGameRatingStats)
-	router.OPTIONS("/:appid", h.optHandler)
-	router.POST("comment/:id/vote", h.VoteComment)
+    router.GET("/search", h.searchHandler)
+    router.GET("/games", h.listGamesPageHandler)
+    router.GET("/games/:appid/comments", h.GetCommentsPage)
+    router.GET("/:appid/rating", h.GetGameRatingStats) // Déclaré AVANT /:appid
 
+    router.GET("/:appid", h.gameInfoHandler)
+    router.OPTIONS("/:appid", h.optHandler)
+
+    router.POST("comment/:id/vote", h.VoteComment)
 }

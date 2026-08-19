@@ -25,6 +25,7 @@ type (
 		CreatedAt             time.Time      `json:"-"`
 		UpdatedAt             time.Time      `json:"-"`
 		DeletedAt             gorm.DeletedAt `gorm:"index" json:"-"`
+		
 	}
 
 	Developer struct {
@@ -54,12 +55,13 @@ type (
 		Description           string    `json:"description"`
 		Header_image_link     string    `json:"header_image"`
 		Background_image_link string    `json:"background_image"`
-		ReleaseDate           time.Time `json:"release_date"`
+		ReleaseDate           string	 `json:"release_date"`
 		SteamScore            float64   `json:"steam_score"`
 		Genres                []string  `json:"genres,omitempty"`
 		Developers            []string  `json:"developers,omitempty"`
 		Publishers            []string  `json:"publishers,omitempty"`
 		TotalReviews          uint64    `json:"total_reviews"`
+		ListState			  int  `json:"list_state"`
 	}
 
 	SteamAppdetails struct {
