@@ -44,7 +44,8 @@ type (
 	}
 
 	FriendAccept struct {
-		ID string `json:"id" binding:"required"`
+		ID     string `json:"id" binding:"required"`
+		Accept bool   `json:"accept" binding:"required"`
 	}
 )
 

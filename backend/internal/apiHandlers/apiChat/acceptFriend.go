@@ -59,8 +59,11 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		if err := tx.Where("user1_id = ? AND user2_id = ?", user1id, user2id).Model(&models.Conversation{}).First(&conv).Error; err != nil {
 			return err
 		}
-		conv.Accepted = true
-		return tx.Save(&conv).Error
+		if req.Accept {
+			conv.Accepted = true
+			return tx.Save(&conv).Error
+		}
+		return tx.Delete(&conv).Error
 	})
 	if err != nil {
 		if err.Error() == "not found" {
@@ -69,14 +72,20 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 			})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "Failed to accept friend request",
+				"error": "Failed to accept/reject friend request",
 			})
-			log.Printf("[ERROR] Failed to accept friend request: %v", err.Error())
+			log.Printf("[ERROR] Failed to accept/reject friend request: %v", err.Error())
 		}
 		return
 	}
+	if req.Accept {
+		c.JSON(http.StatusCreated, gin.H{
+			"message": "Friend request successfully accepted",
+		})
+		return
+	}
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "Friend request successfully accepted",
+		"message": "Friend reqest successfully rejected",
 	})
 }
 
