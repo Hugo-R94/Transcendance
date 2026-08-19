@@ -10,8 +10,10 @@ type DropdownMenuProps = {
   color: string;
   className?: string;
   menuClassName?: string;
-  Name: string;
+  Name?: string;
   value?: string;
+  neutralValue?: boolean;
+  pos?: -1 | 1; // -1 pour ouverture vers le haut, 1 (ou défaut) pour le bas
   onChange: (value: string) => void;
 };
 
@@ -49,6 +51,8 @@ function DropdownMenu({
   menuClassName = "",
   Name,
   value,
+  neutralValue = true,
+  pos = 1,
   onChange,
 }: DropdownMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -72,17 +76,34 @@ function DropdownMenu({
 
   // Empêcher le scroll du body en arrière-plan sur mobile quand le menu est ouvert
   useEffect(() => {
+    if (!neutralValue) return;
+
     if (menuOpen && window.innerWidth < 640) {
       document.body.style.overflow = "hidden";
     } else {
       document.body.style.overflow = "";
     }
+
     return () => {
       document.body.style.overflow = "";
     };
-  }, [menuOpen]);
+  }, [menuOpen, neutralValue]);
 
   const selectedItem = items.find((item) => item.value === value);
+
+  // Gestion dynamique du positionnement sur desktop selon la prop pos
+  const positionClasses =
+    pos === -1
+      ? "sm:top-auto sm:bottom-[calc(100%+0.5rem)]" // Ouverture vers le HAUT
+      : "sm:top-[calc(100%+0.5rem)] sm:bottom-auto"; // Ouverture vers le BAS
+
+  // Gestion de la rotation de la flèche (inversée si pos === -1)
+  const getArrowRotation = () => {
+    if (pos === -1) {
+      return menuOpen ? "rotate-180" : "rotate-0"; // Flèche ▲ par défaut, tourne vers le bas au clic
+    }
+    return menuOpen ? "rotate-180" : "rotate-0";
+  };
 
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
@@ -93,18 +114,16 @@ function DropdownMenu({
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="flex w-full items-center justify-between bg-transparent px-4 py-3 cursor-pointer"
+          className="flex w-fit items-center justify-between bg-transparent px-4 py-3 cursor-pointer"
         >
           <span className="font-bold text-white truncate mr-2">
-            {selectedItem?.label ?? Name}
+            {selectedItem?.label ?? Name ?? items[0]?.label}
           </span>
 
           <span
-            className={`text-xs text-white transition-transform duration-200 shrink-0 ${
-              menuOpen ? "rotate-180" : ""
-            }`}
+            className={`text-xs text-white transition-transform duration-200 shrink-0 ${getArrowRotation()}`}
           >
-            ▲
+            {pos === -1 ? "▲" : "▼"}
           </span>
         </button>
       </div>
@@ -115,11 +134,12 @@ function DropdownMenu({
           /* Positionnement Mobile First (centré / plein écran adaptatif) */
           fixed left-4 right-4 top-1/2 -translate-y-1/2
           
-          /* Switch vers Desktop (Dropdown sous le bouton) */
-          sm:absolute sm:left-auto sm:right-0 sm:top-[calc(100%+0.5rem)] sm:translate-y-0
+          /* Switch vers Desktop (positionnement haut/bas dynamique) */
+          sm:absolute sm:left-auto sm:right-0 sm:translate-y-0
           sm:w-64
+          ${positionClasses}
 
-          z-50
+          z-25
           flex
           flex-col
           gap-2.5
@@ -143,17 +163,21 @@ function DropdownMenu({
           ${menuClassName}
         `}
       >
-        <button
-          type="button"
-          onClick={() => {
-            onChange("");
-            setMenuOpen(false);
-          }}
-          className={`${buttonClass} bg-byellow`}
-        >
-          {Name}
-        </button>
+        {/* Affiche le bouton neutre UNIQUEMENT si Name est fourni */}
+        {Name && (
+          <button
+            type="button"
+            onClick={() => {
+              onChange("");
+              setMenuOpen(false);
+            }}
+            className={`${buttonClass} bg-byellow`}
+          >
+            {Name}
+          </button>
+        )}
 
+        {/* Liste des options */}
         {items.map((item, index) => (
           <button
             key={item.value}

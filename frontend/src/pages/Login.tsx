@@ -37,10 +37,10 @@ function Login() {
         throw new Error(result.error || `Erreur serveur : ${response.status}`);
       }
 
-      // Stockage du token
+      // Stockage du token et de expire token 
       localStorage.setItem("token", result.token);
+      localStorage.setItem("token_expiration", result.token_expiration);
 
-      // Notification de succès
       setNotificationMessage("Connexion réussie ! Redirection...");
 
       // Réinitialisation des champs
@@ -49,7 +49,7 @@ function Login() {
 
       // Redirection vers Home après un court délai pour laisser le temps de voir la notif
       setTimeout(() => {
-        navigate("/");
+        navigate("/games");
       }, 1000);
 
     } catch (error: any) {

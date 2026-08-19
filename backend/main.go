@@ -79,7 +79,8 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	//	commentVoteGroup := v1.Group("/commentVote")
 	comment.CommentRoutes(commentGroup, db)
 	game.GetGameInfo(gameGroup, db)
-
+	user.GetUserInfo(userGroup, v1, db)
+	
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
 	user.LogoutUser(userGroup, db)
@@ -89,6 +90,14 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	apichat.FriendReq(v1, db)
 	apichat.GetConvs(v1, db)
 	chat.ChatSetup(v1, db, hub)
+	user.GetPP(v1, db)
+	user.GetUserComments(v1, db)
+	user.UserDescriptionRoutes(v1, db)
+	user.AddGameToList(v1, db)
+	user.GetUserGameList(v1, db)
+	for _, route := range router.Routes() {
+		log.Printf("Route enregistrée: %s %s", route.Method, route.Path)
+	}
 	return router
 }
 

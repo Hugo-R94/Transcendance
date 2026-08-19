@@ -2,9 +2,9 @@ import api from "./api";
 import type { CommentData } from "../components/commentSection";
 
 export interface PostCommentRequest {
-  gameID: number;
+  game_id: number;
   comment: string;
-  commentTitle: string;
+  comment_title: string;
   rating: number;
 }
 

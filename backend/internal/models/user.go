@@ -19,7 +19,14 @@ type (
 		CreatedAt        time.Time      `json:"-"`
 		UpdatedAt        time.Time      `json:"-"`
 		DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
+		Description		 string 		` json:"description"`
+		Title1			 string		
+		Title2			 string		
 		Comments         []Comment      `gorm:"foreignKey:UserID" json:"comments,omitempty"`
+		
+		LikedGames     	 []Game `gorm:"many2many:user_liked_games;" json:"liked_games,omitempty"`
+		DislikedGames    []Game `gorm:"many2many:user_disliked_games;" json:"disliked_games,omitempty"`
+		WishlistedGames  []Game `gorm:"many2many:user_wishlisted_games;" json:"wishlisted_games,omitempty"`
 	}
 
 	RegisterRequest struct {
@@ -28,6 +35,13 @@ type (
 		Password string `json:"password" binding:"required,min=8,max=60"`
 	}
 
+	UserProfileResponse struct {
+		Username    string `json:"username"`
+		Description string ` json:"description"`
+		Title1      string `json:"title_1"`
+		Title2      string `json:"title_2"`
+	}
+	
 	LoginRequest struct {
 		Username string `json:"username" binding:"required"`
 		Password string `json:"password" binding:"required"`

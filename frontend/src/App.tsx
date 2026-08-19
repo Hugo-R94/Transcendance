@@ -1,3 +1,4 @@
+// App.tsx
 import { Routes, Route, Outlet } from "react-router-dom";
 import Home from "./pages/Home";
 import Games from "./pages/GameList";
@@ -10,8 +11,8 @@ import Clicker from "./pages/clicker";
 import ShaderBackground from "./components/shaderBG";
 import NavBar from "./components/navBar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import UserProfil from "./pages/userProfilID";
 
-// Composant Layout avec NavBar
 function ProtectedLayout() {
   return (
     <>
@@ -30,16 +31,17 @@ function App() {
         {/* --- ROUTES PUBLIQUES --- */}
         <Route path="/login" element={<Login />} />
         <Route path="/signin" element={<Signin />} />
+        <Route path="/" element={<Home />} />
 
         {/* --- ROUTES PROTÉGÉES --- */}
         <Route element={<ProtectedRoute redirectTo="/login" />}>
           <Route element={<ProtectedLayout />}>
-            <Route path="/" element={<Home />} />
             <Route path="/game/:appid" element={<GamePage />} />
             <Route path="/profil" element={<Profil />} />
+            <Route path="/profil/:userid" element={<UserProfil />} /> 
             <Route path="/games" element={<Games />} />
             <Route path="/support" element={<Support />} />
-            <Route path="/clicker" element={<Clicker />} />
+            <Route path="/clicker" element={<Clicker />} /> 
           </Route>
         </Route>
       </Routes>

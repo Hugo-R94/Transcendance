@@ -5,8 +5,7 @@ import ShaderBackground from "../components/shaderBG";
 function Home() {
   return (
     <div className="min-h-screen flex items-center justify-center text-white">
-      <NavBar />
-      <div className="w-full h-fit translate-y-10 flex flex-col items-center justify-center text-center">
+      <div className="w-full h-fit flex flex-col items-center justify-center text-center">
         {/* Titre avec le style exact demandé */}
         <p className="text-5xl text-gray-300 font-bold">
           Bienvenue sur <span className="text-white">Click</span>
@@ -20,11 +19,6 @@ function Home() {
 
         {/* Boutons positionnés côte à côte */}
         <div className="flex flex-col gap-4 mt-6">
-          <a href="http://localhost:5173/games">
-			<button className="balatro bg-bblue h-15 w-50 rounded-2xl shadow-black/75 shadow-md hover:outline-3 text-xl font-bold">
-            Découvrir les jeux
-          </button>
-		  </a>
 		  
 		  <a href="http://localhost:5173/login">
           <button className="balatro bg-byellow h-15 w-50 rounded-2xl shadow-black/75 shadow-md hover:outline-3 text-xl font-bold">

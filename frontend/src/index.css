@@ -173,7 +173,6 @@ code {
 .balatro:hover:not(:focus-within) {
   scale: 1.05;
   animation: card-wobble 2.4s ease-in-out infinite;
-  z-index: 9999;
 }
 
 .balatro:hover:not(:focus-within)::before {
@@ -226,6 +225,18 @@ code {
 
 .bg-bgreen{
 	background: #3c9b71;
+}
+
+.text-bgreen{
+	color: #3c9b71;
+}
+
+.text-bred{
+	color: #fb4740;
+}
+
+.text-byellow{
+	color: #ed8a00;
 }
 
 .bg-byellow{
