@@ -50,8 +50,9 @@ type (
 )
 
 const (
-	MessageTypeChat       = "message"
-	MessageTypeConnect    = "connect"
-	MessageTypeDisconnect = "disconnect"
-	MessageTypeFriendReq  = "friend_req"
+	MessageTypeChat         = "message"
+	MessageTypeConnect      = "connect"
+	MessageTypeDisconnect   = "disconnect"
+	MessageTypeFriendReq    = "friend_req"
+	MessageTypeFriendAccept = "friend_accept"
 )

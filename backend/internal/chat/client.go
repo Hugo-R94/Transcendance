@@ -13,6 +13,13 @@ type Client struct {
 	ID   uuid.UUID
 }
 
+func validType(typeMsg string) bool {
+	if typeMsg == models.MessageTypeChat || typeMsg == models.MessageTypeConnect || typeMsg == models.MessageTypeDisconnect || typeMsg == models.MessageTypeFriendReq || typeMsg == models.MessageTypeFriendAccept {
+		return true
+	}
+	return false
+}
+
 func (c *Client) readPump() {
 	defer func() {
 		c.Hub.Unregister <- c
@@ -27,10 +34,13 @@ func (c *Client) readPump() {
 		if err != nil {
 			continue
 		}
+		if !validType(msg.Type) {
+			continue
+		}
 		newMsg := models.Message{
 			ConversationID: convID,
 			Text:           msg.Text,
-			Type:           models.MessageTypeChat,
+			Type:           msg.Type,
 		}
 		c.Hub.Broadcast <- broadcastMessage{Client: c, Message: newMsg}
 	}

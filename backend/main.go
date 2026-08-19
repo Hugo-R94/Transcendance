@@ -15,6 +15,7 @@ import (
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
+	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 
 	//"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/Hugo-R94/Transcendance/backend/internal/database"
@@ -42,7 +43,7 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 	return db, sqldb
 }
 
-func setupRouter(db *gorm.DB) *gin.Engine {
+func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 
 	router := gin.Default()
 	trustedProxies := []string{os.Getenv("TRUSTED_PROXIES")}
@@ -87,6 +88,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	apichat.FriendAccept(v1, db)
 	apichat.FriendReq(v1, db)
 	apichat.GetConvs(v1, db)
+	chat.ChatSetup(v1, db, hub)
 	return router
 }
 
@@ -104,12 +106,17 @@ func main() {
 	database.GetAllGames(db)
 	go database.CompleteDB(db, ctx)
 
-	router := setupRouter(db)
+	var hub chat.Hub
+	hub.HubInit(db)
+
+	router := setupRouter(db, &hub)
 	server := &http.Server{
 		Addr:              os.Getenv("ADDR"),
 		Handler:           router,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
+
+	go hub.Run()
 
 	go func() {
 		<-quit

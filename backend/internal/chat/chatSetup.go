@@ -11,7 +11,7 @@ import (
 )
 
 type (
-	ChatHandler struct {
+	WSHandler struct {
 		db  *gorm.DB
 		hub *Hub
 	}
@@ -24,7 +24,7 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-func (h *ChatHandler) setup(c *gin.Context) {
+func (h *WSHandler) setup(c *gin.Context) {
 	idRaw, exists := c.Get("id")
 	if exists == false {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -54,6 +54,6 @@ func (h *ChatHandler) setup(c *gin.Context) {
 }
 
 func ChatSetup(router *gin.RouterGroup, db *gorm.DB, hub *Hub) {
-	h := &ChatHandler{db: db, hub: hub}
+	h := &WSHandler{db: db, hub: hub}
 	router.GET("/ws", h.setup)
 }

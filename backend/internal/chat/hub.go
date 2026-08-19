@@ -23,7 +23,15 @@ type (
 	}
 )
 
-func (h *Hub) run() {
+func (hub *Hub) HubInit(db *gorm.DB) {
+	hub.Clients = make(map[*Client]bool)
+	hub.Broadcast = make(chan broadcastMessage)
+	hub.Register = make(chan *Client)
+	hub.Unregister = make(chan *Client)
+	hub.DB = db
+}
+
+func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.Register:
@@ -39,15 +47,7 @@ func (h *Hub) run() {
 				log.Printf("[ERROR] Couldn't fetch conversation: %v", err)
 				continue
 			}
-			//check if user can send a message in the conv
-			userInConv := false
-			for _, user := range conv.Users {
-				if user.ID == bm.Client.ID {
-					userInConv = true
-					break
-				}
-			}
-			if !userInConv {
+			if bm.Client.ID != conv.User1ID && bm.Client.ID != conv.User2ID {
 				log.Printf("[ERROR] User %v not authorized in conversation %v", bm.Client.ID, bm.Message.ConversationID)
 				continue
 			}
@@ -61,7 +61,6 @@ func (h *Hub) run() {
 				continue
 			}
 
-			//send message to every user in conv but the sender
 			h.broadcastToRecipient(bm, conv)
 		}
 	}
@@ -72,15 +71,14 @@ func (h *Hub) broadcastToRecipient(bm broadcastMessage, conv models.Conversation
 		if client == bm.Client {
 			continue
 		}
-		for _, user := range conv.Users {
-			if user.ID == client.ID {
-				select {
-				case client.Send <- bm.Message:
-				case <-time.After(1 * time.Second):
-					close(client.Send)
-					delete(h.Clients, client)
-				}
+		if client.ID == conv.User1ID || client.ID == conv.User2ID {
+			select {
+			case client.Send <- bm.Message:
+			case <-time.After(1 * time.Second):
+				close(client.Send)
+				delete(h.Clients, client)
 			}
+			return
 		}
 	}
 }
