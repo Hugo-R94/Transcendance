@@ -16,8 +16,6 @@ import (
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
 	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
-
-	//"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/Hugo-R94/Transcendance/backend/internal/database"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
@@ -37,7 +35,7 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 	if err != nil {
 		log.Fatalf("[ERROR] Fatal error, could not get db generic interface: %v", err)
 	}
-	if err := db.AutoMigrate(&models.User{}, &models.Game{}, &models.Developer{}, &models.Publisher{}, &models.Comment{}, &models.CommentVote{}, &models.Conversation{}, &models.Message{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Game{}, &models.Developer{}, &models.Publisher{}, &models.Comment{}, &models.CommentVote{}, &models.Conversation{}, &models.Message{}, &models.UserBlock{}); err != nil {
 		log.Fatalf("[ERROR] Fatal error, Failed to automigrate: %v", err)
 	}
 	return db, sqldb
@@ -80,7 +78,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	comment.CommentRoutes(commentGroup, db)
 	game.GetGameInfo(gameGroup, db)
 	user.GetUserInfo(userGroup, v1, db)
-	
+
 	user.RegisterUser(userGroup, db)
 	user.LoginUser(userGroup, db)
 	user.LogoutUser(userGroup, db)
@@ -89,6 +87,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	apichat.FriendAccept(v1, db)
 	apichat.FriendReq(v1, db)
 	apichat.GetConvs(v1, db)
+	apichat.BlockUser(v1, db)
 	chat.ChatSetup(v1, db, hub)
 	user.GetPP(v1, db)
 	user.GetUserComments(v1, db)

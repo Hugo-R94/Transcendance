@@ -54,6 +54,10 @@ type (
 		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 	}
 
+	BlockRequest struct {
+		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
+	}
+
 	FriendAccept struct {
 		ID     string `json:"id" binding:"required"`
 		Accept bool   `json:"accept" binding:"required"`
