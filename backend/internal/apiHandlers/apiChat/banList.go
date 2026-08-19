@@ -82,6 +82,7 @@ func (h *ChatHandler) blockUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User blocked successfully",
 	})
+	h.unFriend(c)
 }
 
 func BlockUser(router *gin.RouterGroup, db *gorm.DB) {
