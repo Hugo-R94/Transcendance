@@ -51,6 +51,9 @@ func (h *Hub) Run() {
 				log.Printf("[ERROR] User %v not authorized in conversation %v", bm.Client.ID, bm.Message.ConversationID)
 				continue
 			}
+			if !conv.Accepted && bm.Message.Type != models.MessageTypeFriendReq {
+				continue
+			}
 			//add info in Message struct and register it
 			bm.Message.SenderID = bm.Client.ID
 			bm.Message.Time = time.Now()
