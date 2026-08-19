@@ -54,7 +54,9 @@ func (h *ChatHandler) fetchConvs(c *gin.Context) {
 		Preload("User2", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "username", "profile_pic")
 		}).
-		Preload("Messages").
+		Preload("Messages", func(db *gorm.DB) *gorm.DB {
+			return db.Order("created_at DESC").Limit(500)
+		}).
 		Find(&convs).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not find conversations",
