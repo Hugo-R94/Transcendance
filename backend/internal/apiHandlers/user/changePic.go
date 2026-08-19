@@ -55,7 +55,7 @@ func (h *UserHandler) uploadPic(c *gin.Context) {
 	}
 
 	fileDir := fmt.Sprintf("uploads/users/%s", id.String())
-	if err := os.MkdirAll(fileDir, 0755); err != nil {
+	if err := os.MkdirAll(fileDir, 0700); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not save file",
 		})

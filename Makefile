@@ -9,6 +9,8 @@ all: up
 	cd backend && go build && ./backend
 
 up: ${CERT}
+	podman pull docker.io/library/postgres:17.5
+	podman pull docker.io/dpage/pgadmin4:8
 	podman-compose -f compose.yml up -d --build
 
 down:

@@ -4,16 +4,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 	"gorm.io/gorm"
 )
 
 type (
 	Message struct {
 		ID             uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
-		SenderID       string         `gorm:"type:varchar(36); index" json:"sender_id"`
-		RecipientID    string         `gorm:"type:varchar(36); index" json:"recipient_id"`
-		ConversationID string         `gorm:"type:varchar(36); index" json:"conversation_id"`
+		SenderID       uuid.UUID      `gorm:"type:uuid; index" json:"sender_id"`
+		ConversationID uuid.UUID      `gorm:"type:uuid; index" json:"conversation_id"`
 		Text           string         `gorm:"type:text" json:"text"`
 		Time           time.Time      `json:"time"`
 		Type           string         `gorm:"type:varchar(10)" json:"type"`
@@ -24,36 +22,37 @@ type (
 
 	Conversation struct {
 		ID        uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
-		User1ID   string         `gorm:"type:varchar(36); index:idx_member,unique" json:"user1_id"`
-		User2ID   string         `gorm:"type:varchar(36); index:idx_member,unique" json:"user2_id"`
-		Messages  []Message      `gorm:"foreignKey:ConversationID"`
+		User1ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users" json:"-"`
+		User2ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users" json:"-"`
+		User1     User           `gorm:"foreignKey:User1ID;references:ID" json:"user1"`
+		User2     User           `gorm:"foreignKey:User2ID;references:ID" json:"user2"`
+		Accepted  bool           `gorm:"default:false" json:"accepted"`
+		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID" json:"messages"`
 		CreatedAt time.Time      `json:"-"`
 		UpdatedAt time.Time      `json:"-"`
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	}
 
-	MessageRequest struct {
-		RecipientID string `json:"recipient_id" binding:"required"`
-		Text        string `json:"text" binding:"required"`
+	MessageSend struct {
+		ConversationID string `json:"conversation_id" binding:"required"`
+		Text           string `json:"text"`
+		Type           string `json:"type"`
 	}
 
-	Client struct {
-		hub  *Hub
-		conn *websocket.Conn
-		send chan Message
-		id   string
+	FriendRequest struct {
+		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 	}
 
-	Hub struct {
-		clients    []Client
-		broadcast  chan Message
-		register   chan *Client
-		unregister chan *Client
+	FriendAccept struct {
+		ID     string `json:"id" binding:"required"`
+		Accept bool   `json:"accept" binding:"required"`
 	}
 )
 
 const (
-	MessageTypeChat       = "message"
-	MessageTypeConnect    = "connect"
-	MessageTypeDisconnect = "disconnect"
+	MessageTypeChat         = "message"
+	MessageTypeConnect      = "connect"
+	MessageTypeDisconnect   = "disconnect"
+	MessageTypeFriendReq    = "friend_req"
+	MessageTypeFriendAccept = "friend_accept"
 )
