@@ -54,6 +54,10 @@ type (
 		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 	}
 
+	UnFriendRequest struct {
+		ID string `json:"id" binding:"required"`
+	}
+
 	BlockRequest struct {
 		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 	}

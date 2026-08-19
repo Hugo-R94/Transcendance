@@ -26,6 +26,7 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid user ID",
 		})
+		return
 	}
 
 	var req models.FriendRequest
