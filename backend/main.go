@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	apichat "github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/apiChat"
+	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/apiChat"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"

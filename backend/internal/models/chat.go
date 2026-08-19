@@ -33,6 +33,17 @@ type (
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	}
 
+	UserBlock struct {
+		ID            uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
+		UserID        uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_block_list" json:"-"`
+		BlockedUserID uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_block_list" json:"-"`
+		User          User           `gorm:"foreignKey:UserID;references:ID" json:"-"`
+		BlockedUser   User           `gorm:"foreignKey:BlockedUserID;references:ID" json:"blocked_user"`
+		CreatedAt     time.Time      `json:"-"`
+		UpdatedAt     time.Time      `json:"-"`
+		DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
+	}
+
 	MessageSend struct {
 		ConversationID string `json:"conversation_id" binding:"required"`
 		Text           string `json:"text"`
