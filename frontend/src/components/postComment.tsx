@@ -1,23 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import StarRating from "./star";
 import Notification from "./notification";
 import { postComment } from "../api/comments";
+import { fetchUserProfilePicture } from "../api/getUserAvatar";
 
 interface PostCommentProps {
     gameId: number;
-    onCommentPosted?: () => void; // 👈 Callback optionnelle pour recharger la liste
+    onCommentPosted?: () => void;
 }
 
 function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
     const [comment, setComment] = useState("");
     const [title, setTitle] = useState("");
     const [rating, setRating] = useState(0);
-
-    // État pour la notification
+    const [ppURL, setPpURL] = useState<string | null>(null);
     const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
 
+    useEffect(() => {
+        let objectUrl = "";
+
+        const loadAvatar = async () => {
+            try {
+                const url = await fetchUserProfilePicture();
+                if (url) {
+                    objectUrl = url;
+                    setPpURL(url);
+                }
+            } catch (err) {
+                console.error("Erreur fetch avatar:", err);
+            }
+        };
+
+        loadAvatar();
+
+        return () => {
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
+    }, []);
+
     const handlePostComment = async () => {
-        // 🔒 Protection : Vérifie si le gameId est valide
         if (!gameId || gameId === 0) {
             setNotificationMessage("Erreur : Impossible de publier, l'ID du jeu est introuvable.");
             return;
@@ -36,15 +57,11 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
                 rating,
             });
 
-            // Réinitialisation des champs après succès
             setComment("");
             setTitle("");
             setRating(0);
-
-            // Message de succès
             setNotificationMessage("Commentaire publié avec succès !");
 
-            // 🔄 Informe le composant parent de rafraîchir la liste des commentaires
             if (onCommentPosted) {
                 onCommentPosted();
             }
@@ -58,7 +75,6 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
 
     return (
         <div className="bg-black/40 w-full h-fit mt-5 rounded-2xl p-5 backdrop-blur-md">
-            {/* Notification */}
             {notificationMessage && (
                 <Notification
                     message={notificationMessage}
@@ -67,7 +83,13 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
             )}
 
             <div className="w-full h-15 flex items-center gap-3">
-                <div className="bg-gray-400 w-15 h-15 rounded-full"></div>
+                <div className="bg-gray-400 w-15 h-15 rounded-full overflow-hidden flex items-center justify-center">
+                    {ppURL ? (
+                        <img src={ppURL} alt="Avatar" className="w-full h-full object-cover" />
+                    ) : (
+                        <div className="w-full h-full bg-gray-500 animate-pulse" />
+                    )}
+                </div>
                 <p className="font-bold inset-x-0 my-auto">
                     Did you like this game ?
                 </p>

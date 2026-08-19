@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Pagination from "./paginationController";
 import DropdownMenu from "./dropdownFilter";
 import { genres, orderOptions } from "../pages/GameList";
@@ -80,12 +80,10 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
   return (
     <>
       {/* ==================== VERSION DESKTOP ==================== */}
-      {/* Utilisation de overflow-y-auto pour la liste et overflow-visible sur le footer pour les dropdowns */}
       <div
         className={`hidden sm:flex w-full h-[calc(100vh-280px)] min-h-[400px] flex-col rounded-2xl relative ${className}`}
       >
-        {/* Zone d'affichage des jeux avec scroll interne */}
-        <div className="w-full flex justify-center items-center h-[85%] overflow-y-auto p-2 rounded-t-2xl">
+        <div className="w-full flex justify-center items-center h-[85%] overflow-visible p-2 rounded-t-2xl ">
           {loading ? (
             <div className="flex h-full w-full items-center justify-center">
               <span className="text-gray-400">Chargement...</span>
@@ -99,7 +97,6 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
           )}
         </div>
 
-        {/* Footer PC : overflow-visible indispensable pour que les menus déroulants ne soient pas coupés */}
         <div className="relative z-50 flex h-[15%] min-h-[65px] w-full items-center justify-center gap-4 rounded-b-2xl bg-byellow px-4 overflow-visible backdrop-blur-md">
           <div className="flex items-center justify-center gap-2 py-1 sm:gap-4 overflow-visible">
             <DropdownMenu
@@ -137,10 +134,11 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
         </div>
       </div>
 
-      {/* ==================== VERSION MOBILE ==================== */}
-      <div className={`sm:hidden flex flex-col w-full rounded-2xl relative ${className}`}>
-        {/* 1. Filtres en HAUT sur mobile avec overflow-visible pour les dropdowns */}
-        <div className="relative z-50 flex flex-wrap items-center justify-center gap-2 p-2 bg-byellow rounded-t-2xl mb-2 overflow-visible">
+      {/* ==================== VERSION MOBILE CORRIGÉE ==================== */}
+      <div className={`sm:hidden flex flex-col w-full h-auto pb-6 relative ${className}`}>
+        
+        {/* 1. Filtres en HAUT (bien espacés et fluides) */}
+        <div className="relative  flex flex-wrap items-center justify-center gap-2 py-3 px-2 bg-byellow rounded-2xl mb-4">
           <DropdownMenu
             pos={-1}
             items={listOptions}
@@ -158,17 +156,16 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
           />
           <DropdownMenu
             Name="Tri"
-            items={orderOptions}
             pos={-1}
-            items-pos={-1}
+            items={orderOptions}
             value={selectedOrderBy}
             onChange={handleOrderByChange}
             color="bg-bred"
           />
         </div>
 
-        {/* 2. Liste des jeux */}
-        <div className="w-full flex justify-center items-center py-2 px-2 max-h-[55vh] overflow-y-auto">
+        {/* 2. Liste des jeux mobile */}
+        <div className="w-full flex justify-center items-center py-2 px-2">
           {loading ? (
             <div className="flex h-40 w-full items-center justify-center">
               <span className="text-gray-400">Chargement...</span>
@@ -183,7 +180,7 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
         </div>
 
         {/* 3. Pagination en BAS sur mobile */}
-        <div className="relative z-10 flex h-auto min-h-[55px] w-full items-center justify-center rounded-b-2xl bg-byellow px-4 py-2 mt-2 backdrop-blur-md">
+        <div className="relative z-10 flex h-auto min-h-[55px] w-full items-center justify-center rounded-2xl bg-byellow px-4 py-2 mt-4">
           <Pagination
             page={page}
             totalPages={totalPages}

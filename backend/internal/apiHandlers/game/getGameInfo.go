@@ -3,7 +3,9 @@ package game
 import (
 	"html"
 	"log"
+	"time"
 	"net/http"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -75,6 +77,22 @@ func parseDescription(rawHTML string) string {
 	content = multiNewlineRegex.ReplaceAllString(content, "\n\n")
 
 	return strings.TrimSpace(content)
+}
+
+func FormatGameDate(t time.Time) string {
+    // Si la date est vide (0001-01-01)
+    if t.IsZero() || t.Year() <= 1 {
+        return "Date inconnue"
+    }
+
+    months := map[time.Month]string{
+        time.January: "janvier", time.February: "février", time.March: "mars",
+        time.April: "avril", time.May: "mai", time.June: "juin",
+        time.July: "juillet", time.August: "août", time.September: "septembre",
+        time.October: "octobre", time.November: "novembre", time.December: "décembre",
+    }
+
+    return fmt.Sprintf("%d %s %d", t.Day(), months[t.Month()], t.Year())
 }
 
 func (h *GameHandler) gameInfoHandler(c *gin.Context) {
@@ -152,7 +170,7 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
         Description:           parseDescription(existingGame.Description),
         Header_image_link:     existingGame.Header_image_link,
         Background_image_link: existingGame.Background_image_link,
-        ReleaseDate:           existingGame.Date,
+        ReleaseDate:           FormatGameDate(existingGame.Date),
         SteamScore:            existingGame.SteamScore / 10,
         TotalReviews:          existingGame.TotalReviews,
         ListState:             listState,
@@ -199,21 +217,25 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 
 	switch orderBy {
 	case "release_date_asc":
-		db = db.Order("Date ASC")
-	case "release_date_desc":
-		db = db.Order("Date DESC")
+        db = db.Where("date > ?", time.Time{}) 
+        db = db.Order("date ASC")
+    case "release_date_desc":
+        db = db.Where("date > ?", time.Time{})
+        db = db.Order("date DESC")
 	case "rating_asc":
 		db = db.Order("steam_score ASC")
 	case "rating_desc":
 		db = db.Order("steam_score DESC")
 	case "most_played":
-		db = db.Order("TotalReviews DESC")
+		db = db.Order("total_reviews DESC")
 	case "less_played":
-		db = db.Order("TotalReviews ASC")
+		db = db.Order("total_reviews ASC")
 	case "name_asc":
-		db = db.Order("Name ASC")
-	case "name_desc":
-		db = db.Order("Name ASC")
+        db = db.Where("name != ?", "%")
+        db = db.Order("name ASC")
+    case "name_desc":
+        db = db.Where("name != ?", "%")
+        db = db.Order("name DESC")
 	default:
 		db = db.Order("app_id ASC")
 	}

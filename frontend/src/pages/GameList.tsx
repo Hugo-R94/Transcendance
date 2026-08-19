@@ -109,31 +109,31 @@ function Games() {
       */}
       <div className="relative pt-20 pb-10 px-2 flex flex-col items-center justify-between sm:fixed sm:left-1/2 sm:-translate-x-1/2 sm:w-4/5 lg:w-3/5 sm:h-[calc(100vh-120px)] sm:top-20 sm:p-2 sm:pb-2">
         
-        {/* Header filtres */}
-        <div className="w-full flex justify-center items-center py-2 shrink-0 gap-4">
-          <p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] hidden sm:block">
-            WHAT'S HOT ?
-          </p>
+		{/* Header filtres */}
+		<div className="w-full flex justify-center items-center mt-3 py-2 shrink-0 gap-4 z-30 relative">
+		<p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] hidden sm:block">
+			WHAT'S HOT ?
+		</p>
 
-          <DropdownMenu
-            Name="Genre"
-            items={genres}
-            value={genre}
-            onChange={(value) => changeFilter("genre", value)}
-            color="bg-bblue"
-          />
+		<DropdownMenu
+			Name="Genre"
+			items={genres}
+			value={genre}
+			onChange={(value) => changeFilter("genre", value)}
+			color="bg-bblue"
+		/>
 
-          <DropdownMenu
-            Name="Tri"
-            items={orderOptions}
-            value={orderBy}
-            onChange={(value) => changeFilter("orderBy", value)}
-            color="bg-bred"
-          />
-        </div>
+		<DropdownMenu
+			Name="Tri"
+			items={orderOptions}
+			value={orderBy}
+			onChange={(value) => changeFilter("orderBy", value)}
+			color="bg-bred"
+		/>
+		</div>
 
         {/* Zone centrale pour GameList */}
-        <div className="w-full flex-1 sm:min-h-[300px] flex items-center justify-center my-2 bg">
+        <div className="w-full flex-1 sm:min-h-[300px] flex items-center justify-center my-2">
           {loading ? (
             <div className="flex h-40 sm:h-full w-full items-center justify-center text-gray-400">
               Chargement...

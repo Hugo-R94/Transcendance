@@ -9,10 +9,10 @@ all: up
 	cd backend && go build && ./backend
 
 up: ${CERT}
-	docker-compose -f compose.yml up -d --build
+	podman-compose -f compose.yml up -d --build
 
 down:
-	docker-compose -f compose.yml down
+	podman-compose -f compose.yml down
 
 gen_cert: ${CERT}
 
@@ -72,8 +72,8 @@ fclean: clean
 re: down fclean all
 
 db_wipe: check
-	docker-compose -f compose.yml down -v
-	rm -rf ./docker/.DB_data
+	podman-compose -f compose.yml down -v
+	rm -rf ./podman/.DB_data
 
 check:
 	@read -p "Are you sure? [y/N] " ans && [[ "$$ans" =~ ^[Yy](es)?$$ ]]

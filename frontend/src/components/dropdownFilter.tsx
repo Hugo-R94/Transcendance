@@ -139,7 +139,7 @@ function DropdownMenu({
           sm:w-64
           ${positionClasses}
 
-          z-50
+          z-25
           flex
           flex-col
           gap-2.5

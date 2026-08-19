@@ -35,7 +35,7 @@ export default function ProfileMenu({ activeTab = "profil", onTabChange }: Profi
                 onClick={() => handleSelect(option.value)}
                 className={`w-full h-full rounded-2xl font-bold transition-all shadow-md shadow-black cursor-pointer balatro ${
                   option.color
-                } ${isActive ? "ring-2 ring-white scale-[1.02]" : "hover:opacity-90"}`}
+                } ${isActive ? "ring-2 ring-white scale-[1.02]" : "hover:z-150"}`}
               >
                 {option.label}
               </button>
@@ -50,7 +50,7 @@ export default function ProfileMenu({ activeTab = "profil", onTabChange }: Profi
       {/* -------------------- VERSION MOBILE -------------------- */}
       <div className="sm:hidden w-[80%] mx-auto my-3">
         <DropdownFilter
-          className="bg-bred w-full h-fit z-100 rounded-2xl shadow-black shadow-md"
+          className="bg-bred w-full h-fit z-25 active:z-150 rounded-2xl shadow-black shadow-md"
           color="bg-bred"
           items={MENU_OPTIONS}
           value={selectedTab}

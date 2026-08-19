@@ -55,7 +55,7 @@ type (
 		Description           string    `json:"description"`
 		Header_image_link     string    `json:"header_image"`
 		Background_image_link string    `json:"background_image"`
-		ReleaseDate           time.Time `json:"release_date"`
+		ReleaseDate           string	 `json:"release_date"`
 		SteamScore            float64   `json:"steam_score"`
 		Genres                []string  `json:"genres,omitempty"`
 		Developers            []string  `json:"developers,omitempty"`

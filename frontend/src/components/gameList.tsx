@@ -16,7 +16,6 @@ type DisplayGame = Game & { _leaving?: boolean };
 const STAGGER_MS = 60;
 const ANIM_MS = 350;
 
-// Largeur et espacement/overlap réduits à la fois pour le mobile et le desktop
 const CARD_W = 120; 
 const CARD_W_SM = 140; 
 const OVERLAP = 5; 
@@ -110,8 +109,8 @@ function GameList({ games }: GameListProps) {
         ref={containerRef}
         className="w-full h-auto md:h-full flex items-center justify-center relative p-2 z-10"
       >
-       {/* ==================== DESKTOP : éventail avec cartes plus petites et espacées ==================== */}
-        <div className="hidden sm:flex sm:flex-col justify-around items-center w-full h-full relative -translate-y-20 translate-x-1/20">
+       {/* ==================== DESKTOP : pointer-events-none appliqué ici ==================== */}
+        <div className="hidden sm:flex sm:flex-col justify-around items-center w-full h-full relative -translate-y-20 pointer-events-none">
           {rowArray.map((rowIndex) => {
             const rowGames = displayGames.slice(rowIndex * cols, rowIndex * cols + cols);
             const n = rowGames.length;
@@ -144,12 +143,13 @@ function GameList({ games }: GameListProps) {
                           left,
                           width: cardW,
                           top: "-50%",
-                            transform: `rotate(${offset * 6}deg) translateY(${Math.abs(offset) * 6}px)`,
+                          transform: `rotate(${offset * 6}deg) translateY(${Math.abs(offset) * 6}px)`,
                           transformOrigin: "center center",
                         }}
                       >
+                        {/* pointer-events-auto rétabli uniquement sur chaque carte pour qu'elles restent cliquables et survolables */}
                         <div
-                          className="transition-transform duration-300 group-hover:scale-125 group-hover:-translate-y-6 group-hover:rotate-0 hover:z-100 shadow-2xl rounded-xl"
+                          className="transition-transform duration-300 group-hover:scale-125 group-hover:-translate-y-6 group-hover:rotate-0 hover:z-100 shadow-2xl rounded-xl pointer-events-auto"
                           style={{
                             animation: `${game._leaving ? "card-exit" : "card-enter"} ${ANIM_MS}ms ease forwards`,
                             animationDelay: `${flatIndex * STAGGER_MS}ms`,
@@ -172,9 +172,9 @@ function GameList({ games }: GameListProps) {
           {displayGames
             .filter((g) => !g._leaving)
             .map((game) => (
-              <div key={game.appid} className="w-full max-w-full min-w-0 flex justify-center items-center">
-                <GameCard id={game.appid} name={game.name} tag="" imgLink={game.header_image} />
-              </div>
+            <div key={game.appid} className="w-full">
+                <GameCard id={game.appid} name={game.name} tag="" imgLink={game.header_image} className="w-full h-auto object-cover" />
+            </div>
             ))}
         </div>
       </div>

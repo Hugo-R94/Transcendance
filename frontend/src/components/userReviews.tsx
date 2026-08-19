@@ -74,12 +74,12 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
 
   return (
     <>
-      {/* ================= DESKTOP VIEW (Côte à côte avec taille fixe) ================= */}
+      {/* ================= DESKTOP VIEW ================= */}
       <div className="hidden sm:flex w-[95%] h-[240px] flex-row items-center gap-3 my-2 shrink-0">
         <div className={`flex-1 h-full rounded-2xl p-4 shadow-md shadow-black/25 ${color} flex flex-col justify-between overflow-visible`}>
           <div>
             <div className="flex items-center gap-3 shrink-0">
-              <Link to={`/profil/${review.user_id}`} className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer">
+              <Link to={`/profil/${review.user_id}`} className="flex items-center gap-3 hover:opacity-85 transition-opacity cursor-pointer">
                 {avatarUrl ? (
                   <img src={avatarUrl} alt={nickname} className="h-10 w-10 rounded-full object-cover shadow-sm border border-white/20" />
                 ) : (
@@ -117,42 +117,47 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
         </div>
       </div>
 
-      {/* ================= MOBILE VIEW (Simplifié et empilé) ================= */}
+      {/* ================= MOBILE VIEW (Refondu & Épuré) ================= */}
       <div className={`sm:hidden flex flex-col w-[95%] rounded-2xl p-4 shadow-md shadow-black/25 my-3 ${color} gap-3`}>
-        {/* Header utilisateur */}
-        <div className="flex items-center gap-3">
-          <Link to={`/profil/${review.user_id}`} className="flex items-center gap-3">
+        {/* Top : Auteur + Date */}
+        <div className="flex items-center justify-between">
+          <Link to={`/profil/${review.user_id}`} className="flex items-center gap-2.5">
             {avatarUrl ? (
-              <img src={avatarUrl} alt={nickname} className="h-10 w-10 rounded-full object-cover border border-white/20" />
+              <img src={avatarUrl} alt={nickname} className="h-8 w-8 rounded-full object-cover border border-white/20" />
             ) : (
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-400 text-base font-bold text-white shrink-0">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-400 text-sm font-bold text-white shrink-0">
                 {nickname.charAt(0).toUpperCase()}
               </div>
             )}
+            <p className="font-bold text-gray-200 text-xs truncate max-w-[140px]">{nickname}</p>
           </Link>
-          <div className="flex flex-col text-left">
-            <p className="font-bold text-gray-300 text-sm">{nickname}</p>
-            <p className="text-[10px] text-gray-300/75">Posté le {new Date(review.CreatedAt).toLocaleDateString()}</p>
-          </div>
+          <p className="text-[10px] text-gray-300/80">
+            {new Date(review.CreatedAt).toLocaleDateString()}
+          </p>
         </div>
 
-        {/* Miniature du jeu et titre côte à côte sur mobile */}
-        <div className="flex gap-3 items-center bg-black/20 p-2 rounded-xl">
-          <div className="w-20 h-28 shrink-0">
+        {/* Bloc central : Jeu + Titre & Note */}
+        <div className="flex items-center gap-3 bg-black/20 p-2.5 rounded-xl">
+          <div className="w-24 shrink-0 flex justify-center">
             {gameData ? (
-              <GameCard id={review.game_id} name={gameData.name} tag="" imgLink={gameData.header_image} className="w-full h-full" />
+              <div className="w-20 rounded-lg overflow-visible p-1 shadow">
+                <GameCard id={review.game_id} name={gameData.name} tag="" imgLink={gameData.header_image} className="w-full h-auto" />
+              </div>
             ) : (
-              <div className="w-full h-full bg-white/10 rounded-xl" />
+              <div className="w-20 h-28 bg-white/10 rounded-lg animate-pulse" />
             )}
           </div>
-          <div className="flex flex-col flex-1 text-center">
-            <p className="font-extrabold text-sm text-gray-200">{review.comment_title || "Avis sans titre"}</p>
-            <Rating rating={review.rating} className="justify-center scale-75 mt-1" />
+          <div className="flex flex-col flex-1 text-left overflow-hidden">
+            <p className="font-extrabold text-sm text-white truncate">{review.comment_title || "Avis sans titre"}</p>
+            {gameData && <p className="text-[11px] text-gray-300/90 truncate mt-0.5">{gameData.name}</p>}
+            <div className="mt-2">
+              <Rating rating={review.rating} className="scale-75 origin-left" />
+            </div>
           </div>
         </div>
 
         {/* Commentaire texte */}
-        <div className="text-xs bg-white/10 rounded-xl p-3 font-semibold whitespace-pre-wrap break-words text-gray-300 max-h-[120px] overflow-y-auto">
+        <div className="text-xs bg-white/10 rounded-xl p-3 font-medium whitespace-pre-wrap break-words text-gray-200 max-h-[130px] overflow-y-auto leading-relaxed">
           {review.comment}
         </div>
       </div>
@@ -216,9 +221,9 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
         </div>
       </div>
 
-      {/* VERSION MOBILE SIMPLIFIÉE */}
+      {/* VERSION MOBILE */}
       <div className={`sm:hidden flex flex-col w-full rounded-2xl overflow-visible relative ${className}`}>
-        <div className="w-full flex flex-col items-center py-2 overflow-y-auto px-2 max-h-[65vh]">
+        <div className="w-full flex flex-col items-center py-2 overflow-y-auto px-2">
           {loading ? (
             <div className="flex h-40 w-full items-center justify-center text-gray-400">Chargement...</div>
           ) : error ? (
@@ -236,7 +241,7 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
             ))
           )}
         </div>
-        <div className="relative z-20 flex h-auto min-h-[55px] w-full items-center justify-center rounded-b-2xl bg-byellow px-4 py-2 mt-2 backdrop-blur-md">
+        <div className="relative z-20 flex h-auto min-h-[55px] w-full items-center justify-center rounded-2xl bg-byellow px-4 py-2 mt-4 backdrop-blur-md">
           <Pagination page={page} totalPages={totalPages} onPageChange={(newPage) => setPage(newPage)} />
         </div>
       </div>

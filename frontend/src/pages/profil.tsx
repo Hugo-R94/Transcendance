@@ -5,6 +5,7 @@ import Notification from "../components/notification";
 import { ProfileHeader } from "../components/profilHeader";
 import UserReviews from "../components/userReviews";
 import UserFriendsList from "../components/userFriendList";
+import { fetchUserProfilePicture } from "../api/getUserAvatar";
 
 export type UserProfile = {
   username: string;
@@ -28,7 +29,7 @@ function Profil() {
   useEffect(() => {
     let objectUrl = "";
 
-    const fetchProfile = async () => {
+    const fetchProfileData = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -36,15 +37,11 @@ function Profil() {
           return;
         }
 
-        const pictureResponse = await fetch(
-          `http://localhost:8080/api/v1/getPP?t=${Date.now()}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-
-        if (pictureResponse.ok) {
-          const blob = await pictureResponse.blob();
-          objectUrl = URL.createObjectURL(blob);
-          setImageSrc(objectUrl);
+        // Utilisation de la fonction exportable ici avec await
+        const ppUrl = await fetchUserProfilePicture();
+        if (ppUrl) {
+          objectUrl = ppUrl;
+          setImageSrc(ppUrl);
         }
 
         const profileResponse = await fetch("http://localhost:8080/api/v1/profil", {
@@ -68,7 +65,7 @@ function Profil() {
       }
     };
 
-    fetchProfile();
+    fetchProfileData();
 
     return () => {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
@@ -139,10 +136,9 @@ function Profil() {
       case "game":
         return <UserGameList />;
       case "reviews":
-        return <UserReviews />
+        return <UserReviews />;
       case "friends":
-        return <UserFriendsList />
-        // return <div className="flex h-full w-full items-center justify-center text-white font-bold">Section Friends</div>;
+        return <UserFriendsList />;
       case "gambles":
         return <div className="flex h-full w-full items-center justify-center text-white font-bold">Section Gambles</div>;
       default:
