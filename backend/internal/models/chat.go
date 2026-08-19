@@ -20,18 +20,31 @@ type (
 		DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
 	}
 
-	MessageSend struct {
-		ConversationID string `json:"conversation_id" binding:"required"`
-		Text           string `json:"text"`
-	}
-
 	Conversation struct {
 		ID        uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
-		Users     []User         `gorm:"many2many:user_convs;" json:"users"`
+		User1ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users"`
+		User2ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users"`
+		User1     User           `gorm:"foreignKey:User1ID;references:ID"`
+		User2     User           `gorm:"foreignKey:User2ID;references:ID"`
+		Accepted  bool           `gorm:"default:false" json:"-"`
 		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID" json:"messages"`
 		CreatedAt time.Time      `json:"-"`
 		UpdatedAt time.Time      `json:"-"`
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	}
+
+	MessageSend struct {
+		ConversationID string `json:"conversation_id" binding:"required"`
+		Text           string `json:"text"`
+		Type           string `json:"type"`
+	}
+
+	FriendRequest struct {
+		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
+	}
+
+	FriendAccept struct {
+		ID string `json:"id" binding:"required"`
 	}
 )
 

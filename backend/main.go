@@ -11,10 +11,12 @@ import (
 	"syscall"
 	"time"
 
+	apichat "github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/apiChat"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
-	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
+
+	//"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/Hugo-R94/Transcendance/backend/internal/database"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
@@ -34,7 +36,7 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 	if err != nil {
 		log.Fatalf("[ERROR] Fatal error, could not get db generic interface: %v", err)
 	}
-	if err := db.AutoMigrate(&models.User{}, &models.Game{}, &models.Developer{}, &models.Publisher{}, &models.Comment{}, &models.CommentVote{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.Game{}, &models.Developer{}, &models.Publisher{}, &models.Comment{}, &models.CommentVote{}, &models.Conversation{}, &models.Message{}); err != nil {
 		log.Fatalf("[ERROR] Fatal error, Failed to automigrate: %v", err)
 	}
 	return db, sqldb
@@ -82,7 +84,8 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	user.LogoutUser(userGroup, db)
 	user.RefreshUser(userGroup, db)
 	user.ChangePP(v1, db)
-	chat.ChatSetup(userGroup, db)
+	apichat.FriendAccept(v1, db)
+	apichat.FriendReq(v1, db)
 	return router
 }
 
