@@ -26,6 +26,7 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid user ID",
 		})
+		return
 	}
 
 	var req models.FriendAccept
@@ -40,6 +41,7 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid user ID",
 		})
+		return
 	}
 
 	err = h.db.Transaction(func(tx *gorm.DB) error {

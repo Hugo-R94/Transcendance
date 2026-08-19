@@ -22,11 +22,11 @@ type (
 
 	Conversation struct {
 		ID        uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
-		User1ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users"`
-		User2ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users"`
-		User1     User           `gorm:"foreignKey:User1ID;references:ID"`
-		User2     User           `gorm:"foreignKey:User2ID;references:ID"`
-		Accepted  bool           `gorm:"default:false" json:"-"`
+		User1ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users" json:"-"`
+		User2ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users" json:"-"`
+		User1     User           `gorm:"foreignKey:User1ID;references:ID" json:"user1"`
+		User2     User           `gorm:"foreignKey:User2ID;references:ID" json:"user2"`
+		Accepted  bool           `gorm:"default:false" json:"accepted"`
 		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID" json:"messages"`
 		CreatedAt time.Time      `json:"-"`
 		UpdatedAt time.Time      `json:"-"`

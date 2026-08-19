@@ -86,6 +86,7 @@ func setupRouter(db *gorm.DB) *gin.Engine {
 	user.ChangePP(v1, db)
 	apichat.FriendAccept(v1, db)
 	apichat.FriendReq(v1, db)
+	apichat.GetConvs(v1, db)
 	return router
 }
 
