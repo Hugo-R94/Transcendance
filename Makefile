@@ -1,11 +1,8 @@
-SHELL := /bin/bash
-
-.PHONY: all clean fclean re gen_cert up down check db_wipe
+.phony: all clean re gen_cert up down check db_wipe
 
 CERT = ./certificates
 
 all: up
-	ln -snf ../certificates backend/certificates
 	cd backend && go build && ./backend
 
 up: ${CERT}
@@ -16,7 +13,13 @@ up: ${CERT}
 down:
 	podman-compose -f compose.yml down
 
-gen_cert: ${CERT}
+clean:
+	rm -rf certificates
+
+fclean:clean
+	rm -f Transcendance
+
+re: down fclean all
 
 ${CERT}:
 	mkdir -p certificates
@@ -26,17 +29,15 @@ ${CERT}:
 	
 	openssl genrsa -out certificates/server.key 2048
 	openssl req -new -key certificates/server.key -out certificates/server.csr \
-	  -subj "/CN=postgres"
+	  -subj "/CN=postgres" \
 	
-	printf "subjectAltName=DNS:postgres,DNS:localhost,DNS:127.0.0.1,IP:127.0.0.1,IP:::1\n" > certificates/extfile.cnf
 	openssl x509 -req -in certificates/server.csr \
 	  -CA certificates/rootCA.crt \
 	  -CAkey certificates/rootCA.key \
 	  -CAcreateserial \
 	  -out certificates/server.crt \
 	  -days 365 -sha256 \
-	  -extfile certificates/extfile.cnf
-	rm -f certificates/extfile.cnf
+	  -extfile <(printf "subjectAltName=DNS:postgres,DNS:localhost,DNS:127.0.0.1,IP:127.0.0.1,IP:::1")
 	
 	openssl genrsa -out certificates/client.key 2048
 	openssl req -new -key certificates/client.key -out certificates/client.csr \
@@ -59,23 +60,13 @@ ${CERT}:
 	  -CAcreateserial \
 	  -out certificates/client_pgadmin.crt \
 	  -days 365 -sha256
-	
-	# Fixation des droits exigés par PostgreSQL et OpenSSL
-	chmod 755 certificates
-	chmod 644 certificates/*.crt
-	chmod 600 certificates/*.key
 
-clean:
-	rm -rf certificates backend/certificates
-
-fclean: clean
-	rm -f Transcendance backend/backend
-
-re: down fclean all
 
 db_wipe: check
-	podman-compose -f compose.yml down -v
-	rm -rf ./podman/.DB_data
+	podman-compose -f compose.yml up -d
+	podman exec -u root transcendance_postgres_1 chmod -R a+rwX /var/lib/postgresql/
+	rm -rf ./docker/.DB_data
+	podman-compose -f compose.yml down
 
 check:
-	@read -p "Are you sure? [y/N] " ans && [[ "$$ans" =~ ^[Yy](es)?$$ ]]
+	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]

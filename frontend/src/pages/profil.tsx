@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProfileMenu from "../components/profilMenu";
 import UserGameList from "../components/userGameList";
 import Notification from "../components/notification";
@@ -6,8 +6,10 @@ import { ProfileHeader } from "../components/profilHeader";
 import UserReviews from "../components/userReviews";
 import UserFriendsList from "../components/userFriendList";
 import { fetchUserProfilePicture } from "../api/getUserAvatar";
+import api from "../api/api";
 
 export type UserProfile = {
+  id?: string;
   username: string;
   description: string;
   title_1: string;
@@ -15,122 +17,102 @@ export type UserProfile = {
   profile_picture: string;
 };
 
-function Profil() {
+export default function Profil() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [description, setDescription] = useState<string>("");
-  const [isSavingDesc, setIsSavingDesc] = useState<boolean>(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState<string>("");
-  const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
-
+  
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSavingDesc, setIsSavingDesc] = useState<boolean>(false);
+  const [notification, setNotification] = useState<string | null>(null);
+  
   const [activeTab, setActiveTab] = useState<string>("game");
+  const userID = localStorage.getItem("userID");
 
+  // Récupération des données du profil et de l'avatar au montage
   useEffect(() => {
     let objectUrl = "";
 
-    const fetchProfileData = async () => {
+    const loadProfileData = async () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
           setError("Non authentifié");
+          setLoading(false);
           return;
         }
 
-        // Utilisation de la fonction exportable ici avec await
-        const ppUrl = await fetchUserProfilePicture();
+        // Chargement de l'avatar et du profil en parallèle
+        const [ppUrl, profileRes] = await Promise.all([
+          fetchUserProfilePicture().catch(() => ""),
+          api.get("/profil")
+        ]);
+
         if (ppUrl) {
           objectUrl = ppUrl;
           setImageSrc(ppUrl);
         }
 
-        const profileResponse = await fetch("http://localhost:8080/api/v1/profil", {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!profileResponse.ok) {
-          throw new Error(`Erreur serveur (${profileResponse.status})`);
-        }
-
-        const data: UserProfile = await profileResponse.json();
+        const data: UserProfile = profileRes.data;
         setProfile(data);
         setDescription(data.description || "");
+
+        // Synchronisation éventuelle de l'ID utilisateur
+        if (data.id) {
+          localStorage.setItem("userID", String(data.id));
+        }
       } catch (err: any) {
-        setError(err.message || "Une erreur est survenue");
+        setError(err.response?.data?.error || err.message || "Une erreur est survenue");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProfileData();
+    loadProfileData();
 
     return () => {
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
   }, []);
 
+  // Gestion du changement de photo de profil
   const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
-    const token = localStorage.getItem("token");
-    if (!token) return;
 
     const formData = new FormData();
     formData.append("profile_picture", file);
 
     try {
-      const response = await fetch("http://localhost:8080/api/v1/changePP", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+      await api.post("/changePP", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || `Erreur lors de l'envoi (${response.status})`);
-      }
 
       if (imageSrc) URL.revokeObjectURL(imageSrc);
       setImageSrc(URL.createObjectURL(file));
-      setNotificationMessage("Photo de profil mise à jour avec succès !");
+      setNotification("Photo de profil mise à jour avec succès !");
     } catch (err: any) {
-      alert(err.message || "Impossible de mettre à jour la photo de profil.");
+      alert(err.response?.data?.error || "Impossible de mettre à jour la photo de profil.");
     }
   };
 
+  // Sauvegarde de la description
   const handleSaveDescription = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
     setIsSavingDesc(true);
     try {
-      const response = await fetch("http://localhost:8080/api/v1/profil/description", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ description }),
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || "Impossible de sauvegarder la description.");
-      }
+      await api.post("/profil/description", { description });
 
       if (profile) setProfile({ ...profile, description });
-      setNotificationMessage("Description sauvegardée avec succès !");
+      setNotification("Description sauvegardée avec succès !");
     } catch (err: any) {
-      alert(err.message || "Erreur lors de la sauvegarde.");
+      alert(err.response?.data?.error || "Erreur lors de la sauvegarde.");
     } finally {
       setIsSavingDesc(false);
     }
   };
 
+  // Routage du contenu des onglets
   const renderTabContent = () => {
     switch (activeTab) {
       case "game":
@@ -138,7 +120,7 @@ function Profil() {
       case "reviews":
         return <UserReviews />;
       case "friends":
-        return <UserFriendsList />;
+        return <UserFriendsList userId={userID ?? profile?.id} />;
       case "gambles":
         return <div className="flex h-full w-full items-center justify-center text-white font-bold">Section Gambles</div>;
       default:
@@ -156,8 +138,8 @@ function Profil() {
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      {notificationMessage && (
-        <Notification message={notificationMessage} onClose={() => setNotificationMessage(null)} />
+      {notification && (
+        <Notification message={notification} onClose={() => setNotification(null)} />
       )}
 
       {/* -------------------- VERSION DESKTOP -------------------- */}
@@ -202,5 +184,3 @@ function Profil() {
     </div>
   );
 }
-
-export default Profil;

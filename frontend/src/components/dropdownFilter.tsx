@@ -14,6 +14,7 @@ type DropdownMenuProps = {
   value?: string;
   neutralValue?: boolean;
   pos?: -1 | 1; // -1 pour ouverture vers le haut, 1 (ou défaut) pour le bas
+  isIconOnly?: boolean; // Vrai si on veut juste le bouton "⋮"
   onChange: (value: string) => void;
 };
 
@@ -53,6 +54,7 @@ function DropdownMenu({
   value,
   neutralValue = true,
   pos = 1,
+  isIconOnly = false,
   onChange,
 }: DropdownMenuProps) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -97,14 +99,6 @@ function DropdownMenu({
       ? "sm:top-auto sm:bottom-[calc(100%+0.5rem)]" // Ouverture vers le HAUT
       : "sm:top-[calc(100%+0.5rem)] sm:bottom-auto"; // Ouverture vers le BAS
 
-  // Gestion de la rotation de la flèche (inversée si pos === -1)
-  const getArrowRotation = () => {
-    if (pos === -1) {
-      return menuOpen ? "rotate-180" : "rotate-0"; // Flèche ▲ par défaut, tourne vers le bas au clic
-    }
-    return menuOpen ? "rotate-180" : "rotate-0";
-  };
-
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
       {/* Bouton de déclenchement */}
@@ -114,27 +108,36 @@ function DropdownMenu({
         <button
           type="button"
           onClick={() => setMenuOpen((o) => !o)}
-          className="flex w-fit items-center justify-between bg-transparent px-4 py-3 cursor-pointer"
+          className={`flex items-center justify-between bg-transparent cursor-pointer ${
+            isIconOnly ? "px-3 py-1.5 h-full w-full justify-center" : "w-fit px-4 py-3"
+          }`}
         >
-          <span className="font-bold text-white truncate mr-2">
-            {selectedItem?.label ?? Name ?? items[0]?.label}
-          </span>
-
-          <span
-            className={`text-xs text-white transition-transform duration-200 shrink-0 ${getArrowRotation()}`}
-          >
-            {pos === -1 ? "▲" : "▼"}
-          </span>
+          {isIconOnly ? (
+            /* Bouton avec uniquement les 3 points */
+            <span className="font-bold text-white text-base">⋮</span>
+          ) : (
+            /* Bouton classique avec texte et flèche */
+            <>
+              <span className="font-bold text-white truncate mr-2">
+                {selectedItem?.label ?? Name ?? items[0]?.label}
+              </span>
+              <span
+                className={`text-xs text-white transition-transform duration-200 shrink-0 ${
+                  menuOpen ? "rotate-180" : "rotate-0"
+                }`}
+              >
+                {pos === -1 ? "▲" : "▼"}
+              </span>
+            </>
+          )}
         </button>
       </div>
 
       {/* Popover / Menu déroulant */}
       <div
         className={`
-          /* Positionnement Mobile First (centré / plein écran adaptatif) */
+          /* Positionnement Mobile First */
           fixed left-4 right-4 top-1/2 -translate-y-1/2
-          
-          /* Switch vers Desktop (positionnement haut/bas dynamique) */
           sm:absolute sm:left-auto sm:right-0 sm:translate-y-0
           sm:w-64
           ${positionClasses}
@@ -163,8 +166,8 @@ function DropdownMenu({
           ${menuClassName}
         `}
       >
-        {/* Affiche le bouton neutre UNIQUEMENT si Name est fourni */}
-        {Name && (
+        {/* Bouton neutre optionnel (affiché uniquement si Name est présent ET qu'on n'est pas en mode isIconOnly) */}
+        {Name && !isIconOnly && (
           <button
             type="button"
             onClick={() => {
@@ -177,7 +180,7 @@ function DropdownMenu({
           </button>
         )}
 
-        {/* Liste des options */}
+        {/* Liste des options (uniquement les items passés en props, pas de traces de "⋮") */}
         {items.map((item, index) => (
           <button
             key={item.value}

@@ -1,0 +1,61 @@
+type Tab = "friends" | "requests";
+
+interface ChatMenuHeaderProps {
+  activeTab: Tab;
+  setActiveTab: (tab: Tab) => void;
+  onClose: () => void;
+  isOpen: boolean;
+}
+
+export function ChatMenuHeader({ activeTab, setActiveTab, onClose, isOpen }: ChatMenuHeaderProps) {
+  return (
+    <div 
+      className={`flex flex-row justify-center items-center gap-x-2 transition-all duration-300 rounded-2xl shrink-0 p-1 ${
+        isOpen ? "w-full h-15" : "w-full h-9 justify-between px-2"
+      }`}
+    >
+      {isOpen ? (
+        <>
+          {/* État ouvert : Affichage des onglets normaux */}
+          <button 
+            onClick={(e) => { e.stopPropagation(); setActiveTab("friends"); }} 
+            className={`bg-bblue w-1/2 h-full rounded-2xl balatro transition-all ${activeTab === "friends" ? "outline-3 outline-white" : ""} active:scale-90`}
+          >
+            AMIS
+          </button>
+          <button 
+            onClick={(e) => { e.stopPropagation(); setActiveTab("requests"); }} 
+            className={`bg-bred w-1/2 h-full rounded-2xl balatro transition-all ${activeTab === "requests" ? "outline-3 outline-white" : ""} active:scale-90`}
+          >
+            INVITATIONS
+          </button>
+          <button 
+            onClick={(e) => { 
+              e.stopPropagation(); 
+              onClose(); 
+            }} 
+            className="bg-byellow w-1/5 h-full rounded-2xl balatro font-bold active:scale-90 flex items-center justify-center transition-all text-white"
+          >
+            <span className="transform transition-transform duration-500 inline-block rotate-0">
+              ▼
+            </span>
+          </button>
+        </>
+      ) : (
+        /* État fermé : Centrage vertical parfait avec items-center */
+        <div 
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            onClose(); 
+          }} 
+          className="w-full h-full flex flex-row items-center justify-between cursor-pointer text-white px-1"
+        >
+          <span className="font-bold text-xs tracking-wider balatro">CHAT</span>
+          <span className="transform transition-transform duration-500 inline-block rotate-180 text-xs">
+            ▼
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}

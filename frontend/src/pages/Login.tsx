@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Notification from "../components/notification";
-import ShaderBackground from "../components/shaderBG";
+import api from "../api/api"; // Ton instance axios configurée
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -37,9 +37,26 @@ function Login() {
         throw new Error(result.error || `Erreur serveur : ${response.status}`);
       }
 
-      // Stockage du token et de expire token 
+      // Stockage des informations de session
       localStorage.setItem("token", result.token);
-      localStorage.setItem("token_expiration", result.token_expiration);
+      localStorage.setItem(
+        "token_expiration",
+        String(Date.now() + result.expires_in * 1000)
+      );
+      localStorage.setItem("userID", result.user_ID);
+
+      // Récupération de la photo de profil comme tu le faisais avant
+      try {
+        const ppRes = await api.get(`/getPP?userID=${result.user_ID}`, {
+          responseType: "blob",
+        });
+        const objectUrl = URL.createObjectURL(ppRes.data);
+        localStorage.setItem("userPP", objectUrl);
+      } catch (ppErr) {
+        console.error("Erreur lors de la récupération de la photo de profil au login :", ppErr);
+      }
+
+      console.log("USER ID STOCKÉ =", localStorage.getItem("userID"));
 
       setNotificationMessage("Connexion réussie ! Redirection...");
 
@@ -47,7 +64,7 @@ function Login() {
       setUsername("");
       setPassword("");
 
-      // Redirection vers Home après un court délai pour laisser le temps de voir la notif
+      // Redirection vers les jeux après un court délai
       setTimeout(() => {
         navigate("/games");
       }, 1000);
@@ -62,14 +79,12 @@ function Login() {
 
   return (
     <div className="relative min-h-screen">
-      {/* Notification globale */}
       {notificationMessage && (
         <Notification
           message={notificationMessage}
           onClose={() => setNotificationMessage(null)}
         />
       )}
-
 
       <div className="absolute h-100 w-70 bg-white m-auto inset-0">
         <div

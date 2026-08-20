@@ -53,6 +53,7 @@ type (
 		ExpiresIn        int    `json:"expires_in"`
 		RefreshToken     string `json:"refresh_token"`
 		RefreshExpiresIn int    `json:"refresh_expires_in"`
+		UserID			 string `json:"user_ID"`
 	}
 
 	RefreshRequest struct {

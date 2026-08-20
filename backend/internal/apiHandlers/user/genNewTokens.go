@@ -53,6 +53,7 @@ func genNewTokens(c *gin.Context, user models.User, h *UserHandler) {
 		ExpiresIn:        3600,
 		RefreshToken:     refreshToken,
 		RefreshExpiresIn: 604800,
+		UserID:			  user.ID.String(),
 	}
 	c.JSON(http.StatusOK, resp)
 }
