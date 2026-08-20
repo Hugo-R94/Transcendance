@@ -39,8 +39,8 @@ func GetAllGames(db *gorm.DB) {
 	if err != nil {
 		return
 	}
-	var existingGame models.Game
 	for _, data := range resp {
+		var existingGame models.Game
 		err_exist := db.Where("app_id = ?", data.AppID).First(&existingGame).Error
 		if err_exist == nil {
 			continue
