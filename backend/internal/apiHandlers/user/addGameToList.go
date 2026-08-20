@@ -1,10 +1,11 @@
 package user
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
-	"log"
+
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -42,7 +43,7 @@ func (h *UserHandler) addToList(c *gin.Context) {
 
 	// 2. Extraction des Query Params (?appID=...&list=...)
 	appIDStr := c.Query("appID")
-	targetList := strings.ToLower(c.Query("list"))	
+	targetList := strings.ToLower(c.Query("list"))
 
 	if appIDStr == "" || targetList == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Les paramètres 'appID' et 'list' sont requis"})
@@ -120,145 +121,145 @@ func GetUserGameList(router *gin.RouterGroup, db *gorm.DB) {
 	router.GET("/GameList", h.getUserGameListHandler)
 }
 func (h *UserHandler) getUserGameListHandler(c *gin.Context) {
-    var userID uuid.UUID
+	var userID uuid.UUID
 
-    // 1. Détermination du userID (Query Param `userid` vs Utilisateur connecté)
-    targetUserIDQuery := c.Query("userid")
+	// 1. Détermination du userID (Query Param `userid` vs Utilisateur connecté)
+	targetUserIDQuery := c.Query("userid")
 
-    if targetUserIDQuery != "" {
-        // Option A: Un `userid` est fourni dans les query params (?userid=...)
-        parsedID, err := uuid.Parse(targetUserIDQuery)
-        if err != nil {
-            c.JSON(http.StatusBadRequest, gin.H{"error": "Format d'ID utilisateur en paramètre invalide"})
-            return
-        }
-        userID = parsedID
-    } else {
-        // Option B: Pas de paramètre -> On récupère l'ID du user connecté via le token/contexte
-        idRaw, exists := c.Get("id")
-        if !exists {
-            c.JSON(http.StatusUnauthorized, gin.H{"error": "Utilisateur non authentifié"})
-            return
-        }
+	if targetUserIDQuery != "" {
+		// Option A: Un `userid` est fourni dans les query params (?userid=...)
+		parsedID, err := uuid.Parse(targetUserIDQuery)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Format d'ID utilisateur en paramètre invalide"})
+			return
+		}
+		userID = parsedID
+	} else {
+		// Option B: Pas de paramètre -> On récupère l'ID du user connecté via le token/contexte
+		idRaw, exists := c.Get("id")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Utilisateur non authentifié"})
+			return
+		}
 
-        switch v := idRaw.(type) {
-        case uuid.UUID:
-            userID = v
-        case string:
-            var err error
-            userID, err = uuid.Parse(v)
-            if err != nil {
-                c.JSON(http.StatusInternalServerError, gin.H{"error": "Format d'ID utilisateur invalide dans le jeton"})
-                return
-            }
-        default:
-            c.JSON(http.StatusInternalServerError, gin.H{"error": "Format d'ID utilisateur inconnu"})
-            return
-        }
-    }
+		switch v := idRaw.(type) {
+		case uuid.UUID:
+			userID = v
+		case string:
+			var err error
+			userID, err = uuid.Parse(v)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Format d'ID utilisateur invalide dans le jeton"})
+				return
+			}
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Format d'ID utilisateur inconnu"})
+			return
+		}
+	}
 
-    // 2. Extraction du paramètre obligatoire ?list=...
-    targetList := strings.ToLower(c.Query("list"))
-    if targetList == "" {
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Le paramètre 'list' est requis (likes, dislikes, wishlist)"})
-        return
-    }
+	// 2. Extraction du paramètre obligatoire ?list=...
+	targetList := strings.ToLower(c.Query("list"))
+	if targetList == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Le paramètre 'list' est requis (likes, dislikes, wishlist)"})
+		return
+	}
 
-    var joinTable string
-    switch targetList {
-    case "likes", "like":
-        joinTable = "user_liked_games"
-    case "dislikes", "dislike":
-        joinTable = "user_disliked_games"
-    case "wishlist":
-        joinTable = "user_wishlisted_games"
-    default:
-        c.JSON(http.StatusBadRequest, gin.H{"error": "Type de liste invalide. Valeurs acceptées: 'likes', 'dislikes', 'wishlist'"})
-        return
-    }
+	var joinTable string
+	switch targetList {
+	case "likes", "like":
+		joinTable = "user_liked_games"
+	case "dislikes", "dislike":
+		joinTable = "user_disliked_games"
+	case "wishlist":
+		joinTable = "user_wishlisted_games"
+	default:
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Type de liste invalide. Valeurs acceptées: 'likes', 'dislikes', 'wishlist'"})
+		return
+	}
 
-    // 3. Pagination
-    const pageSize = 15
-    page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-    if err != nil || page < 1 {
-        page = 1
-    }
+	// 3. Pagination
+	const pageSize = 15
+	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+		page = 1
+	}
 
-    // 4. Construction de la requête filtrée sur la table de jointure du user
-    db := h.db.Model(&models.Game{}).
-        Where("games.app_id IN (SELECT game_app_id FROM "+joinTable+" WHERE user_id = ?)", userID)
+	// 4. Construction de la requête filtrée sur la table de jointure du user
+	db := h.db.Model(&models.Game{}).
+		Where("games.app_id IN (SELECT game_app_id FROM "+joinTable+" WHERE user_id = ?)", userID)
 
-    // Filtre par Genre (optionnel)
-    genre := c.Query("genre")
-    if genre != "" {
-        db = db.Where(
-            "games.app_id IN (?)",
-            h.db.
-                Table("genre_games").
-                Select("game_app_id").
-                Joins("JOIN genres ON genres.id = genre_games.genre_id").
-                Where("genres.name = ?", genre),
-        )
-    }
+	// Filtre par Genre (optionnel)
+	genre := c.Query("genre")
+	if genre != "" {
+		db = db.Where(
+			"games.app_id IN (?)",
+			h.db.
+				Table("genre_games").
+				Select("game_app_id").
+				Joins("JOIN genres ON genres.id = genre_games.genre_id").
+				Where("genres.name = ?", genre),
+		)
+	}
 
-    // Tri par champ (optionnel, app_id par défaut)
-    orderBy := c.DefaultQuery("orderBy", "app_id")
-    switch orderBy {
-    case "release_date_asc":
-        db = db.Order("Date ASC")
-    case "release_date_desc":
-        db = db.Order("Date DESC")
-    case "rating_asc":
-        db = db.Order("steam_score ASC")
-    case "rating_desc":
-        db = db.Order("steam_score DESC")
-    case "most_played":
-        db = db.Order("TotalReviews DESC")
-    case "less_played":
-        db = db.Order("TotalReviews ASC")
-    case "name_asc":
-        db = db.Order("Name ASC")
-    case "name_desc":
-        db = db.Order("Name DESC")
-    default:
-        db = db.Order("app_id ASC")
-    }
+	// Tri par champ (optionnel, app_id par défaut)
+	orderBy := c.DefaultQuery("orderBy", "app_id")
+	switch orderBy {
+	case "release_date_asc":
+		db = db.Order("Date ASC")
+	case "release_date_desc":
+		db = db.Order("Date DESC")
+	case "rating_asc":
+		db = db.Order("steam_score ASC")
+	case "rating_desc":
+		db = db.Order("steam_score DESC")
+	case "most_played":
+		db = db.Order("TotalReviews DESC")
+	case "less_played":
+		db = db.Order("TotalReviews ASC")
+	case "name_asc":
+		db = db.Order("Name ASC")
+	case "name_desc":
+		db = db.Order("Name DESC")
+	default:
+		db = db.Order("app_id ASC")
+	}
 
-    // 5. Décompte du nombre total de jeux dans la liste demandée
-    var total int64
-    if err := db.Count(&total).Error; err != nil {
-        log.Printf("[ERROR] Count user games error: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors du décompte des jeux"})
-        return
-    }
+	// 5. Décompte du nombre total de jeux dans la liste demandée
+	var total int64
+	if err := db.Count(&total).Error; err != nil {
+		log.Printf("[ERROR] Count user games error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors du décompte des jeux"})
+		return
+	}
 
-    // 6. Récupération des jeux paginés
-    var games []models.Game
-    err = db.
-        Limit(pageSize).
-        Offset((page - 1) * pageSize).
-        Find(&games).Error
+	// 6. Récupération des jeux paginés
+	var games []models.Game
+	err = db.
+		Limit(pageSize).
+		Offset((page - 1) * pageSize).
+		Find(&games).Error
 
-    if err != nil {
-        log.Printf("[ERROR] Get user games error: %v", err)
-        c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la récupération des jeux"})
-        return
-    }
+	if err != nil {
+		log.Printf("[ERROR] Get user games error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors de la récupération des jeux"})
+		return
+	}
 
-    // 7. Construction du JSON de réponse
-    response := make([]models.GetGameResponse, 0, len(games))
-    for _, g := range games {
-        response = append(response, models.GetGameResponse{
-            AppID:             g.AppID,
-            Name:              g.Name,
-            Header_image_link: g.Header_image_link,
-        })
-    }
+	// 7. Construction du JSON de réponse
+	response := make([]models.GetGameResponse, 0, len(games))
+	for _, g := range games {
+		response = append(response, models.GetGameResponse{
+			AppID:             g.AppID,
+			Name:              g.Name,
+			Header_image_link: g.Header_image_link,
+		})
+	}
 
-    c.JSON(http.StatusOK, gin.H{
-        "games":       response,
-        "total":       total,
-        "page":        page,
-        "total_pages": (total + pageSize - 1) / pageSize,
-    })
+	c.JSON(http.StatusOK, gin.H{
+		"games":       response,
+		"total":       total,
+		"page":        page,
+		"total_pages": (total + pageSize - 1) / pageSize,
+	})
 }

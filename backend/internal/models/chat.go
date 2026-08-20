@@ -27,12 +27,21 @@ type (
 		User1     User           `gorm:"foreignKey:User1ID;references:ID" json:"user1"`
 		User2     User           `gorm:"foreignKey:User2ID;references:ID" json:"user2"`
 		Accepted  bool           `gorm:"default:false" json:"accepted"`
-		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID" json:"messages"`
-		User1AJour bool `gorm:"default:true" json:"user1_a_jour"`
-		User2AJour bool `gorm:"default:true" json:"user2_a_jour"`
+		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID;onDelete:CASCADE" json:"messages"`
 		CreatedAt time.Time      `json:"-"`
 		UpdatedAt time.Time      `json:"-"`
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+	}
+
+	UserBlock struct {
+		ID            uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
+		UserID        uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_block_list" json:"-"`
+		BlockedUserID uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_block_list" json:"-"`
+		User          User           `gorm:"foreignKey:UserID;references:ID" json:"-"`
+		BlockedUser   User           `gorm:"foreignKey:BlockedUserID;references:ID" json:"blocked_user"`
+		CreatedAt     time.Time      `json:"-"`
+		UpdatedAt     time.Time      `json:"-"`
+		DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 	}
 
 	MessageSend struct {
@@ -42,6 +51,14 @@ type (
 	}
 
 	FriendRequest struct {
+		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
+	}
+
+	UnFriendRequest struct {
+		ID string `json:"id" binding:"required"`
+	}
+
+	BlockRequest struct {
 		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 	}
 

@@ -1,6 +1,7 @@
 package chat
 
 import (
+	"context"
 	"log"
 	"time"
 
@@ -31,9 +32,16 @@ func (hub *Hub) HubInit(db *gorm.DB) {
 	hub.DB = db
 }
 
-func (h *Hub) Run() {
+func (h *Hub) Run(ctx context.Context) {
 	for {
 		select {
+		case <-ctx.Done():
+			log.Println("[INFO] Hub shutting down")
+			close(h.Broadcast)
+			for Client := range h.Clients {
+				Client.Conn.Close()
+			}
+			return
 		case client := <-h.Register:
 			h.Clients[client] = true
 		case client := <-h.Unregister:
