@@ -12,11 +12,14 @@ import ShaderBackground from "./components/shaderBG";
 import NavBar from "./components/navBar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
+import MinimalChat from "./pages/minichat";
+import ChatMenu from "./components/chatMenu";
 
 function ProtectedLayout() {
   return (
     <>
       <NavBar />
+	  <ChatMenu />
       <Outlet />
     </>
   );
@@ -40,6 +43,7 @@ function App() {
             <Route path="/profil" element={<Profil />} />
             <Route path="/profil/:userid" element={<UserProfil />} /> 
             <Route path="/games" element={<Games />} />
+            <Route path="/chat" element={<MinimalChat />} />
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} /> 
           </Route>

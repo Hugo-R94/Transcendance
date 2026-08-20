@@ -20,6 +20,15 @@ func invalidTokenResponse(c *gin.Context) {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
+
+		// Dev uniquement : accepter aussi ?token=...
+		if authHeader == "" {
+			queryToken := c.Query("token")
+			if queryToken != "" {
+				authHeader = "Bearer " + queryToken
+			}
+		}
+
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Missing token",
@@ -31,9 +40,16 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
 		claims := &models.TokenClaims{}
-		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (any, error) {
-			return JwtSecret, nil
-		}, jwt.WithValidMethods([]string{"HS256"}))
+
+		token, err := jwt.ParseWithClaims(
+			tokenStr,
+			claims,
+			func(token *jwt.Token) (any, error) {
+				return JwtSecret, nil
+			},
+			jwt.WithValidMethods([]string{"HS256"}),
+		)
+
 		if err != nil || token == nil {
 			invalidTokenResponse(c)
 			return
@@ -49,6 +65,7 @@ func AuthMiddleware() gin.HandlerFunc {
 			invalidTokenResponse(c)
 			return
 		}
+
 		c.Set("id", userID)
 		c.Next()
 	}

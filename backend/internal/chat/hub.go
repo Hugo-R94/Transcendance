@@ -77,19 +77,35 @@ func (h *Hub) Run(ctx context.Context) {
 	}
 }
 
+// func (h *Hub) broadcastToRecipient(bm broadcastMessage, conv models.Conversation) {
+// 	for client := range h.Clients {
+// 		// if client == bm.Client {
+// 		// 	continue
+// 		// }
+// 		if client.ID == conv.User1ID || client.ID == conv.User2ID {
+// 			select {
+// 			case client.Send <- bm.Message:
+// 			case <-time.After(1 * time.Second):
+// 				close(client.Send)
+// 				delete(h.Clients, client)
+// 			}
+// 			return
+// 		}
+// 	}
+// }
+
+
 func (h *Hub) broadcastToRecipient(bm broadcastMessage, conv models.Conversation) {
 	for client := range h.Clients {
-		if client == bm.Client {
+		if client.ID != conv.User1ID && client.ID != conv.User2ID {
 			continue
 		}
-		if client.ID == conv.User1ID || client.ID == conv.User2ID {
-			select {
-			case client.Send <- bm.Message:
-			case <-time.After(1 * time.Second):
-				close(client.Send)
-				delete(h.Clients, client)
-			}
-			return
+
+		select {
+		case client.Send <- bm.Message:
+		case <-time.After(1 * time.Second):
+			close(client.Send)
+			delete(h.Clients, client)
 		}
 	}
 }

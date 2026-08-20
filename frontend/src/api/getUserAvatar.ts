@@ -67,3 +67,4 @@ export async function fetchUserProfilePicture(userId?: string): Promise<string |
 
   return null;
 }
+
