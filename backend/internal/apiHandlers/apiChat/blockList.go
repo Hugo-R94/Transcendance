@@ -25,7 +25,8 @@ func (h *ChatHandler) blockUser(c *gin.Context) {
 	}
 
 	var user models.User
-	if err := h.db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+	if err := h.db.Where("username = ?", req.Username).
+		First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "User not found",
 		})
