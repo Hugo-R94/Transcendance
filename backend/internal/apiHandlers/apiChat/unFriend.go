@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
-	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -13,20 +12,8 @@ import (
 )
 
 func (h *ChatHandler) unFriend(c *gin.Context) {
-	idRaw, exists := c.Get("id")
-	if exists == false {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User id missing",
-		})
-		return
-	}
-	id, ok := idRaw.(uuid.UUID)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid user ID",
-		})
-		return
-	}
+	idRaw, _ := c.Get("id")
+	id := idRaw.(uuid.UUID)
 
 	var req models.UnFriendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -84,5 +71,5 @@ func (h *ChatHandler) unFriend(c *gin.Context) {
 
 func UnFriendReq(router *gin.RouterGroup, db *gorm.DB) {
 	h := &ChatHandler{db: db}
-	router.DELETE("/unfriend", utils.AuthMiddleware(), h.unFriend)
+	router.DELETE("/unfriend", h.unFriend)
 }

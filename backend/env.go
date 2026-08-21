@@ -8,9 +8,8 @@ import (
 )
 
 func envCheck() {
-	err_env := godotenv.Load(".env")
-	if err_env != nil {
-		log.Printf("[WARNING] Error while trying to load .env: %v", err_env)
+	if err := godotenv.Load(".env"); err != nil {
+		log.Printf("[WARNING] Error while trying to load .env: %v", err)
 	}
 	if os.Getenv("ADDR") == "" {
 		log.Fatal("[ERROR] ADDR not found in env")

@@ -11,7 +11,7 @@ import (
 )
 
 var JwtSecret = []byte(os.Getenv("JWT_SECRET"))
-var RefreshSecret = []byte(os.Getenv("JWT_SECRET"))
+var RefreshSecret = []byte(os.Getenv("REFRESH_SECRET"))
 
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
@@ -21,7 +21,7 @@ func HashPassword(password string) (string, error) {
 func HashReToken(token string) (string, error) {
 	hash := sha256.Sum256([]byte(token))
 	tokenHash := hex.EncodeToString(hash[:])
-	bytes, err := bcrypt.GenerateFromPassword([]byte(tokenHash), 12)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(tokenHash), 14)
 	return string(bytes), err
 }
 
