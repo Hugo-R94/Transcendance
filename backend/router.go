@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/apiChat"
+	"github.com/Hugo-R94/Transcendance/backend/internal/gambling"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
@@ -47,7 +48,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	userGroup := router.Group("/")
 	gameGroup := v1.Group("/game")
 	commentGroup := v1.Group("/comments")
-
+	router.GET("/ws", gambling.HandleWebSocket)
 	comment.CommentRoutes(commentGroup, db)
 	game.GetGameInfo(gameGroup, db)
 	user.GetUserInfo(userGroup, v1, db)

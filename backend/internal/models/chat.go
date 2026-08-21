@@ -11,7 +11,7 @@ type (
 	Message struct {
 		ID             uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
 		SenderID       uuid.UUID      `gorm:"type:uuid; index" json:"sender_id"`
-		ConversationID uuid.UUID      `gorm:"type:uuid; index" json:"conversation_id"`
+		ConversationID uuid.UUID      `gorm:"type:uuid; index; constraint:onDelete:CASCADE;" json:"conversation_id"`
 		Text           string         `gorm:"type:text" json:"text"`
 		Time           time.Time      `json:"time"`
 		Type           string         `gorm:"type:varchar(10)" json:"type"`
@@ -27,7 +27,7 @@ type (
 		User1     User           `gorm:"foreignKey:User1ID;references:ID" json:"user1"`
 		User2     User           `gorm:"foreignKey:User2ID;references:ID" json:"user2"`
 		Accepted  bool           `gorm:"default:false" json:"accepted"`
-		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID;onDelete:CASCADE" json:"messages"`
+		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID" json:"messages"`
 		CreatedAt time.Time      `json:"-"`
 		UpdatedAt time.Time      `json:"-"`
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`

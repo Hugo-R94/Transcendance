@@ -1,0 +1,744 @@
+package gambling
+
+import (
+	"errors"
+	"sort"
+	"time"
+
+	"github.com/google/uuid"
+)
+
+// ============================================================
+// ROOM MANAGER
+// ============================================================
+
+func (rm *RoomManager) CreateRoom(roomID string) (*Room, error) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+
+	if _, exists := rm.Rooms[roomID]; exists {
+		return nil, errors.New("room already exists")
+	}
+
+	room := NewRoom(roomID)
+
+	room.Manager = rm
+
+	rm.Rooms[roomID] = room
+
+	return room, nil
+}
+
+func (rm *RoomManager) GetRoom(roomID string) *Room {
+	rm.mu.RLock()
+	defer rm.mu.RUnlock()
+
+	return rm.Rooms[roomID]
+}
+
+// ============================================================
+// DELETE ROOM
+// ============================================================
+
+func (rm *RoomManager) DeleteRoom(roomID string) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+
+	delete(rm.Rooms, roomID)
+}
+
+// ============================================================
+// ROOM
+// ============================================================
+
+func NewRoom(id string) *Room {
+	return &Room{
+		ID:          id,
+		Players:     make(map[uuid.UUID]*Player),
+		CurrentTurn: 0,
+		State:       GameStateWaiting,
+		WinningNum:  -1,
+		Hub:         NewHub(),
+	}
+}
+
+func (r *Room) AddPlayer(player *Player) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.Players[player.ID] = player
+}
+
+func (r *Room) RemovePlayer(playerID uuid.UUID) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	delete(r.Players, playerID)
+}
+
+func (r *Room) GetPlayer(playerID uuid.UUID) *Player {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	return r.Players[playerID]
+}
+
+// ============================================================
+// ROOM STATE
+// ============================================================
+
+func (r *Room) GetRoomState() RoomStateMessage {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	players := make([]PlayerInfo, 0, len(r.Players))
+	ready := 0
+
+	for _, player := range r.Players {
+		if player.Ready {
+			ready++
+		}
+
+		players = append(players, PlayerInfo{
+			PlayerID: player.ID.String(),
+			Username: player.Username,
+			Balance:  player.Balance,
+			Ready:    player.Ready,
+		})
+	}
+
+	sort.Slice(players, func(i, j int) bool {
+		return players[i].Username < players[j].Username
+	})
+
+	return RoomStateMessage{
+		Type:     "room_state",
+		Players:  players,
+		Ready:    ready,
+		Total:    len(players),
+		AllReady: ready >= MinPlayers,
+	}
+}
+
+func (r *Room) ReadyCount() int {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	count := 0
+
+	for _, player := range r.Players {
+		if player.Ready {
+			count++
+		}
+	}
+
+	return count
+}
+
+func (r *Room) CanStartGame() bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	if r.GameStarted {
+		return false
+	}
+
+	ready := 0
+
+	for _, player := range r.Players {
+		if player.Ready {
+			ready++
+		}
+	}
+
+	return ready >= MinPlayers
+}
+
+func (r *Room) IsGameOver() bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	return r.CurrentTurn >= MaxTurns
+}
+
+// ============================================================
+// READY
+// ============================================================
+
+func (r *Room) SetPlayerReady(
+	playerID uuid.UUID,
+	ready bool,
+) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.GameStarted {
+		return errors.New("game already started")
+	}
+
+	player, exists := r.Players[playerID]
+
+	if !exists {
+		return errors.New("player not found")
+	}
+
+	player.Ready = ready
+
+	return nil
+}
+
+// ============================================================
+// START GAME
+// ============================================================
+
+func (r *Room) StartGame() {
+	r.mu.Lock()
+
+	if r.GameStarted {
+		r.mu.Unlock()
+		return
+	}
+
+	r.GameStarted = true
+	r.StartPending = false
+	r.CurrentTurn = 1
+	r.State = GameStateWaiting
+
+	r.mu.Unlock()
+
+	r.Hub.BroadcastJSON(GameStartedMessage{
+		Type: "game_started",
+		Turn: 1,
+	})
+
+	go r.RunGame()
+}
+
+// ============================================================
+// TURN
+// ============================================================
+
+func (r *Room) StartTurn() {
+	r.mu.Lock()
+
+	r.ResetBetsUnsafe()
+
+	r.State = GameStateBetting
+	r.BettingStartedAt = time.Now()
+
+	turn := r.CurrentTurn
+
+	r.mu.Unlock()
+
+	r.Hub.BroadcastJSON(TurnStartedMessage{
+		Type: "turn_started",
+		Turn: turn,
+	})
+
+	r.Hub.BroadcastJSON(BettingStartedMessage{
+		Type:     "betting_started",
+		Turn:     turn,
+		Duration: int(BettingDuration.Seconds()),
+	})
+}
+
+// ============================================================
+// RESET BETS
+// ============================================================
+
+func (r *Room) ResetBetsUnsafe() {
+	for _, player := range r.Players {
+		player.CurrentBet = nil
+		player.ScratchResult = nil
+	}
+
+	r.WinningNum = -1
+}
+
+// ============================================================
+// BETTING PHASE
+// ============================================================
+
+func (r *Room) RunBettingPhase() {
+	time.Sleep(BettingDuration)
+
+	r.mu.Lock()
+
+	if r.State != GameStateBetting {
+		r.mu.Unlock()
+		return
+	}
+
+	r.State = GameStateScratch
+	turn := r.CurrentTurn
+
+	r.mu.Unlock()
+
+	r.Hub.BroadcastJSON(BettingEndedMessage{
+		Type: "betting_ended",
+		Turn: turn,
+	})
+
+	// // Le client reçoit cette phase et peut démarrer
+	// // son compte à rebours local.
+	// r.Hub.BroadcastJSON(ScratchStartedMessage{
+	// 	Type:     "scratch_started",
+	// 	Turn:     turn,
+	// 	Duration: int(ScratchDuration.Seconds()),
+	// })
+}
+
+// ============================================================
+// SCRATCH PHASE
+// ============================================================
+
+func (r *Room) RunScratchPhase() {
+	time.Sleep(ScratchDuration)
+
+	r.mu.Lock()
+
+	if r.State != GameStateScratch {
+		r.mu.Unlock()
+		return
+	}
+
+	r.State = GameStateSpinning
+	turn := r.CurrentTurn
+
+	r.mu.Unlock()
+
+	r.Hub.BroadcastJSON(SpinningStartedMessage{
+		Type:     "spinning_started",
+		Turn:     turn,
+		Duration: int(SpinningDuration.Seconds()),
+	})
+}
+
+// ============================================================
+// BET
+// ============================================================
+
+func (r *Room) PlaceBet(
+	playerID uuid.UUID,
+	chip *Chip,
+) error {
+	if chip == nil {
+		return errors.New("invalid bet")
+	}
+
+	if chip.ChipValue <= 0 {
+		return errors.New("invalid chip value")
+	}
+
+	if !isValidTarget(chip.Target) {
+		return errors.New("invalid betting target")
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.State != GameStateBetting {
+		return errors.New("betting is not active")
+	}
+
+	if time.Since(r.BettingStartedAt) > BettingDuration {
+		return errors.New("betting time expired")
+	}
+
+	player, exists := r.Players[playerID]
+
+	if !exists {
+		return errors.New("player not found")
+	}
+
+	if player.CurrentBet != nil {
+		return errors.New("player already has a bet")
+	}
+
+	if chip.ChipValue > player.Balance {
+		return errors.New("insufficient balance")
+	}
+
+	// Retrait immédiat de la mise.
+	player.Balance -= chip.ChipValue
+
+	chip.PlayerID = playerID.String()
+
+	player.CurrentBet = chip
+
+	return nil
+}
+
+// ============================================================
+// SCRATCH
+// ============================================================
+
+func (r *Room) ScratchPlayer(
+	playerID uuid.UUID,
+) (*Ticket, error) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.State != GameStateScratch {
+		return nil, errors.New(
+			"scratch phase is not active",
+		)
+	}
+
+	player, exists := r.Players[playerID]
+
+	if !exists {
+		return nil, errors.New("player not found")
+	}
+
+	if player.CurrentBet == nil {
+		return nil, errors.New(
+			"you must place a bet first",
+		)
+	}
+
+	if player.ScratchResult != nil {
+		return nil, errors.New(
+			"ticket already scratched",
+		)
+	}
+
+	ticket := generateScratchTicket()
+
+	if ticket == nil {
+		return nil, errors.New(
+			"unable to generate scratch ticket",
+		)
+	}
+
+	player.ScratchResult = ticket
+
+	return ticket, nil
+}
+
+// ============================================================
+// SPIN
+// ============================================================
+
+func (r *Room) Spin() error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if r.State != GameStateSpinning {
+		return errors.New(
+			"spinning phase is not active",
+		)
+	}
+
+	number, err := winningNumberGenerator()
+
+	if err != nil {
+		return err
+	}
+
+	r.WinningNum = number
+
+	return nil
+}
+
+// ============================================================
+// RESOLVE
+// ============================================================
+
+func (r *Room) ResolveTurn() TurnResolvedMessage {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	results := make(
+		[]PlayerResult,
+		0,
+		len(r.Players),
+	)
+
+	for _, player := range r.Players {
+		bet := player.CurrentBet
+
+		// Aucun pari.
+		if bet == nil {
+			results = append(
+				results,
+				PlayerResult{
+					PlayerID: player.ID.String(),
+					Username: player.Username,
+					Result:   "tie",
+
+					BalanceBefore: player.Balance,
+					Gain:          0,
+					BalanceAfter:  player.Balance,
+				},
+			)
+
+			continue
+		}
+
+		// Le solde actuel est le solde après retrait
+		// de la mise.
+		balanceAfterBet := player.Balance
+
+		win := calculateFinalWin(
+			bet,
+			player.ScratchResult,
+			r.WinningNum,
+		)
+
+		// On reverse le gain.
+		player.Balance += win
+
+		// Solde réellement possédé avant le pari.
+		balanceBeforeBet :=
+			balanceAfterBet + bet.ChipValue
+
+		// Gain net par rapport au solde initial.
+		netGain :=
+			player.Balance - balanceBeforeBet
+
+		result := "lose"
+
+		if netGain > 0 {
+			result = "win"
+		} else if netGain == 0 {
+			result = "tie"
+		}
+
+		results = append(
+			results,
+			PlayerResult{
+				PlayerID: player.ID.String(),
+				Username: player.Username,
+
+				Result: result,
+
+				BalanceBefore: balanceBeforeBet,
+
+				Gain: netGain,
+
+				BalanceAfter: player.Balance,
+			},
+		)
+	}
+
+	sort.Slice(
+		results,
+		func(i, j int) bool {
+			return results[i].Gain >
+				results[j].Gain
+		},
+	)
+
+	r.State = GameStateResolving
+
+	return TurnResolvedMessage{
+		Type:          "turn_resolved",
+		Turn:          r.CurrentTurn,
+		WinningNumber: r.WinningNum,
+		Players:       results,
+	}
+}
+
+// ============================================================
+// RUN TURN
+// ============================================================
+
+func (r *Room) RunTurn() error {
+	// ========================================================
+	// BETTING
+	// ========================================================
+
+	r.StartTurn()
+
+	r.RunBettingPhase()
+
+	// ========================================================
+	// SCRATCH
+	// ========================================================
+
+	r.RunScratchPhase()
+
+	// ========================================================
+	// SPIN
+	// ========================================================
+
+	if err := r.Spin(); err != nil {
+		return err
+	}
+
+	// Le numéro est tiré, mais on laisse la roulette
+	// tourner pendant la durée prévue.
+	time.Sleep(SpinningDuration)
+
+	// ========================================================
+	// RESOLVE
+	// ========================================================
+
+	result := r.ResolveTurn()
+
+	// Le serveur envoie ici les balanceAfter définitifs.
+	r.Hub.BroadcastJSON(result)
+
+	// Laisse le temps au frontend d'afficher le résultat.
+	time.Sleep(ResultDuration)
+
+	return nil
+}
+
+// ============================================================
+// RUN GAME
+// ============================================================
+
+func (r *Room) RunGame() {
+	for {
+		// ======================================================
+		// RUN TURN
+		// ======================================================
+
+		if err := r.RunTurn(); err != nil {
+			r.Hub.BroadcastJSON(ErrorMessage{
+				Type:    "error",
+				Message: err.Error(),
+			})
+
+			r.mu.Lock()
+			r.State = GameStateFinished
+			r.mu.Unlock()
+
+			// Même en cas d'erreur, on détruit la room.
+			r.DestroyRoom()
+
+			return
+		}
+
+		// ======================================================
+		// GAME OVER
+		// ======================================================
+
+		r.mu.Lock()
+
+		if r.CurrentTurn >= MaxTurns {
+			r.State = GameStateFinished
+
+			turn := r.CurrentTurn
+
+			var winnerID string
+			winnerBalance := -1
+
+			for _, player := range r.Players {
+				if player.Balance > winnerBalance {
+					winnerBalance = player.Balance
+					winnerID = player.ID.String()
+				}
+			}
+
+			r.mu.Unlock()
+
+			// IMPORTANT :
+			// envoyer game_finished AVANT de supprimer la room.
+			r.Hub.BroadcastJSON(GameFinishedMessage{
+				Type:     "game_finished",
+				Turn:     turn,
+				WinnerID: winnerID,
+			})
+
+			// Petit délai pour laisser les clients recevoir
+			// le dernier message.
+			time.Sleep(500 * time.Millisecond)
+
+			// ==================================================
+			// DESTROY ROOM
+			// ==================================================
+
+			r.DestroyRoom()
+
+			return
+		}
+
+		// ======================================================
+		// NEXT TURN
+		// ======================================================
+
+		r.CurrentTurn++
+
+		r.mu.Unlock()
+
+		time.Sleep(1 * time.Second)
+	}
+}
+
+// ============================================================
+// DESTROY ROOM
+// ============================================================
+
+func (r *Room) DestroyRoom() {
+	if r.Manager == nil {
+		return
+	}
+
+	r.Manager.DeleteRoom(r.ID)
+}
+
+// ============================================================
+// START COUNTDOWN
+// ============================================================
+
+func (r *Room) StartCountdown() {
+	r.mu.Lock()
+
+	if r.StartPending || r.GameStarted {
+		r.mu.Unlock()
+		return
+	}
+
+	r.StartPending = true
+
+	r.mu.Unlock()
+
+	go func() {
+		for remaining := 5; remaining > 0; remaining-- {
+			r.mu.RLock()
+
+			ready := 0
+
+			for _, player := range r.Players {
+				if player.Ready {
+					ready++
+				}
+			}
+
+			gameStarted := r.GameStarted
+
+			r.mu.RUnlock()
+
+			// Quelqu'un n'est plus prêt :
+			// on annule le compte à rebours.
+			if gameStarted || ready < MinPlayers {
+				r.mu.Lock()
+				r.StartPending = false
+				r.mu.Unlock()
+
+				return
+			}
+
+			r.Hub.BroadcastJSON(
+				GameStartingMessage{
+					Type:      "game_starting",
+					Countdown: remaining,
+				},
+			)
+
+			time.Sleep(time.Second)
+		}
+
+		// Vérification finale.
+		if r.CanStartGame() {
+			r.StartGame()
+		} else {
+			r.mu.Lock()
+			r.StartPending = false
+			r.mu.Unlock()
+		}
+	}()
+}
