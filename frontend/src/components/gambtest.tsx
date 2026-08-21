@@ -2,11 +2,9 @@ import { useState } from "react";
 
 import { Roulette } from "./gambling/roulette";
 import { PhaseTimer } from "./gambling/phaseTimer";
-import { Balance } from "./gambling/balance";
 import { BettingPanel } from "./gambling/bettingPanel";
 import { MyResult } from "./gambling/Result";
 import { ResultsTable } from "./gambling/resultTable";
-import { ScratchTicket } from "./gambling/scratchTicket";
 
 export default function Gambling() {
   const [betAmount, setBetAmount] =
@@ -27,69 +25,84 @@ export default function Gambling() {
       target: string;
     } | null>(null);
 
-  const [ticket, setTicket] =
-    useState<any>(null);
-
-  const placeBet = () => {
+  const placeBet = (
+    newTarget: string,
+    amount: number
+  ) => {
     setHasBet(true);
 
     setCurrentBet({
-      chipValue: betAmount,
-      target,
+      chipValue: amount,
+      target: newTarget,
     });
-  };
 
-  const scratch = () => {
-    setTicket({
-      type: "bonus",
-      value: 0.2,
-    });
+    setTarget(newTarget);
+    setBetAmount(amount);
   };
 
   return (
     <>
       <main className="relative">
-		<div className="flex inset-0 mx-auto">
-        <Balance
-          balance={balance}
-        />
-		</div>
 
-        <PhaseTimer
-          state="betting"
-          countdown={15}
-        />
+        {/* TIMER */}
+        <div className="mt-5">
+          <PhaseTimer
+            state="betting"
+            countdown={15}
+          />
+        </div>
 
-        <Roulette
-          winningNumber={17}
-          state="betting"
-        />
+        {/* ROULETTE */}
+        <div className="mt-20">
+          <Roulette
+            winningNumber={0}
+            state="betting"
+          />
+        </div>
 
+        {/* TABLE */}
         <BettingPanel
           state="betting"
+
           balance={balance}
+
           betAmount={betAmount}
           setBetAmount={setBetAmount}
+
           target={target}
           setTarget={setTarget}
+
           currentBet={currentBet}
+
           hasBet={hasBet}
+
           phaseCountdown={15}
+
           placeBet={placeBet}
+
+          /*
+           * TEST
+           *
+           * Ici on simule le joueur connecté.
+           */
+          userID="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3ODczMzU2NzMsImlkIjoiNTFmODIwMjQtOWZlZS00OTFiLWE1MGItYmZhZjc5ZDU1NWVlIn0.jmpObXXWjk5EDe1s9L68g1IeXQfghG5pMQfdSL5RIrM"
+
+          /*
+           * TEST
+           *
+           * Le joueur numéro 2
+           * doit donc avoir la couleur
+           * correspondant au numéro 2.
+           */
+          playerNumber={2}
         />
 
-        <ScratchTicket
-          state="scratch"
-          hasBet={hasBet}
-          ticket={ticket}
-          countdown={10}
-          scratch={scratch}
-        />
-
+        {/* RESULTAT */}
         <MyResult
           result={null}
         />
 
+        {/* HISTORIQUE */}
         <ResultsTable
           results={[]}
           playerId="demo"

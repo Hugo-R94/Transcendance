@@ -1866,9 +1866,6 @@ export default function Gambling() {
 
           <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8">
 
-            <h2 className="mb-6 text-2xl font-black">
-              Ton pari
-            </h2>
 
             {/* BALANCE */}
 

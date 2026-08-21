@@ -267,7 +267,6 @@ func (c *Client) handlePlaceBet(data []byte) {
 			Type:    "error",
 			Message: "you are not in a room",
 		})
-
 		return
 	}
 
@@ -278,7 +277,6 @@ func (c *Client) handlePlaceBet(data []byte) {
 			Type:    "error",
 			Message: "invalid place_bet message",
 		})
-
 		return
 	}
 
@@ -288,33 +286,29 @@ func (c *Client) handlePlaceBet(data []byte) {
 		Target:    message.Target,
 	}
 
-	if err := c.Room.PlaceBet(
-		c.PlayerID,
-		chip,
-	); err != nil {
-
+	if err := c.Room.PlaceBet(c.PlayerID, chip); err != nil {
 		c.SendJSON(ErrorMessage{
 			Type:    "error",
 			Message: err.Error(),
 		})
-
 		return
 	}
 
 	player := c.Room.GetPlayer(c.PlayerID)
-
 	if player == nil {
 		return
 	}
 
-	// Confirmation personnelle avec le vrai solde.
-	c.SendJSON(BetPlacedMessage{
-		Type:      "bet_placed",
-		PlayerID:  c.PlayerID.String(),
-		ChipValue: message.ChipValue,
-		Target:    message.Target,
-		Balance:   player.Balance,
-	})
+	message := BetPlacedMessage{
+		Type:         "bet_placed",
+		PlayerID:     c.PlayerID.String(),
+		PlayerNumber: player.userNumber,
+		ChipValue:    message.ChipValue,
+		Target:       message.Target,
+		Balance:      player.Balance,
+	}
+
+	c.Room.Hub.BroadcastJSON(message)
 }
 
 // ============================================================

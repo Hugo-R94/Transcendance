@@ -68,11 +68,11 @@ type Room struct {
 // ============================================================
 
 type Player struct {
-	ID       uuid.UUID
-	Username string
-	Balance  int
-
-	Ready bool
+	ID         uuid.UUID
+	PlayerNumber int
+	Username   string
+	Balance    int
+	Ready      bool
 
 	CurrentBet    *Chip
 	ScratchResult *Ticket
@@ -243,11 +243,12 @@ type BettingEndedMessage struct {
 }
 
 type BetPlacedMessage struct {
-	Type      string `json:"type"`
-	PlayerID  string `json:"playerId"`
-	ChipValue int    `json:"chipValue"`
-	Target    string `json:"target"`
-	Balance   int    `json:"balance"`
+	Type         string `json:"type"`
+	PlayerID     string `json:"playerId"`
+	PlayerNumber int    `json:"playerNumber"`
+	ChipValue    int    `json:"chipValue"`
+	Target       string `json:"target"`
+	Balance      int    `json:"balance"`
 }
 
 type ScratchResultMessage struct {

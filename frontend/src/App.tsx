@@ -16,6 +16,7 @@ import MinimalChat from "./pages/minichat";
 import ChatMenu from "./components/chatMenu";
 import Gambling from "./pages/gambling";
 
+
 function ProtectedLayout() {
   return (
     <>

@@ -1,8 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useEffect, useRef, useState } from "react";
 
 import type {
   Player,
@@ -13,70 +9,50 @@ import type {
   JsonLog,
 } from "../types/gambling";
 
+export type PlayerBet = {
+  playerId: string;
+  playerNumber: number;
+  chipValue: number;
+  target: string;
+};
+
 export function useGambling() {
   // ==========================================================
   // WEBSOCKET
   // ==========================================================
 
-  const socketRef =
-    useRef<WebSocket | null>(null);
-
-  const playerIdRef =
-    useRef("");
-
-  const logIdRef =
-    useRef(0);
+  const socketRef = useRef<WebSocket | null>(null);
+  const playerIdRef = useRef("");
+  const logIdRef = useRef(0);
 
   const phaseCountdownIntervalRef =
-    useRef<ReturnType<typeof setInterval> | null>(
-      null
-    );
+    useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ==========================================================
   // CONNECTION
   // ==========================================================
 
-  const [connected, setConnected] =
-    useState(false);
-
-  const [joined, setJoined] =
-    useState(false);
-
-  const [roomId, setRoomId] =
-    useState("room-123");
-
-  const [playerId, setPlayerId] =
-    useState("");
-
-  const [username, setUsername] =
-    useState("");
+  const [connected, setConnected] = useState(false);
+  const [joined, setJoined] = useState(false);
+  const [roomId, setRoomId] = useState("room-123");
+  const [playerId, setPlayerId] = useState("");
+  const [username, setUsername] = useState("");
 
   // ==========================================================
   // LOBBY
   // ==========================================================
 
-  const [players, setPlayers] =
-    useState<Player[]>([]);
-
-  const [ready, setReady] =
-    useState(false);
-
-  const [countdown, setCountdown] =
-    useState<number | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [ready, setReady] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // ==========================================================
   // GAME
   // ==========================================================
 
-  const [gameStarted, setGameStarted] =
-    useState(false);
-
-  const [turn, setTurn] =
-    useState(0);
-
-  const [state, setState] =
-    useState("waiting");
-
+  const [gameStarted, setGameStarted] = useState(false);
+  const [turn, setTurn] = useState(0);
+  const [state, setState] = useState("waiting");
   const [phaseCountdown, setPhaseCountdown] =
     useState<number | null>(null);
 
@@ -84,30 +60,21 @@ export function useGambling() {
   // BET
   // ==========================================================
 
-  const [balance, setBalance] =
-    useState(1000);
+  const [balance, setBalance] = useState(1000);
+  const [balanceBefore, setBalanceBefore] = useState(1000);
+  const [betAmount, setBetAmount] = useState(50);
+  const [target, setTarget] = useState("red");
+  const [currentBet, setCurrentBet] = useState<Bet | null>(null);
+  const [hasBet, setHasBet] = useState(false);
 
-  const [balanceBefore, setBalanceBefore] =
-    useState(1000);
-
-  const [betAmount, setBetAmount] =
-    useState(50);
-
-  const [target, setTarget] =
-    useState("red");
-
-  const [currentBet, setCurrentBet] =
-    useState<Bet | null>(null);
-
-  const [hasBet, setHasBet] =
-    useState(false);
+  // Tous les paris actuellement présents sur la table.
+  const [playerBets, setPlayerBets] = useState<PlayerBet[]>([]);
 
   // ==========================================================
   // SCRATCH
   // ==========================================================
 
-  const [ticket, setTicket] =
-    useState<Ticket | null>(null);
+  const [ticket, setTicket] = useState<Ticket | null>(null);
 
   // ==========================================================
   // ROULETTE
@@ -120,86 +87,57 @@ export function useGambling() {
   // RESULTS
   // ==========================================================
 
-  const [myResult, setMyResult] =
-    useState<Result | null>(null);
-
-  const [results, setResults] =
-    useState<Result[]>([]);
+  const [myResult, setMyResult] = useState<Result | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
 
   // ==========================================================
   // ERROR / LOGS
   // ==========================================================
 
-  const [error, setError] =
-    useState("");
-
-  const [jsonLogs, setJsonLogs] =
-    useState<JsonLog[]>([]);
+  const [error, setError] = useState("");
+  const [jsonLogs, setJsonLogs] = useState<JsonLog[]>([]);
 
   // ==========================================================
   // COUNTDOWN
   // ==========================================================
 
   const stopPhaseCountdown = () => {
-    if (
-      phaseCountdownIntervalRef.current
-    ) {
-      clearInterval(
-        phaseCountdownIntervalRef.current
-      );
-
-      phaseCountdownIntervalRef.current =
-        null;
+    if (phaseCountdownIntervalRef.current) {
+      clearInterval(phaseCountdownIntervalRef.current);
+      phaseCountdownIntervalRef.current = null;
     }
 
     setPhaseCountdown(null);
   };
 
-  const startPhaseCountdown = (
-    seconds: number
-  ) => {
+  const startPhaseCountdown = (seconds: number) => {
     stopPhaseCountdown();
 
-    if (
-      !Number.isFinite(seconds) ||
-      seconds <= 0
-    ) {
+    if (!Number.isFinite(seconds) || seconds <= 0) {
       setPhaseCountdown(null);
       return;
     }
 
-    let remaining =
-      Math.ceil(seconds);
+    let remaining = Math.ceil(seconds);
 
-    setPhaseCountdown(
-      remaining
-    );
+    setPhaseCountdown(remaining);
 
-    phaseCountdownIntervalRef.current =
-      setInterval(() => {
-        remaining--;
+    phaseCountdownIntervalRef.current = setInterval(() => {
+      remaining--;
 
-        if (remaining <= 0) {
-          setPhaseCountdown(0);
+      if (remaining <= 0) {
+        setPhaseCountdown(0);
 
-          if (
-            phaseCountdownIntervalRef.current
-          ) {
-            clearInterval(
-              phaseCountdownIntervalRef.current
-            );
-
-            phaseCountdownIntervalRef.current =
-              null;
-          }
-
-          return;
+        if (phaseCountdownIntervalRef.current) {
+          clearInterval(phaseCountdownIntervalRef.current);
+          phaseCountdownIntervalRef.current = null;
         }
 
-        setPhaseCountdown(
-          remaining
-        );
-      }, 1000);
+        return;
+      }
+
+      setPhaseCountdown(remaining);
+    }, 1000);
   };
 
   // ==========================================================
@@ -214,57 +152,35 @@ export function useGambling() {
       id: ++logIdRef.current,
       direction,
       data,
-      timestamp:
-        new Date().toLocaleTimeString(),
+      timestamp: new Date().toLocaleTimeString(),
     };
 
-    console.log(
-      `[WS ${direction}]`,
-      data
-    );
+    console.log(`[WS ${direction}]`, data);
 
-    setJsonLogs((current) => [
-      log,
-      ...current,
-    ]);
+    setJsonLogs((current) => [log, ...current]);
   };
 
   // ==========================================================
   // SEND
   // ==========================================================
 
-  const send = (
-    message: object
-  ) => {
-    const socket =
-      socketRef.current;
+  const send = (message: object) => {
+    const socket = socketRef.current;
 
-    if (
-      !socket ||
-      socket.readyState !==
-        WebSocket.OPEN
-    ) {
-      setError(
-        "WebSocket non connecté"
-      );
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      setError("WebSocket non connecté");
 
       addJsonLog("system", {
         type: "send_error",
-        message:
-          "WebSocket non connecté",
+        message: "WebSocket non connecté",
       });
 
       return false;
     }
 
-    addJsonLog(
-      "sent",
-      message
-    );
+    addJsonLog("sent", message);
 
-    socket.send(
-      JSON.stringify(message)
-    );
+    socket.send(JSON.stringify(message));
 
     return true;
   };
@@ -273,13 +189,8 @@ export function useGambling() {
   // SERVER MESSAGE
   // ==========================================================
 
-  const handleServerMessage = (
-    data: ServerMessage
-  ) => {
-    console.log(
-      "SERVER MESSAGE:",
-      data
-    );
+  const handleServerMessage = (data: ServerMessage) => {
+    console.log("SERVER MESSAGE:", data);
 
     switch (data.type) {
       // ======================================================
@@ -287,13 +198,10 @@ export function useGambling() {
       // ======================================================
 
       case "connected": {
-        const id =
-          data.playerId ?? "";
+        const id = data.playerId ?? "";
 
         setPlayerId(id);
-
-        playerIdRef.current =
-          id;
+        playerIdRef.current = id;
 
         break;
       }
@@ -303,31 +211,17 @@ export function useGambling() {
       // ======================================================
 
       case "room_joined": {
-        const id =
-          data.playerId ?? "";
+        const id = data.playerId ?? "";
 
         setJoined(true);
-
         setPlayerId(id);
+        playerIdRef.current = id;
 
-        playerIdRef.current =
-          id;
+        setUsername(data.username ?? "");
 
-        setUsername(
-          data.username ?? ""
-        );
-
-        if (
-          typeof data.balance ===
-          "number"
-        ) {
-          setBalance(
-            data.balance
-          );
-
-          setBalanceBefore(
-            data.balance
-          );
+        if (typeof data.balance === "number") {
+          setBalance(data.balance);
+          setBalanceBefore(data.balance);
         }
 
         break;
@@ -338,30 +232,17 @@ export function useGambling() {
       // ======================================================
 
       case "room_state": {
-        if (
-          Array.isArray(
-            data.players
-          )
-        ) {
-          setPlayers(
-            data.players
+        if (Array.isArray(data.players)) {
+          setPlayers(data.players);
+
+          const me = data.players.find(
+            (p: Player) =>
+              p.playerId === playerIdRef.current
           );
 
-          const me =
-            data.players.find(
-              (p: Player) =>
-                p.playerId ===
-                playerIdRef.current
-            );
-
           if (me) {
-            setReady(
-              me.ready
-            );
-
-            setBalance(
-              me.balance
-            );
+            setReady(me.ready);
+            setBalance(me.balance);
           }
         }
 
@@ -373,36 +254,26 @@ export function useGambling() {
       // ======================================================
 
       case "player_joined": {
-        setPlayers(
-          (current) => {
-            if (
-              current.some(
-                (p) =>
-                  p.playerId ===
-                  data.playerId
-              )
-            ) {
-              return current;
-            }
-
-            return [
-              ...current,
-              {
-                playerId:
-                  data.playerId,
-                username:
-                  data.username ??
-                  data.playerId,
-                balance:
-                  data.balance ??
-                  1000,
-                ready:
-                  data.ready ??
-                  false,
-              },
-            ];
+        setPlayers((current) => {
+          if (
+            current.some(
+              (p) => p.playerId === data.playerId
+            )
+          ) {
+            return current;
           }
-        );
+
+          return [
+            ...current,
+            {
+              playerId: data.playerId,
+              username:
+                data.username ?? data.playerId,
+              balance: data.balance ?? 1000,
+              ready: data.ready ?? false,
+            },
+          ];
+        });
 
         break;
       }
@@ -412,13 +283,17 @@ export function useGambling() {
       // ======================================================
 
       case "player_left": {
-        setPlayers(
-          (current) =>
-            current.filter(
-              (p) =>
-                p.playerId !==
-                data.playerId
-            )
+        setPlayers((current) =>
+          current.filter(
+            (p) => p.playerId !== data.playerId
+          )
+        );
+
+        // Son chip doit également disparaître.
+        setPlayerBets((current) =>
+          current.filter(
+            (bet) => bet.playerId !== data.playerId
+          )
         );
 
         break;
@@ -429,28 +304,22 @@ export function useGambling() {
       // ======================================================
 
       case "player_ready": {
-        setPlayers(
-          (current) =>
-            current.map(
-              (player) =>
-                player.playerId ===
-                data.playerId
-                  ? {
-                      ...player,
-                      ready:
-                        data.ready,
-                    }
-                  : player
-            )
+        setPlayers((current) =>
+          current.map((player) =>
+            player.playerId === data.playerId
+              ? {
+                  ...player,
+                  ready: data.ready,
+                }
+              : player
+          )
         );
 
         if (
           data.playerId ===
           playerIdRef.current
         ) {
-          setReady(
-            data.ready
-          );
+          setReady(data.ready);
         }
 
         break;
@@ -462,8 +331,7 @@ export function useGambling() {
 
       case "game_starting": {
         setCountdown(
-          typeof data.countdown ===
-            "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : null
         );
@@ -476,55 +344,30 @@ export function useGambling() {
       // ======================================================
 
       case "game_started": {
-        console.log(
-          "GAME STARTED !",
-          data
-        );
+        console.log("GAME STARTED !", data);
 
-        setGameStarted(
-          true
-        );
-
-        setCountdown(
-          null
-        );
+        setGameStarted(true);
+        setCountdown(null);
 
         setTurn(
-          typeof data.turn ===
-            "number"
+          typeof data.turn === "number"
             ? data.turn
             : 1
         );
 
-        setState(
-          "betting"
-        );
-
+        setState("betting");
         setResults([]);
+        setMyResult(null);
+        setWinningNumber(null);
+        setCurrentBet(null);
+        setHasBet(false);
+        setTicket(null);
 
-        setMyResult(
-          null
-        );
-
-        setWinningNumber(
-          null
-        );
-
-        setCurrentBet(
-          null
-        );
-
-        setHasBet(
-          false
-        );
-
-        setTicket(
-          null
-        );
+        // Nouvelle partie = aucun chip.
+        setPlayerBets([]);
 
         startPhaseCountdown(
-          typeof data.countdown ===
-            "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 15
         );
@@ -537,46 +380,27 @@ export function useGambling() {
       // ======================================================
 
       case "turn_started": {
-        setGameStarted(
-          true
-        );
+        setGameStarted(true);
 
         setTurn(
-          typeof data.turn ===
-            "number"
+          typeof data.turn === "number"
             ? data.turn
             : 1
         );
 
-        setState(
-          "betting"
-        );
-
-        setHasBet(
-          false
-        );
-
-        setCurrentBet(
-          null
-        );
-
-        setTicket(
-          null
-        );
-
-        setWinningNumber(
-          null
-        );
-
-        setMyResult(
-          null
-        );
-
+        setState("betting");
+        setHasBet(false);
+        setCurrentBet(null);
+        setTicket(null);
+        setWinningNumber(null);
+        setMyResult(null);
         setResults([]);
 
+        // Nouveau tour = nouveaux chips.
+        setPlayerBets([]);
+
         startPhaseCountdown(
-          typeof data.countdown ===
-            "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 15
         );
@@ -589,26 +413,15 @@ export function useGambling() {
       // ======================================================
 
       case "betting_started": {
-        setGameStarted(
-          true
-        );
+        setGameStarted(true);
+        setState("betting");
 
-        setState(
-          "betting"
-        );
-
-        if (
-          typeof data.turn ===
-          "number"
-        ) {
-          setTurn(
-            data.turn
-          );
+        if (typeof data.turn === "number") {
+          setTurn(data.turn);
         }
 
         startPhaseCountdown(
-          typeof data.countdown ===
-            "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 15
         );
@@ -621,13 +434,10 @@ export function useGambling() {
       // ======================================================
 
       case "betting_ended": {
-        setState(
-          "scratch"
-        );
+        setState("scratch");
 
         startPhaseCountdown(
-          typeof data.countdown ===
-            "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 10
         );
@@ -640,48 +450,61 @@ export function useGambling() {
       // ======================================================
 
       case "bet_placed": {
+        const newBet: PlayerBet = {
+          playerId: data.playerId,
+          playerNumber:
+            typeof data.playerNumber === "number"
+              ? data.playerNumber
+              : 0,
+          chipValue: data.chipValue,
+          target: data.target,
+        };
+
+        // Remplace le pari précédent du joueur.
+        setPlayerBets((current) => [
+          ...current.filter(
+            (bet) =>
+              bet.playerId !==
+              data.playerId
+          ),
+          newBet,
+        ]);
+
+        // Si c'est moi, mise à jour de mon état local.
         if (
           data.playerId ===
           playerIdRef.current
         ) {
-          setHasBet(
-            true
-          );
+          setHasBet(true);
 
           setCurrentBet({
-            chipValue:
-              data.chipValue,
-            target:
-              data.target,
+            chipValue: data.chipValue,
+            target: data.target,
           });
 
           if (
-            typeof data.balance ===
-            "number"
+            typeof data.balance === "number"
           ) {
-            setBalance(
-              data.balance
-            );
+            setBalance(data.balance);
           }
         }
 
+        // Mise à jour du solde du joueur
+        // dans le lobby / players.
         if (
-          typeof data.balance ===
-          "number"
+          typeof data.balance === "number"
         ) {
-          setPlayers(
-            (current) =>
-              current.map(
-                (player) =>
-                  player.playerId ===
-                  data.playerId
-                    ? {
-                        ...player,
-                        balance:
-                          data.balance,
-                      }
-                    : player
-              )
+          setPlayers((current) =>
+            current.map((player) =>
+              player.playerId ===
+              data.playerId
+                ? {
+                    ...player,
+                    balance:
+                      data.balance,
+                  }
+                : player
+            )
           );
         }
 
@@ -697,9 +520,7 @@ export function useGambling() {
           data.playerId ===
           playerIdRef.current
         ) {
-          setTicket(
-            data.ticket
-          );
+          setTicket(data.ticket);
         }
 
         break;
@@ -710,13 +531,10 @@ export function useGambling() {
       // ======================================================
 
       case "spinning_started": {
-        setState(
-          "spinning"
-        );
+        setState("spinning");
 
         startPhaseCountdown(
-          typeof data.countdown ===
-            "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 5
         );
@@ -731,17 +549,10 @@ export function useGambling() {
       case "turn_resolved": {
         stopPhaseCountdown();
 
-        setState(
-          "resolving"
-        );
+        setState("resolving");
 
-        if (
-          typeof data.turn ===
-          "number"
-        ) {
-          setTurn(
-            data.turn
-          );
+        if (typeof data.turn === "number") {
+          setTurn(data.turn);
         }
 
         if (
@@ -754,62 +565,52 @@ export function useGambling() {
         }
 
         const serverResults: Result[] =
-          Array.isArray(
-            data.players
-          )
+          Array.isArray(data.players)
             ? data.players
             : [];
 
-        setResults(
-          serverResults
+        setResults(serverResults);
+
+        const me = serverResults.find(
+          (result) =>
+            result.playerId ===
+            playerIdRef.current
         );
 
-        const me =
-          serverResults.find(
-            (result) =>
-              result.playerId ===
-              playerIdRef.current
-          );
-
         if (me) {
-          setMyResult(
-            me
-          );
-
+          setMyResult(me);
           setBalanceBefore(
             me.balanceBefore
           );
-
           setBalance(
             me.balanceAfter
           );
         }
 
-        setPlayers(
-          (currentPlayers) =>
-            currentPlayers.map(
-              (player) => {
-                const result =
-                  serverResults.find(
-                    (r) =>
-                      r.playerId ===
-                      player.playerId
-                  );
+        setPlayers((currentPlayers) =>
+          currentPlayers.map(
+            (player) => {
+              const result =
+                serverResults.find(
+                  (r) =>
+                    r.playerId ===
+                    player.playerId
+                );
 
-                if (!result) {
-                  return player;
-                }
-
-                return {
-                  ...player,
-                  username:
-                    result.username ??
-                    player.username,
-                  balance:
-                    result.balanceAfter,
-                };
+              if (!result) {
+                return player;
               }
-            )
+
+              return {
+                ...player,
+                username:
+                  result.username ??
+                  player.username,
+                balance:
+                  result.balanceAfter,
+              };
+            }
+          )
         );
 
         break;
@@ -822,25 +623,16 @@ export function useGambling() {
       case "game_finished": {
         stopPhaseCountdown();
 
-        setGameStarted(
-          false
-        );
+        setGameStarted(false);
+        setState("finished");
+        setCountdown(null);
 
-        setState(
-          "finished"
-        );
-
-        setCountdown(
-          null
-        );
+        setPlayerBets([]);
 
         if (
-          typeof data.balance ===
-          "number"
+          typeof data.balance === "number"
         ) {
-          setBalance(
-            data.balance
-          );
+          setBalance(data.balance);
         }
 
         break;
@@ -853,7 +645,7 @@ export function useGambling() {
       case "error": {
         setError(
           data.message ??
-            "Erreur serveur"
+          "Erreur serveur"
         );
 
         break;
@@ -889,32 +681,23 @@ export function useGambling() {
 
     setError("");
 
-    const socket =
-      new WebSocket(
-        "ws://localhost:8080/ws"
-      );
+    const socket = new WebSocket(
+      "ws://localhost:8080/ws"
+    );
 
     socket.onopen = () => {
       console.log(
         "WebSocket connecté"
       );
 
-      setConnected(
-        true
-      );
+      setConnected(true);
 
-      addJsonLog(
-        "system",
-        {
-          type:
-            "connection_open",
-        }
-      );
+      addJsonLog("system", {
+        type: "connection_open",
+      });
     };
 
-    socket.onmessage = (
-      event
-    ) => {
+    socket.onmessage = (event) => {
       try {
         const data =
           JSON.parse(
@@ -929,9 +712,7 @@ export function useGambling() {
         handleServerMessage(
           data
         );
-      } catch (
-        parseError
-      ) {
+      } catch (parseError) {
         console.error(
           "JSON invalide :",
           event.data,
@@ -941,10 +722,8 @@ export function useGambling() {
         addJsonLog(
           "system",
           {
-            type:
-              "invalid_json",
-            raw:
-              event.data,
+            type: "invalid_json",
+            raw: event.data,
           }
         );
 
@@ -954,9 +733,7 @@ export function useGambling() {
       }
     };
 
-    socket.onerror = (
-      event
-    ) => {
+    socket.onerror = (event) => {
       console.error(
         "WebSocket error :",
         event
@@ -965,8 +742,7 @@ export function useGambling() {
       addJsonLog(
         "system",
         {
-          type:
-            "connection_error",
+          type: "connection_error",
         }
       );
 
@@ -975,9 +751,7 @@ export function useGambling() {
       );
     };
 
-    socket.onclose = (
-      event
-    ) => {
+    socket.onclose = (event) => {
       console.log(
         "WebSocket fermé",
         event.code,
@@ -987,35 +761,24 @@ export function useGambling() {
       addJsonLog(
         "system",
         {
-          type:
-            "connection_closed",
-          code:
-            event.code,
-          reason:
-            event.reason,
+          type: "connection_closed",
+          code: event.code,
+          reason: event.reason,
         }
       );
 
-      setConnected(
-        false
-      );
+      setConnected(false);
+      setJoined(false);
+      setGameStarted(false);
 
-      setJoined(
-        false
-      );
-
-      setGameStarted(
-        false
-      );
+      setPlayerBets([]);
 
       stopPhaseCountdown();
 
-      socketRef.current =
-        null;
+      socketRef.current = null;
     };
 
-    socketRef.current =
-      socket;
+    socketRef.current = socket;
   };
 
   // ==========================================================
@@ -1032,8 +795,7 @@ export function useGambling() {
 
     socket.close();
 
-    socketRef.current =
-      null;
+    socketRef.current = null;
   };
 
   // ==========================================================
@@ -1051,8 +813,7 @@ export function useGambling() {
 
     send({
       type: "join_room",
-      roomId:
-        roomId.trim(),
+      roomId: roomId.trim(),
     });
   };
 
@@ -1065,19 +826,13 @@ export function useGambling() {
       return;
     }
 
-    const next =
-      !ready;
+    const next = !ready;
 
-    // Optimistic UI
-    setReady(
-      next
-    );
+    setReady(next);
 
     send({
-      type:
-        "player_ready",
-      ready:
-        next,
+      type: "player_ready",
+      ready: next,
     });
   };
 
@@ -1085,11 +840,17 @@ export function useGambling() {
   // BET
   // ==========================================================
 
-  const placeBet = () => {
-    if (
-      state !==
-      "betting"
-    ) {
+  const placeBet = (
+    newTarget?: string,
+    amount?: number
+  ) => {
+    const finalTarget =
+      newTarget ?? target;
+
+    const finalAmount =
+      amount ?? betAmount;
+
+    if (state !== "betting") {
       setError(
         "Les paris sont fermés"
       );
@@ -1105,7 +866,7 @@ export function useGambling() {
       return;
     }
 
-    if (betAmount <= 0) {
+    if (finalAmount <= 0) {
       setError(
         "Montant invalide"
       );
@@ -1113,10 +874,7 @@ export function useGambling() {
       return;
     }
 
-    if (
-      betAmount >
-      balance
-    ) {
+    if (finalAmount > balance) {
       setError(
         "Solde insuffisant"
       );
@@ -1124,12 +882,13 @@ export function useGambling() {
       return;
     }
 
+    setTarget(finalTarget);
+    setBetAmount(finalAmount);
+
     send({
-      type:
-        "place_bet",
-      chipValue:
-        betAmount,
-      target,
+      type: "place_bet",
+      chipValue: finalAmount,
+      target: finalTarget,
     });
   };
 
@@ -1138,10 +897,7 @@ export function useGambling() {
   // ==========================================================
 
   const scratch = () => {
-    if (
-      state !==
-      "scratch"
-    ) {
+    if (state !== "scratch") {
       setError(
         "Le scratch n'est pas disponible"
       );
@@ -1162,8 +918,7 @@ export function useGambling() {
     }
 
     send({
-      type:
-        "scratch",
+      type: "scratch",
     });
   };
 
@@ -1236,6 +991,9 @@ export function useGambling() {
     currentBet,
     hasBet,
     placeBet,
+
+    // ⭐ paris de tous les joueurs
+    playerBets,
 
     // scratch
     ticket,
