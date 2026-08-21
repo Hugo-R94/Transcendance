@@ -14,6 +14,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
 import MinimalChat from "./pages/minichat";
 import ChatMenu from "./components/chatMenu";
+import Gambling from "./pages/gambling";
 
 function ProtectedLayout() {
   return (
@@ -44,6 +45,7 @@ function App() {
             <Route path="/profil/:userid" element={<UserProfil />} /> 
             <Route path="/games" element={<Games />} />
             <Route path="/chat" element={<MinimalChat />} />
+            <Route path="/gambling" element={<Gambling />} />
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} /> 
           </Route>

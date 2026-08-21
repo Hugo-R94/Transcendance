@@ -36,8 +36,8 @@ func (h *UserHandler) register(c *gin.Context) {
 			Username:   req.Username,
 			PassHash:   hashedPassword,
 			ProfilePic: "avatars/avatar_default.png",
-			Title1:		"New",
-			Title2: 	"Player",
+			Title1:		"9",
+			Title2: 	"10",
 		}
 		return tx.Create(&newUser).Error
 	})

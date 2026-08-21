@@ -76,21 +76,6 @@ func (h *ChatHandler) fetchConvs(c *gin.Context) {
 }
 
 func (h *ChatHandler) readConv(c *gin.Context) {
-	idRaw, exists := c.Get("id")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User id missing",
-		})
-		return
-	}
-
-	userid, ok := idRaw.(uuid.UUID)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid user ID",
-		})
-		return
-	}
 
 	convID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
@@ -124,39 +109,6 @@ func (h *ChatHandler) readConv(c *gin.Context) {
 
 		return
 	}
-
-	// L'utilisateur est User1
-	if conv.User1ID == userid {
-		conv.User1AJour = true
-
-	// L'utilisateur est User2
-	} else if conv.User2ID == userid {
-		conv.User2AJour = true
-
-	// L'utilisateur ne fait pas partie de la conversation
-	} else {
-		c.JSON(http.StatusForbidden, gin.H{
-			"error": "You are not part of this conversation",
-		})
-		return
-	}
-
-	if err := h.db.Save(&conv).Error; err != nil {
-		log.Printf(
-			"[ERROR] Could not mark conversation as read: %v",
-			err,
-		)
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not mark conversation as read",
-		})
-
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Conversation marked as read",
-	})
 }
 
 func GetConvs(router *gin.RouterGroup, db *gorm.DB) {
@@ -170,9 +122,9 @@ func GetConvs(router *gin.RouterGroup, db *gorm.DB) {
 		h.fetchConvs,
 	)
 
-	router.PUT(
-		"/convs/:id/read",
-		utils.AuthMiddleware(),
-		h.readConv,
-	)
+	// router.PUT(
+	// 	"/convs/:id/read",
+	// 	utils.AuthMiddleware(),
+	// 	h.readConv,
+	// )
 }

@@ -49,6 +49,7 @@ func (h *ChatHandler) unFriend(c *gin.Context) {
 	var count int64
 	if err := h.db.
 		Where("user1_id = ? AND user2_id = ?", id, userID).
+		Model(&models.Conversation{}).
 		Count(&count).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Database error",
@@ -68,7 +69,7 @@ func (h *ChatHandler) unFriend(c *gin.Context) {
 			First(&conv).Error; err != nil {
 			return err
 		}
-		return tx.Delete(&conv).Error
+		return tx.Unscoped().Delete(&conv).Error
 	}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Database error",
