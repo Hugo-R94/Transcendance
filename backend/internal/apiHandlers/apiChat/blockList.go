@@ -25,7 +25,8 @@ func (h *ChatHandler) blockUser(c *gin.Context) {
 	}
 
 	var user models.User
-	if err := h.db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+	if err := h.db.Where("username = ?", req.Username).
+		First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "User not found",
 		})
@@ -46,12 +47,30 @@ func (h *ChatHandler) blockUser(c *gin.Context) {
 		}
 		var count int64
 		if err := tx.Model(&models.UserBlock{}).
-			Where("user1_id = ? AND user2_id = ?", newBlock.UserID, newBlock.BlockedUserID).
+			Where("user_id = ? AND blocked_user_id = ?", newBlock.UserID, newBlock.BlockedUserID).
 			Count(&count).Error; err != nil {
 			return err
 		}
 		if count > 0 {
 			return errors.New("duplicate")
+		}
+		if id.String() > user.ID.String() {
+			id, user.ID = user.ID, id
+		}
+		if err := tx.Model(&models.Conversation{}).
+			Where("user1_id = ? AND user2_id = ?", id, user.ID).
+			Count(&count).Error; err != nil {
+			return err
+		}
+		if count > 0 {
+			var conv models.Conversation
+			if err := tx.Where("user1_id = ? AND user2_id = ?", id, user.ID).
+				First(&conv).Error; err != nil {
+				return err
+			}
+			if err := tx.Unscoped().Select("Messages").Delete(&conv).Error; err != nil {
+				return err
+			}
 		}
 		return tx.Create(&newBlock).Error
 	})

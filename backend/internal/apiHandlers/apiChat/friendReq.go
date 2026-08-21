@@ -25,7 +25,8 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 	}
 
 	var user models.User
-	if err := h.db.Where("username = ?", req.Username).First(&user).Error; err != nil {
+	if err := h.db.Where("username = ?", req.Username).
+		First(&user).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "User not found",
 		})
@@ -43,7 +44,6 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 	if err := h.db.
 		Model(&models.UserBlock{}).
 		Where("user_id = ? AND blocked_user_id = ?", user.ID, id).
-		Model(&models.UserBlock{}).
 		Count(&count).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to send friend request",
@@ -61,6 +61,21 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 	err := h.db.Transaction(func(tx *gorm.DB) error {
 		user1id := id
 		user2id := user.ID
+		if err := tx.Model(models.UserBlock{}).
+			Where("user_id = ? AND blocked_user_id = ?", user1id, user2id).
+			Count(&count).Error; err != nil {
+			return err
+		}
+		if count > 0 {
+			var block models.UserBlock
+			if err := tx.Where("user_id = ? AND blocked_user_id = ?", user1id, user2id).
+				First(&block).Error; err != nil {
+				return err
+			}
+			if err := tx.Unscoped().Delete(&block).Error; err != nil {
+				return err
+			}
+		}
 		if user1id.String() > user2id.String() {
 			user1id, user2id = user2id, user1id
 		}

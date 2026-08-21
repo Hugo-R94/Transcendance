@@ -36,21 +36,25 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 			user1id, user2id = user2id, user1id
 		}
 		var count int64
-		if err := tx.Model(&models.Conversation{}).Where("user1_id = ? AND user2_id = ?", user1id, user2id).Count(&count).Error; err != nil {
+		if err := tx.Model(&models.Conversation{}).
+			Where("user1_id = ? AND user2_id = ?", user1id, user2id).
+			Count(&count).Error; err != nil {
 			return err
 		}
 		if count < 1 {
 			return errors.New("not found")
 		}
 		var conv models.Conversation
-		if err := tx.Model(&models.Conversation{}).Where("user1_id = ? AND user2_id = ?", user1id, user2id).First(&conv).Error; err != nil {
+		if err := tx.Model(&models.Conversation{}).
+			Where("user1_id = ? AND user2_id = ?", user1id, user2id).
+			First(&conv).Error; err != nil {
 			return err
 		}
 		if req.Accept {
 			conv.Accepted = true
 			return tx.Save(&conv).Error
 		}
-		return tx.Delete(&conv).Error
+		return tx.Unscoped().Delete(&conv).Error
 	})
 	if err != nil {
 		if err.Error() == "not found" {
