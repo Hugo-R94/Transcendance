@@ -61,6 +61,21 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 	err := h.db.Transaction(func(tx *gorm.DB) error {
 		user1id := id
 		user2id := user.ID
+		if err := tx.Model(models.UserBlock{}).
+			Where("user_id = ? AND blocked_user_id = ?", user1id, user2id).
+			Count(&count).Error; err != nil {
+			return err
+		}
+		if count > 0 {
+			var block models.UserBlock
+			if err := tx.Where("user_id = ? AND blocked_user_id = ?", user1id, user2id).
+				First(&block).Error; err != nil {
+				return err
+			}
+			if err := tx.Unscoped().Delete(&block).Error; err != nil {
+				return err
+			}
+		}
 		if user1id.String() > user2id.String() {
 			user1id, user2id = user2id, user1id
 		}
