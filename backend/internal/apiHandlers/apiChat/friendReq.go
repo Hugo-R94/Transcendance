@@ -55,6 +55,7 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 	var count int64
 	if err := h.db.
 		Where("user_id = ? AND blocked_user_id = ?", user.ID, id).
+		Model(&models.UserBlock{}).
 		Count(&count).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Failed to send friend request",

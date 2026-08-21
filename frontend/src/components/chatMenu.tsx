@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import FriendList from "./friendList";
 import FriendRequestList from "./friendRequestList";
 import Notification from "./notification";
@@ -6,11 +7,19 @@ import { ChatWindowContainer } from "./chatWindowContainer";
 import { useChat } from "../use/useChat";
 
 export default function ChatMenu() {
+  // On initialise isOpen directement depuis le localStorage
+  const [isOpen, setIsOpen] = useState<boolean>(() => {
+    return localStorage.getItem("chatOpen") !== "false"; // Par défaut ouvert sauf si "false" explicite
+  });
+
+  // On sauvegarde dans le localStorage dès que isOpen change
+  useEffect(() => {
+    localStorage.setItem("chatOpen", String(isOpen));
+  }, [isOpen]);
+
   const {
     activeTab,
     setActiveTab,
-    isOpen,
-    setIsOpen,
     currentUserId,
     convs,
     openConvIds,

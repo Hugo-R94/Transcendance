@@ -118,20 +118,12 @@ export function useChat() {
     return null;
   };
 
-  const hasUnreadMessage = (conv: Conversation): boolean => {
-    const myUserId = localStorage.getItem("userID");
-    if (!myUserId) return false;
-    if (String(conv.user1_id) === String(myUserId)) return conv.user1_a_jour === false;
-    if (String(conv.user2_id) === String(myUserId)) return conv.user2_a_jour === false;
-    return false;
-  };
-
   const friends: Friend[] = convs
     .filter((conv) => conv.accepted === true || conv.accepted === 1 || conv.accepted === "1" || conv.accepted === "true")
     .map((conv) => {
       const user = getOtherUser(conv);
       if (!user) return null;
-      return { id: user.id, username: user.username, profilePic: user.profile_pic, hasUnread: hasUnreadMessage(conv) };
+      return { id: user.id, username: user.username, profilePic: user.profile_pic };
     })
     .filter((f): f is Friend => f !== null);
 
@@ -140,7 +132,11 @@ export function useChat() {
     .map((conv) => {
       const user = getOtherUser(conv);
       if (!user) return null;
-      return { id: user.id, username: user.username, profilePic: user.profile_pic };
+      return { 
+        id: user.id, 
+        username: user.username, 
+        profilePic: user.profile_pic 
+      };
     })
     .filter((r): r is FriendRequest => r !== null);
 
@@ -187,10 +183,13 @@ export function useChat() {
       showNotification(err.response?.data?.error || "Utilisateur inconnu.");
     }
   };
-
+  
   const handleAccept = async (req: FriendRequest) => {
     try {
-      await api.put("/friend_accept", { id: req.id, accept: true });
+      await api.put("/friend_accept", { 
+        id: String(req.id),
+        accept: true 
+      });
       await fetchConversations();
       showNotification(`${req.username} est maintenant votre ami !`);
     } catch (err: any) {
@@ -200,14 +199,17 @@ export function useChat() {
 
   const handleReject = async (req: FriendRequest) => {
     try {
-      await api.put("/friend_accept", { id: req.id, accept: false });
+      await api.put("/friend_accept", { 
+        id: String(req.id),
+        accept: false 
+      });
       await fetchConversations();
       showNotification("Invitation refusée.");
     } catch (err: any) {
       showNotification(err.response?.data?.error || "Erreur.");
     }
   };
-
+  
   const handleBlock = (req: FriendRequest) => {
     showNotification(`${req.username} a été bloqué.`);
   };
