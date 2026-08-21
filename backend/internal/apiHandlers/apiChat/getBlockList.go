@@ -31,13 +31,13 @@ func (h *ChatHandler) fetchBlockList(c *gin.Context) {
 		return
 	}
 
-	var convs []models.UserBlock
+	var blockedUsers []models.UserBlock
 	if err := h.db.Model(&models.UserBlock{}).
 		Where("user_id = ?", id).
 		Preload("BlockedUserID", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "username", "profile_pic")
 		}).
-		Find(&convs).Error; err != nil {
+		Find(&blockedUsers).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not find blocked users",
 		})
@@ -45,7 +45,7 @@ func (h *ChatHandler) fetchBlockList(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"conversations": convs,
+		"block_list": blockedUsers,
 	})
 }
 
