@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	//"gorm.io/gorm"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"gorm.io/gorm"
 )

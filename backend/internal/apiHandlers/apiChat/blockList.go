@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
-	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -14,19 +13,8 @@ import (
 )
 
 func (h *ChatHandler) blockUser(c *gin.Context) {
-	idRaw, exists := c.Get("id")
-	if exists == false {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User id missing",
-		})
-		return
-	}
-	id, ok := idRaw.(uuid.UUID)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid user ID",
-		})
-	}
+	idRaw, _ := c.Get("id")
+	id := idRaw.(uuid.UUID)
 
 	var req models.BlockRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -57,8 +45,9 @@ func (h *ChatHandler) blockUser(c *gin.Context) {
 			BlockedUserID: user.ID,
 		}
 		var count int64
-		if err := tx.Where("user1_id = ? AND user2_id = ?", newBlock.UserID, newBlock.BlockedUserID).
-			Model(&models.UserBlock{}).Count(&count).Error; err != nil {
+		if err := tx.Model(&models.UserBlock{}).
+			Where("user1_id = ? AND user2_id = ?", newBlock.UserID, newBlock.BlockedUserID).
+			Count(&count).Error; err != nil {
 			return err
 		}
 		if count > 0 {
@@ -80,12 +69,11 @@ func (h *ChatHandler) blockUser(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "User blocked successfully",
+		"message": "User blocked",
 	})
-	h.unFriend(c)
 }
 
 func BlockUser(router *gin.RouterGroup, db *gorm.DB) {
 	h := &ChatHandler{db: db}
-	router.POST("/block", utils.AuthMiddleware(), h.blockUser)
+	router.POST("/block", h.blockUser)
 }

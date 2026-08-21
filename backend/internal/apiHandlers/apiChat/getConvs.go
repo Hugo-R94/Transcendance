@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
-	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -13,166 +12,50 @@ import (
 )
 
 func (h *ChatHandler) fetchConvs(c *gin.Context) {
-	idRaw, exists := c.Get("id")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User id missing",
+	idRaw, _ := c.Get("id")
+	id := idRaw.(uuid.UUID)
+
+	var count int64
+	if err := h.db.Model(&models.Conversation{}).
+		Where("user1_id = ? OR user2_id = ?", id, id).
+		Count(&count).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not find conversations",
 		})
 		return
 	}
-
-	userid, ok := idRaw.(uuid.UUID)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid user ID",
+	if count < 1 {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "this user has no convs",
 		})
 		return
 	}
 
 	var convs []models.Conversation
-
-	if err := h.db.
-		Where(
-			"user1_id = ? OR user2_id = ?",
-			userid,
-			userid,
-		).
+	if err := h.db.Model(&models.Conversation{}).
+		Where("user1_id = ? OR user2_id = ?", id, id).
 		Preload("User1", func(db *gorm.DB) *gorm.DB {
-			return db.Select(
-				"id",
-				"username",
-				"profile_pic",
-			)
+			return db.Select("id", "username", "profile_pic")
 		}).
 		Preload("User2", func(db *gorm.DB) *gorm.DB {
-			return db.Select(
-				"id",
-				"username",
-				"profile_pic",
-			)
+			return db.Select("id", "username", "profile_pic")
 		}).
 		Preload("Messages", func(db *gorm.DB) *gorm.DB {
-			return db.
-				Order("created_at DESC").
-				Limit(500)
+			return db.Order("created_at DESC").Limit(500)
 		}).
 		Find(&convs).Error; err != nil {
-
-		log.Printf(
-			"[ERROR] Could not find conversations: %v",
-			err,
-		)
-
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not find conversations",
 		})
-
+		log.Printf("[ERROR] Could not find conversations: %v", err)
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"conversations": convs,
 	})
 }
 
-func (h *ChatHandler) readConv(c *gin.Context) {
-	idRaw, exists := c.Get("id")
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "User id missing",
-		})
-		return
-	}
-
-	userid, ok := idRaw.(uuid.UUID)
-	if !ok {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid user ID",
-		})
-		return
-	}
-
-	convID, err := uuid.Parse(c.Param("id"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid conversation ID",
-		})
-		return
-	}
-
-	var conv models.Conversation
-
-	if err := h.db.
-		First(&conv, "id = ?", convID).
-		Error; err != nil {
-
-		if err == gorm.ErrRecordNotFound {
-			c.JSON(http.StatusNotFound, gin.H{
-				"error": "Conversation not found",
-			})
-			return
-		}
-
-		log.Printf(
-			"[ERROR] Could not find conversation: %v",
-			err,
-		)
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not find conversation",
-		})
-
-		return
-	}
-
-	// L'utilisateur est User1
-	if conv.User1ID == userid {
-		conv.User1AJour = true
-
-	// L'utilisateur est User2
-	} else if conv.User2ID == userid {
-		conv.User2AJour = true
-
-	// L'utilisateur ne fait pas partie de la conversation
-	} else {
-		c.JSON(http.StatusForbidden, gin.H{
-			"error": "You are not part of this conversation",
-		})
-		return
-	}
-
-	if err := h.db.Save(&conv).Error; err != nil {
-		log.Printf(
-			"[ERROR] Could not mark conversation as read: %v",
-			err,
-		)
-
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not mark conversation as read",
-		})
-
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Conversation marked as read",
-	})
-}
-
 func GetConvs(router *gin.RouterGroup, db *gorm.DB) {
-	h := &ChatHandler{
-		db: db,
-	}
-
-	router.GET(
-		"/convs",
-		utils.AuthMiddleware(),
-		h.fetchConvs,
-	)
-
-	router.PUT(
-		"/convs/:id/read",
-		utils.AuthMiddleware(),
-		h.readConv,
-	)
+	h := &ChatHandler{db: db}
+	router.GET("/convs", h.fetchConvs)
 }
