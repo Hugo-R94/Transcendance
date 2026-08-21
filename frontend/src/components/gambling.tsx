@@ -1,0 +1,399 @@
+import { useState } from "react";
+
+import { useGambling } from "../use/useGambling";
+
+import { Roulette } from "./gambling/roulette";
+import { PhaseTimer } from "./gambling/phaseTimer";
+import { Balance } from "./gambling/balance";
+import { BettingPanel } from "./gambling/bettingPanel";
+import { MyResult } from "./gambling/Result";
+import { ResultsTable } from "./gambling/resultTable";
+import { ScratchTicket } from "./gambling/scratchTicket";
+import Lobby from "./gambling/Lobby";
+
+type JsonLog = {
+  id: number;
+  direction:
+    | "sent"
+    | "received"
+    | "system";
+  data: any;
+  timestamp: string;
+};
+
+export default function Gambling() {
+  const game =
+    useGambling();
+
+  const [showLogs, setShowLogs] =
+    useState(true);
+
+  const jsonLogs: JsonLog[] =
+    game.jsonLogs ?? [];
+
+  // ==========================================================
+  // LOBBY
+  // ==========================================================
+
+  if (!game.gameStarted) {
+    return (
+      <>
+        <Lobby
+          connected={
+            game.connected
+          }
+          joined={
+            game.joined
+          }
+          roomId={
+            game.roomId
+          }
+          setRoomId={
+            game.setRoomId
+          }
+          players={
+            game.players
+          }
+          playerId={
+            game.playerId
+          }
+          ready={
+            game.ready
+          }
+          countdown={
+            game.countdown
+          }
+          error={
+            game.error
+          }
+          connect={
+            game.connect
+          }
+          disconnect={
+            game.disconnect
+          }
+          joinRoom={
+            game.joinRoom
+          }
+          toggleReady={
+            game.toggleReady
+          }
+        />
+
+        <JsonDebugger
+          logs={
+            jsonLogs
+          }
+          show={
+            showLogs
+          }
+          setShow={
+            setShowLogs
+          }
+          clearLogs={
+            game.clearLogs
+          }
+        />
+      </>
+    );
+  }
+
+  // ==========================================================
+  // GAME
+  // ==========================================================
+
+  return (
+    <>
+      <main className="relative">
+
+        <Balance
+          balance={
+            game.balance
+          }
+        />
+
+        <PhaseTimer
+          state={
+            game.state
+          }
+          countdown={
+            game.phaseCountdown
+          }
+        />
+
+        <Roulette
+          winningNumber={
+            game.winningNumber
+          }
+          state={
+            game.state
+          }
+        />
+
+        <BettingPanel
+          state={
+            game.state
+          }
+          balance={
+            game.balance
+          }
+          betAmount={
+            game.betAmount
+          }
+          setBetAmount={
+            game.setBetAmount
+          }
+          target={
+            game.target
+          }
+          setTarget={
+            game.setTarget
+          }
+          currentBet={
+            game.currentBet
+          }
+          hasBet={
+            game.hasBet
+          }
+          phaseCountdown={
+            game.phaseCountdown
+          }
+          placeBet={
+            game.placeBet
+          }
+        />
+
+        <ScratchTicket
+          state={
+            game.state
+          }
+          hasBet={
+            game.hasBet
+          }
+          ticket={
+            game.ticket
+          }
+          countdown={
+            game.phaseCountdown
+          }
+          scratch={
+            game.scratch
+          }
+        />
+
+        <MyResult
+          result={
+            game.myResult
+          }
+        />
+
+        <ResultsTable
+          results={
+            game.results
+          }
+          playerId={
+            game.playerId
+          }
+        />
+
+      </main>
+
+      <JsonDebugger
+        logs={
+          jsonLogs
+        }
+        show={
+          showLogs
+        }
+        setShow={
+          setShowLogs
+        }
+        clearLogs={
+          game.clearLogs
+        }
+      />
+    </>
+  );
+}
+
+// ============================================================
+// JSON DEBUGGER
+// ============================================================
+
+function JsonDebugger({
+  logs,
+  show,
+  setShow,
+  clearLogs,
+}: {
+  logs: JsonLog[];
+  show: boolean;
+  setShow: (
+    value: boolean
+  ) => void;
+  clearLogs: () => void;
+}) {
+  // ==========================================================
+  // CLOSED
+  // ==========================================================
+
+  if (!show) {
+    return (
+      <button
+        onClick={() =>
+          setShow(true)
+        }
+        className="fixed bottom-5 right-5 z-[9999] rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-black text-white shadow-2xl hover:bg-slate-800"
+      >
+        WebSocket JSON
+      </button>
+    );
+  }
+
+  // ==========================================================
+  // OPEN
+  // ==========================================================
+
+  return (
+    <div className="fixed bottom-5 right-5 z-[9999]">
+
+      <div className="flex h-[420px] w-[400px] flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-950 shadow-2xl">
+
+        {/* HEADER */}
+
+        <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-3">
+
+          <div>
+            <div className="font-black text-white">
+              WebSocket
+            </div>
+
+            <div className="text-xs text-slate-500">
+              {logs.length} message
+              {logs.length > 1
+                ? "s"
+                : ""}
+            </div>
+          </div>
+
+          <div className="flex gap-2">
+
+            <button
+              onClick={
+                clearLogs
+              }
+              className="rounded-lg bg-slate-800 px-3 py-1 text-xs font-bold text-slate-300 hover:bg-slate-700"
+            >
+              Vider
+            </button>
+
+            <button
+              onClick={() =>
+                setShow(false)
+              }
+              className="rounded-lg bg-red-950 px-3 py-1 text-sm font-black text-red-400 hover:bg-red-900"
+            >
+              ×
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* LOGS */}
+
+        <div className="flex-1 space-y-2 overflow-y-auto p-3">
+
+          {logs.length === 0 && (
+            <div className="flex h-full items-center justify-center text-sm text-slate-600">
+              Aucun message WebSocket
+            </div>
+          )}
+
+          {logs.map(
+            (log) => {
+              const sent =
+                log.direction ===
+                "sent";
+
+              const received =
+                log.direction ===
+                "received";
+
+              return (
+                <div
+                  key={
+                    log.id
+                  }
+                  className={`rounded-xl border p-3 ${
+                    sent
+                      ? "border-green-800 bg-green-950/40"
+                      : received
+                      ? "border-blue-800 bg-blue-950/40"
+                      : "border-slate-800 bg-slate-900"
+                  }`}
+                >
+
+                  {/* HEADER */}
+
+                  <div className="mb-2 flex items-center justify-between">
+
+                    <span
+                      className={`text-[10px] font-black ${
+                        sent
+                          ? "text-green-400"
+                          : received
+                          ? "text-blue-400"
+                          : "text-slate-500"
+                      }`}
+                    >
+                      {sent
+                        ? "↑ ENVOYÉ"
+                        : received
+                        ? "↓ REÇU"
+                        : "SYSTEM"}
+                    </span>
+
+                    <span className="text-[10px] text-slate-600">
+                      #
+                      {
+                        log.id
+                      }
+                      {" · "}
+                      {
+                        log.timestamp
+                      }
+                    </span>
+
+                  </div>
+
+                  {/* JSON */}
+
+                  <pre
+                    className={`max-h-40 overflow-auto whitespace-pre-wrap break-all text-xs ${
+                      sent
+                        ? "text-green-300"
+                        : received
+                        ? "text-blue-300"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    {JSON.stringify(
+                      log.data,
+                      null,
+                      2
+                    )}
+                  </pre>
+
+                </div>
+              );
+            }
+          )}
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}
