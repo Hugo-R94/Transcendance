@@ -12,6 +12,7 @@ import ShaderBackground from "./components/shaderBG";
 import NavBar from "./components/navBar";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
+import Gambling from "./pages/gambling";
 
 function ProtectedLayout() {
   return (
@@ -40,6 +41,7 @@ function App() {
             <Route path="/profil" element={<Profil />} />
             <Route path="/profil/:userid" element={<UserProfil />} /> 
             <Route path="/games" element={<Games />} />
+            <Route path="/gambling" element={<Gambling />} />
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} /> 
           </Route>
