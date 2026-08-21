@@ -56,7 +56,7 @@ func (h *ChatHandler) unFriend(c *gin.Context) {
 			First(&conv).Error; err != nil {
 			return err
 		}
-		return tx.Unscoped().Delete(&conv).Error
+		return tx.Unscoped().Select("Messages").Delete(&conv).Error
 	}); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Database error",
