@@ -44,6 +44,7 @@ function Login() {
         String(Date.now() + result.expires_in * 1000)
       );
       localStorage.setItem("userID", result.user_ID);
+	  localStorage.setItem("chatOpen", false);
 
       // Récupération de la photo de profil comme tu le faisais avant
       try {

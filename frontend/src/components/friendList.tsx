@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useUserAvatar } from "../api/getUserAvatar";
-	import DropdownMenu from "./dropdownFilter";
+import DropdownMenu from "./dropdownFilter";
+import api from "../api/api"; // Assure-toi que le chemin vers ton instance api est correct
 
 function FriendAvatar({ friendId, username }: { friendId: string; username: string }) {
   const avatarUrl = useUserAvatar(friendId);
@@ -23,13 +24,23 @@ export default function FriendList({ friends, onFriendClick }: { friends: any[];
 
   const colors = ["bg-byellow", "bg-bred", "bg-bblue", "bg-bgreen"];
 
-  const handleMenuAction = (action: string, friend: any) => {
-    if (action === "block") {
-      console.log("Bloquer l'ami :", friend.id);
-    } else if (action === "delete") {
-      console.log("Supprimer l'ami :", friend.id);
-    }
-  };
+	const handleMenuAction = async (action: string, friend: any) => {
+		try {
+		if (action === "block") {
+			// Ta route est probablement POST, on garde comme ça
+			await api.post("/block", { username: friend.username });
+			console.log("Ami bloqué :", friend.username);
+		} else if (action === "delete") {
+			// Modification : Utilisation de DELETE avec le corps dans { data: ... }
+			await api.delete("/unfriend", { 
+			data: { id: friend.id } 
+			});
+			console.log("Ami supprimé :", friend.id);
+		}
+		} catch (error) {
+		console.error(`Erreur lors de l'action ${action} :`, error);
+		}
+	};
 
   return (
     <div className="overflow-y-auto overflow-x-visible h-full">
@@ -37,11 +48,6 @@ export default function FriendList({ friends, onFriendClick }: { friends: any[];
         {friends.map((friend, index) => {
           const username = friend.username || "Utilisateur";
           const bgColor = colors[index % colors.length];
-
-          const menuItems = [
-            { label: "Bloquer", value: "block" },
-            { label: "Supprimer", value: "delete" },
-          ];
 
           return (
             <div
@@ -67,19 +73,19 @@ export default function FriendList({ friends, onFriendClick }: { friends: any[];
                 Chat
               </button>
 
-              {/* Dropdown Menu configuré pour garder l'apparence du bouton "⋮" */}
-				<DropdownMenu
-				items={[
-					{ label: "Bloquer", value: "block" },
-					{ label: "Supprimer", value: "delete" }
-				]}
-				color="bg-black/20"
-				className="h-full flex items-center"
-				menuClassName="sm:w-44 sm:right-0"
-				pos={index >= friends.length - 2 ? 1 : -1}
-				isIconOnly={true}
-				onChange={(value) => handleMenuAction(value, friend)}
-				/>
+              {/* Dropdown Menu "⋮" */}
+              <DropdownMenu
+                items={[
+                  { label: "Bloquer", value: "block" },
+                  { label: "Supprimer", value: "delete" }
+                ]}
+                color="bg-black/20"
+                className="h-full flex items-center"
+                menuClassName="sm:w-44 sm:right-0"
+                pos={index >= friends.length - 2 ? 1 : -1}
+                isIconOnly={true}
+                onChange={(value) => handleMenuAction(value, friend)}
+              />
             </div>
           );
         })}
