@@ -1,12 +1,11 @@
 import BettingTable from "./bettingTable";
+import { Balance } from "./balance";
 
 type ButtonChipProps = {
   amount: number;
   betAmount: number;
   color: string;
-  setBetAmount: (
-    value: number
-  ) => void;
+  setBetAmount: (value: number) => void;
   disabled?: boolean;
 };
 
@@ -21,12 +20,31 @@ function ButtonChip({
     <button
       type="button"
       disabled={disabled}
-      onClick={() =>
-        setBetAmount(
-          betAmount + amount
-        )
-      }
-      className={`${color} w-15 h-10 card balatro active:scale-90 translate-y-1 hover:z-100`}
+      onClick={() => setBetAmount(betAmount + amount)}
+      className={`
+        ${color}
+
+        h-8
+        w-9
+
+        sm:h-10
+        sm:w-15
+
+        card
+        balatro
+
+        rounded-lg
+        sm:rounded-xl
+
+        translate-y-1
+        active:scale-90
+        hover:z-100
+
+        text-xs
+        sm:text-base
+
+        font-bold
+      `}
     >
       {amount > 0 ? "+" : ""}
       {amount}
@@ -39,14 +57,10 @@ type BettingPanelProps = {
   balance: number;
 
   betAmount: number;
-  setBetAmount: (
-    value: number
-  ) => void;
+  setBetAmount: (value: number) => void;
 
   target: string;
-  setTarget: (
-    value: string
-  ) => void;
+  setTarget: (value: string) => void;
 
   currentBet: {
     chipValue: number;
@@ -54,12 +68,15 @@ type BettingPanelProps = {
   } | null;
 
   hasBet: boolean;
+  phaseCountdown: number | null;
 
-  phaseCountdown:
-    | number
-    | null;
+  placeBet: (
+    target: string,
+    amount: number
+  ) => void;
 
-  placeBet: () => void;
+  userID: string;
+  playerNumber: number;
 };
 
 export function BettingPanel({
@@ -73,62 +90,223 @@ export function BettingPanel({
   hasBet,
   phaseCountdown,
   placeBet,
+  userID,
+  playerNumber,
 }: BettingPanelProps) {
-  const disabled =
+
+  /*
+   * ID du joueur connecté.
+   *
+  /*
+   * État général permettant de miser.
+   */
+  const bettingDisabled =
     state !== "betting" ||
-    hasBet ||
     phaseCountdown === 0;
 
-  return (
-    <div className="flex flex-col justify-center items-center">
+  /*
+   * La table est également bloquée si le montant
+   * n'est pas valide.
+   */
+  const tableDisabled =
+    bettingDisabled ||
+    betAmount <= 0 ||
+    betAmount > balance;
 
-      <h2>
-        Ton pari
-      </h2>
-		<div className="w-100 h-100">
-			<BettingTable/>
-		</div>
-      <div className="bg-bblue w-fit h-fit p-2 card text-3xl font-extrabold">
+  /*
+   * Clic sur une case de roulette.
+   *
+   * 1. On vérifie que la mise est valide.
+   * 2. On change la cible localement.
+   * 3. On envoie immédiatement le nouveau pari.
+   *
+   * Le backend peut alors remplacer le pari
+   * précédent par celui-ci.
+   */
+  const handleTargetChange = (
+    newTarget: string
+  ) => {
+
+    if (
+      bettingDisabled ||
+      betAmount <= 0 ||
+      betAmount > balance
+    ) {
+      return;
+    }
+
+    setTarget(newTarget);
+
+    placeBet(
+      newTarget,
+      betAmount
+    );
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center">
+
+      {/* ========================= */}
+      {/* TABLE DE ROULETTE */}
+      {/* ========================= */}
+
+      <div
+        className="
+          my-3
+          aspect-[3/2]
+          w-[95%]
+          sm:w-125
+        "
+      >
+	<BettingTable
+	target={target}
+	setTarget={handleTargetChange}
+	disabled={tableDisabled}
+	chipValue={betAmount}
+	userID={userID}
+	playerNumber={playerNumber}
+	/>
+      </div>
+
+
+      {/* ========================= */}
+      {/* BALANCE */}
+      {/* ========================= */}
+
+      <div
+        className="
+          my-2
+          mb-5
+          flex
+          h-10
+          w-[90%]
+          justify-center
+          sm:w-100
+        "
+      >
+        <Balance
+          balance={balance}
+        />
+      </div>
+
+
+      {/* ========================= */}
+      {/* TITRE */}
+      {/* Caché sur mobile */}
+      {/* ========================= */}
+
+      <div
+        className="
+          hidden
+          card
+          bg-bblue
+          w-fit
+          p-2
+          text-3xl
+          font-extrabold
+          sm:block
+        "
+      >
         <p>
           How much do you want to bet ???
         </p>
       </div>
 
-      <div className="w-fit h-fit my-3">
 
-        <div className="flex gap-2 font-bold">
+      {/* ========================= */}
+      {/* MONTANT */}
+      {/* ========================= */}
+
+      <div
+        className="
+          my-1
+          h-fit
+          w-full
+          px-2
+
+          sm:my-3
+          sm:w-fit
+          sm:px-0
+        "
+      >
+
+        <div
+          className="
+            flex
+            w-full
+            justify-center
+            gap-2
+            font-bold
+
+            sm:gap-3
+          "
+        >
+
+          {/* -100 */}
 
           <ButtonChip
             amount={-100}
-			color="bg-bblue"
+            color="bg-bblue"
             betAmount={betAmount}
             setBetAmount={setBetAmount}
-            disabled={disabled}
+            disabled={bettingDisabled}
           />
 
+
+          {/* -50 */}
+
           <ButtonChip
-		  	color="bg-bred"
             amount={-50}
+            color="bg-bred"
             betAmount={betAmount}
             setBetAmount={setBetAmount}
-            disabled={disabled}
+            disabled={bettingDisabled}
           />
-		  
-      		<ButtonChip
-		  	color="bg-byellow"
+
+
+          {/* -25 */}
+
+          <ButtonChip
             amount={-25}
+            color="bg-byellow"
             betAmount={betAmount}
             setBetAmount={setBetAmount}
-            disabled={disabled}
+            disabled={bettingDisabled}
           />
-		  
-		  
+
+
+          {/* ========================= */}
+          {/* INPUT */}
+          {/* ========================= */}
+
           <input
-            className="bg-bgreen rounded-2xl w-fit h-fit p-3 card"
+            className="
+              card
+
+              h-8
+              w-14
+
+              rounded-lg
+              bg-bgreen
+
+              p-1
+
+              text-center
+              text-sm
+              font-bold
+
+              outline-none
+
+              sm:h-10
+              sm:w-20
+              sm:rounded-2xl
+              sm:p-3
+              sm:text-base
+            "
             type="number"
             min={1}
             value={betAmount}
-            disabled={disabled}
+            disabled={bettingDisabled}
             onChange={(event) =>
               setBetAmount(
                 Number(
@@ -137,101 +315,111 @@ export function BettingPanel({
               )
             }
           />
-		  
-		  
-      		<ButtonChip
-		  	color="bg-byellow"
-            amount={+25}
-            betAmount={betAmount}
-            setBetAmount={setBetAmount}
-            disabled={disabled}
-          />
-          <ButtonChip
-		  	color="bg-bred"
-            amount={+50}
-            betAmount={betAmount}
-            setBetAmount={setBetAmount}
-            disabled={disabled}
-          />
+
+
+          {/* +25 */}
 
           <ButtonChip
-            amount={+100}
-			color="bg-bblue"
+            amount={25}
+            color="bg-byellow"
             betAmount={betAmount}
             setBetAmount={setBetAmount}
-            disabled={disabled}
+            disabled={bettingDisabled}
+          />
+
+
+          {/* +50 */}
+
+          <ButtonChip
+            amount={50}
+            color="bg-bred"
+            betAmount={betAmount}
+            setBetAmount={setBetAmount}
+            disabled={bettingDisabled}
+          />
+
+
+          {/* +100 */}
+
+          <ButtonChip
+            amount={100}
+            color="bg-bblue"
+            betAmount={betAmount}
+            setBetAmount={setBetAmount}
+            disabled={bettingDisabled}
           />
 
         </div>
 
       </div>
 
-      <div>
-        <button
-          disabled={disabled}
-          onClick={() =>
-            setTarget("red")
-          }
-        >
-          🔴 Rouge
-        </button>
 
-        <button
-          disabled={disabled}
-          onClick={() =>
-            setTarget("green")
-          }
-        >
-          ⚫ Noir
-        </button>
+      {/* ========================= */}
+      {/* MISE ACTUELLE */}
+      {/* ========================= */}
 
-        <button
-          disabled={disabled}
-          onClick={() =>
-            setTarget("odd")
-          }
-        >
-          Impair
-        </button>
+      <div
+        className="
+          flex
+          items-center
+          justify-center
+          gap-x-1
 
-        <button
-          disabled={disabled}
-          onClick={() =>
-            setTarget("even")
-          }
-        >
-          Pair
-        </button>
-      </div>
+          text-center
+          text-sm
 
-      <div>
+          sm:text-base
+        "
+      >
+
         <p>
           Mise actuelle
         </p>
 
-        <strong>
-          {currentBet
-            ? currentBet.chipValue
-            : betAmount}
-        </strong>
+        <p
+          className="
+            mx-2
+            text-xl
+            font-extrabold
+
+            sm:mx-3
+          "
+        >
+          {betAmount}
+        </p>
 
         <span>
-          sur {currentBet?.target ?? target}
+          sur
         </span>
+
+        <p
+          className="
+            mx-2
+            text-xl
+            font-extrabold
+
+            sm:mx-3
+          "
+        >
+          {target || "-"}
+        </p>
+
       </div>
 
-      <button
-        onClick={placeBet}
-        disabled={
-          disabled ||
-          betAmount <= 0 ||
-          betAmount > balance
-        }
+
+      {/* ========================= */}
+      {/* INFO */}
+      {/* ========================= */}
+
+      <p
+        className="
+          mt-2
+          text-xs
+          text-white/50
+        "
       >
-        {hasBet
-          ? "✓ MISE PLACÉE"
-          : `MISER ${betAmount}`}
-      </button>
+        Clique sur une case pour placer ta mise
+      </p>
 
     </div>
   );

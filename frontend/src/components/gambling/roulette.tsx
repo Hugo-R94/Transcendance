@@ -24,10 +24,6 @@ export function Roulette({
   return (
     <section className="flex flex-col items-center gap-4">
 
-      <h2 className="text-2xl font-black">
-        Roulette
-      </h2>
-
       <div
         className={`
           ${color}
@@ -59,7 +55,7 @@ export function Roulette({
         </div>
       )}
 
-      {winningNumber !== null && (
+      {/* {winningNumber !== null && (
         <div className="text-center">
           <small className="block text-xs font-bold text-white/50">
             NUMÉRO GAGNANT
@@ -69,7 +65,7 @@ export function Roulette({
             {winningNumber}
           </strong>
         </div>
-      )}
+      )} */}
 
     </section>
   );
