@@ -2,14 +2,16 @@ package gambling
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
+	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"gorm.io/gorm"
 )
-
 // ============================================================
 // WEBSOCKET
 // ============================================================
@@ -158,11 +160,11 @@ func (c *Client) handleJoinRoom(data []byte) {
 
 	player := &Player{
 		ID:       c.PlayerID,
-		Username: "Player-" + c.PlayerID.String()[:8],
+		Username: c.Username,
 		Balance:  1000,
 		Ready:    false,
 	}
-
+	
 	room.AddPlayer(player)
 
 	c.Room = room
@@ -267,7 +269,6 @@ func (c *Client) handlePlaceBet(data []byte) {
 			Type:    "error",
 			Message: "you are not in a room",
 		})
-
 		return
 	}
 
@@ -278,7 +279,6 @@ func (c *Client) handlePlaceBet(data []byte) {
 			Type:    "error",
 			Message: "invalid place_bet message",
 		})
-
 		return
 	}
 
@@ -288,33 +288,29 @@ func (c *Client) handlePlaceBet(data []byte) {
 		Target:    message.Target,
 	}
 
-	if err := c.Room.PlaceBet(
-		c.PlayerID,
-		chip,
-	); err != nil {
-
+	if err := c.Room.PlaceBet(c.PlayerID, chip); err != nil {
 		c.SendJSON(ErrorMessage{
 			Type:    "error",
 			Message: err.Error(),
 		})
-
 		return
 	}
 
 	player := c.Room.GetPlayer(c.PlayerID)
-
 	if player == nil {
 		return
 	}
 
-	// Confirmation personnelle avec le vrai solde.
-	c.SendJSON(BetPlacedMessage{
-		Type:      "bet_placed",
-		PlayerID:  c.PlayerID.String(),
-		ChipValue: message.ChipValue,
-		Target:    message.Target,
-		Balance:   player.Balance,
-	})
+	betPlacedMsg := BetPlacedMessage{
+		Type:         "bet_placed",
+		PlayerID:     c.PlayerID.String(),
+		PlayerNumber: player.PlayerNumber,
+		ChipValue:    message.ChipValue,
+		Target:       message.Target,
+		Balance:      player.Balance,
+	}
+
+	c.Room.Hub.BroadcastJSON(betPlacedMsg)
 }
 
 // ============================================================
@@ -481,39 +477,102 @@ func (c *Client) WritePump() {
 // WEBSOCKET HANDLER
 // ============================================================
 
-func HandleWebSocket(c *gin.Context) {
-	conn, err := upgrader.Upgrade(
-		c.Writer,
-		c.Request,
-		nil,
-	)
+func HandleWebSocket(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
 
-	if err != nil {
-		log.Printf(
-			"websocket upgrade error: %v",
-			err,
+		// ============================================================
+		// USER ID FOURNI PAR AuthMiddleware
+		// ============================================================
+
+		userIDRaw, exists := c.Get("id")
+
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "user id missing from context",
+			})
+			return
+		}
+
+		userID, ok := userIDRaw.(uuid.UUID)
+
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "invalid user id in context",
+			})
+			return
+		}
+
+		// ============================================================
+		// RÉCUPÉRATION DU USER
+		// ============================================================
+
+		var user models.User
+
+		if err := db.First(&user, "id = ?", userID).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"error": "user not found",
+				})
+				return
+			}
+
+			log.Printf(
+				"failed to find user %s: %v",
+				userID,
+				err,
+			)
+
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to find user",
+			})
+			return
+		}
+
+		// ============================================================
+		// WEBSOCKET UPGRADE
+		// ============================================================
+
+		conn, err := upgrader.Upgrade(
+			c.Writer,
+			c.Request,
+			nil,
 		)
 
-		return
+		if err != nil {
+			log.Printf(
+				"websocket upgrade error: %v",
+				err,
+			)
+			return
+		}
+
+		// ============================================================
+		// CLIENT
+		// ============================================================
+
+		client := &Client{
+			Conn:     conn,
+			PlayerID: user.ID,
+			Username: user.Username,
+			Send:     make(chan []byte, 32),
+		}
+
+		// ============================================================
+		// CONFIRMATION
+		// ============================================================
+
+		client.SendJSON(map[string]interface{}{
+			"type":     "connected",
+			"playerId": user.ID.String(),
+			"username": user.Username,
+		})
+
+		// ============================================================
+		// PUMPS
+		// ============================================================
+
+		go client.WritePump()
+
+		client.ReadPump()
 	}
-
-	playerID := uuid.New()
-
-	client := &Client{
-		Conn:     conn,
-		PlayerID: playerID,
-		Send:     make(chan []byte, 32),
-	}
-
-	// Important :
-	// le client n'est PAS ajouté à un hub global.
-	// Il rejoint le hub de sa room.
-	client.SendJSON(map[string]interface{}{
-		"type":     "connected",
-		"playerId": playerID.String(),
-	})
-
-	go client.WritePump()
-
-	client.ReadPump()
 }
