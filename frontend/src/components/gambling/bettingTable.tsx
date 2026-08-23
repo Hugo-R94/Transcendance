@@ -10,30 +10,24 @@ type BettingTableProps = {
 };
 
 const redNumbers = new Set([
-  1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36,
+  1, 2, 3, 5, 6, 8, 9, 10, 11, 18, 20, 21,
 ]);
 
 const rouletteGrid = [
-  [32, 15, 19, 4, 21],
-  [2, 25, 17, 34, 6],
-  [27, 13, 0, 36, 11],
-  [30, 8, 23, 10, 5],
-  [24, 16, 33, 1, 20],
+  [7,  18, 4,  21, 12],
+  [2,  19, 9,  16, 6],
+  [24, 11, 0,  3,  14],
+  [8,  17, 5,  22, 20],
+  [13, 1,  23, 10, 15],
 ];
 
 const specialBets = [
   { id: "red", label: "RED", color: "bg-bred" },
-  { id: "even", label: "EVEN", color: "bg-bgreen" },
-  { id: "odd", label: "ODD", color: "bg-bred" },
+  { id: "even", label: "EVEN", color: "bg-bblue" },
+  { id: "odd", label: "ODD", color: "bg-bblue" },
   { id: "green", label: "GREEN", color: "bg-bgreen" },
 ];
 
-const chipColors = [
-  "bg-bblue",
-  "bg-byellow",
-  "bg-bgreen",
-  "bg-bred",
-];
 
 function BettingTable({
   target,
@@ -48,23 +42,6 @@ function BettingTable({
     return redNumbers.has(number) ? "bg-bred" : "bg-bgreen";
   };
 
-  const getChipColor = (targetValue: string) => {
-    if (targetValue === "red") return "bg-bred";
-    if (targetValue === "green") return "bg-bgreen";
-
-    const number = Number(targetValue);
-
-    if (!Number.isNaN(number)) {
-      return chipColors[number % chipColors.length];
-    }
-
-    if (targetValue === "even") return "bg-bblue";
-    if (targetValue === "odd") return "bg-byellow";
-
-    return "bg-bred";
-  };
-
-  const chipColor = getChipColor(target);
 
   return (
     <div className="relative h-full w-full">
@@ -97,6 +74,7 @@ function BettingTable({
 				value={chipValue}
 				userID={userID}
 				playerNumber={playerNumber}
+				
 				/>
               )}
             </div>
@@ -104,7 +82,7 @@ function BettingTable({
         })}
       </div>
 
-      {/* PARIS SPÉCIAUX */}
+      {/* PARIS 6SPÉCIAUX */}
       <div className="relative mt-1 flex h-[15%] w-full gap-x-3">
         {specialBets.map((bet) => {
           const isSelected = target === bet.id;

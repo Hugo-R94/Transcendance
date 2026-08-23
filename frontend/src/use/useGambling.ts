@@ -1053,59 +1053,37 @@ export function useGambling() {
   // ==========================================================
   // BET
   // ==========================================================
+	const placeBet = (
+	newTarget?: string,
+	amount?: number
+	) => {
+	const finalTarget = newTarget ?? target;
+	const finalAmount = amount ?? betAmount;
 
-  const placeBet = (
-    newTarget?: string,
-    amount?: number
-  ) => {
-    const finalTarget =
-      newTarget ?? target;
+	if (state !== "betting") {
+		setError("Les paris sont fermés");
+		return;
+	}
 
-    const finalAmount =
-      amount ?? betAmount;
+	if (finalAmount <= 0) {
+		setError("Montant invalide");
+		return;
+	}
 
-    if (state !== "betting") {
-      setError(
-        "Les paris sont fermés"
-      );
+	if (finalAmount > balance) {
+		setError("Solde insuffisant");
+		return;
+	}
 
-      return;
-    }
+	setTarget(finalTarget);
+	setBetAmount(finalAmount);
 
-    if (hasBet) {
-      setError(
-        "Tu as déjà parié"
-      );
-
-      return;
-    }
-
-    if (finalAmount <= 0) {
-      setError(
-        "Montant invalide"
-      );
-
-      return;
-    }
-
-    if (finalAmount > balance) {
-      setError(
-        "Solde insuffisant"
-      );
-
-      return;
-    }
-
-    setTarget(finalTarget);
-
-    setBetAmount(finalAmount);
-
-    send({
-      type: "place_bet",
-      chipValue: finalAmount,
-      target: finalTarget,
-    });
-  };
+	send({
+		type: "place_bet",
+		chipValue: finalAmount,
+		target: finalTarget,
+	});
+	};
 
   // ==========================================================
   // SCRATCH

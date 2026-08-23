@@ -53,16 +53,20 @@ export default function Gambling() {
   return (
     <>
       <main className="relative">
+		
+		<div className="mt-5">
         <PhaseTimer
           state={game.state}
           countdown={game.phaseCountdown}
         />
+		</div>
 
-        <Roulette
-          winningNumber={game.winningNumber}
-          state={game.state}
-        />
-
+		<div className="mt-20">
+			<Roulette
+			winningNumber={game.winningNumber}
+			state={game.state}
+			/>
+		</div>
 		<BettingPanel
 		state={game.state}
 		balance={game.balance}

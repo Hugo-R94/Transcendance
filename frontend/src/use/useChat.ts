@@ -11,11 +11,10 @@ export function useChat() {
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [openConvIds, setOpenConvIds] = useState<string[]>([]);
   const [wsConnected, setWsConnected] = useState(false);
-  const [targetUsername, setTargetUsername] = useState("");
+  const [targetUsername, setTargetUsername] = useState("");	
   const [notification, setNotification] = useState<string | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
-
   const showNotification = (message: string) => {
     setNotification(null);
     window.setTimeout(() => setNotification(message), 10);
@@ -117,28 +116,55 @@ export function useChat() {
     if (String(conv.user2_id) === String(myUserId)) return conv.user1;
     return null;
   };
+	const getAcceptance = (conv: Conversation) => {
+	const myUserId = localStorage.getItem("userID");
 
-  const friends: Friend[] = convs
-    .filter((conv) => conv.accepted === true || conv.accepted === 1 || conv.accepted === "1" || conv.accepted === "true")
-    .map((conv) => {
-      const user = getOtherUser(conv);
-      if (!user) return null;
-      return { id: user.id, username: user.username, profilePic: user.profile_pic };
-    })
-    .filter((f): f is Friend => f !== null);
+	if (String(conv.user1_id) === String(myUserId)) {
+		return {
+		myAccepted: conv.accepted_1,
+		otherAccepted: conv.accepted_2,
+		};
+	}
 
-  const requests: FriendRequest[] = convs
-    .filter((conv) => conv.accepted === false || conv.accepted === 0 || conv.accepted === "0" || conv.accepted === "false")
-    .map((conv) => {
-      const user = getOtherUser(conv);
-      if (!user) return null;
-      return { 
-        id: user.id, 
-        username: user.username, 
-        profilePic: user.profile_pic 
-      };
-    })
-    .filter((r): r is FriendRequest => r !== null);
+	return {
+		myAccepted: conv.accepted_2,
+		otherAccepted: conv.accepted_1,
+	};
+	};
+	
+	const friends: Friend[] = convs
+	.filter((conv) => {
+		const { myAccepted, otherAccepted } = getAcceptance(conv);
+		return myAccepted === true && otherAccepted === true;
+	})
+	.map((conv) => {
+		const user = getOtherUser(conv);
+		if (!user) return null;
+
+		return {
+		id: user.id,
+		username: user.username,
+		profilePic: user.profile_pic,
+		};
+	})
+	.filter((f): f is Friend => f !== null);
+
+	const requests: FriendRequest[] = convs
+	.filter((conv) => {
+		const { myAccepted, otherAccepted } = getAcceptance(conv);
+		return myAccepted === false && otherAccepted === true;
+	})
+	.map((conv) => {
+		const user = getOtherUser(conv);
+		if (!user) return null;
+
+		return {
+		id: user.id,
+		username: user.username,
+		profilePic: user.profile_pic,
+		};
+	})
+  .filter((r): r is FriendRequest => r !== null);
 
   const handleFriendClick = async (friend: Friend) => {
     const conversation = convs.find((conv) => {
