@@ -1,13 +1,9 @@
 export type Player = {
   playerId: string;
+  playerNumber: number;
   username: string;
   balance: number;
   ready: boolean;
-};
-
-export type Ticket = {
-  type: "bonus" | "malus";
-  value: number;
 };
 
 export type Bet = {
@@ -15,17 +11,15 @@ export type Bet = {
   target: string;
 };
 
+export type Ticket = {
+  [key: string]: any;
+};
+
 export type Result = {
   playerId: string;
   username?: string;
-  result: "win" | "lose" | "tie";
   balanceBefore: number;
-  gain: number;
   balanceAfter: number;
-};
-
-export type ServerMessage = {
-  type: string;
   [key: string]: any;
 };
 
@@ -34,4 +28,38 @@ export type JsonLog = {
   direction: "sent" | "received" | "system";
   data: any;
   timestamp: string;
+};
+
+export type ServerMessage = {
+  type: string;
+
+  playerId?: string;
+  playerNumber?: number;
+  username?: string;
+
+  roomId?: string;
+
+  balance?: number;
+  balanceBefore?: number;
+  balanceAfter?: number;
+
+  ready?: boolean;
+
+  countdown?: number;
+
+  turn?: number;
+
+  chipValue?: number;
+  target?: string;
+
+  winningNumber?: number;
+
+  ticket?: Ticket;
+
+  players?: Player[];
+  results?: Result[];
+
+  message?: string;
+
+  [key: string]: any;
 };

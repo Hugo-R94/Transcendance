@@ -43,16 +43,13 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 		},
 	}))
 
-	//setup groups
 	v1 := router.Group("/api/v1")
 	v1.Use(utils.AuthMiddleware())
 	userGroup := router.Group("/")
 	gameGroup := v1.Group("/game")
 	chatGroup := router.Group("/chat")
 	commentGroup := v1.Group("/comments")
-
-	//setup routes
-	router.GET("/ws", gambling.HandleWebSocket)
+	v1.GET("/gamble/ws", gambling.HandleWebSocket(db))
 	comment.CommentRoutes(commentGroup, db)
 	game.GetGameInfo(gameGroup, db)
 	user.GetUserInfo(userGroup, v1, db)
