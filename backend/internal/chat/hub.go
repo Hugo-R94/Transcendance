@@ -59,7 +59,7 @@ func (h *Hub) Run(ctx context.Context) {
 				log.Printf("[ERROR] User %v not authorized in conversation %v", bm.Client.ID, bm.Message.ConversationID)
 				continue
 			}
-			if !conv.Accepted && bm.Message.Type != models.MessageTypeFriendReq {
+			if (!conv.Accepted1 || !conv.Accepted2) && bm.Message.Type != models.MessageTypeFriendReq {
 				continue
 			}
 			//add info in Message struct and register it
@@ -93,7 +93,6 @@ func (h *Hub) Run(ctx context.Context) {
 // 		}
 // 	}
 // }
-
 
 func (h *Hub) broadcastToRecipient(bm broadcastMessage, conv models.Conversation) {
 	for client := range h.Clients {

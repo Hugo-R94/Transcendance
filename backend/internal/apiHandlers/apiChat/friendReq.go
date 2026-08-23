@@ -76,12 +76,21 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 				return err
 			}
 		}
+		var a1 bool
+		var a2 bool
 		if user1id.String() > user2id.String() {
 			user1id, user2id = user2id, user1id
+			a1 = false
+			a2 = true
+		} else {
+			a1 = true
+			a2 = false
 		}
 		newConv := models.Conversation{
-			User1ID: user1id,
-			User2ID: user2id,
+			User1ID:   user1id,
+			User2ID:   user2id,
+			Accepted1: a1,
+			Accepted2: a2,
 		}
 		var count int64
 		if err := tx.Model(&models.Conversation{}).
