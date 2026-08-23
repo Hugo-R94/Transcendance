@@ -34,7 +34,7 @@ func (h *ChatHandler) fetchBlockList(c *gin.Context) {
 	var blockedUsers []models.UserBlock
 	if err := h.db.Model(&models.UserBlock{}).
 		Where("user_id = ?", id).
-		Preload("BlockedUserID", func(db *gorm.DB) *gorm.DB {
+		Preload("BlockedUser", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id", "username", "profile_pic")
 		}).
 		Find(&blockedUsers).Error; err != nil {
