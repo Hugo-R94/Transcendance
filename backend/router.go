@@ -5,11 +5,11 @@ import (
 	"os"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/apiChat"
-	"github.com/Hugo-R94/Transcendance/backend/internal/gambling"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
 	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
+	"github.com/Hugo-R94/Transcendance/backend/internal/gambling"
 	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -43,6 +43,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 		},
 	}))
 
+	//setup groups
 	v1 := router.Group("/api/v1")
 	v1.Use(utils.AuthMiddleware())
 	userGroup := router.Group("/")
@@ -62,6 +63,8 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	apichat.FriendReq(v1, db)
 	apichat.GetConvs(v1, db)
 	apichat.BlockUser(v1, db)
+	apichat.GetBlockList(v1, db)
+	apichat.UnBlockUser(v1, db)
 	chat.ChatSetup(v1, db, hub)
 	user.GetPP(v1, db)
 	user.GetUserComments(v1, db)

@@ -40,17 +40,10 @@ func AuthMiddleware() gin.HandlerFunc {
 		tokenStr := strings.TrimPrefix(authHeader, "Bearer ")
 
 		claims := &models.TokenClaims{}
-
-		token, err := jwt.ParseWithClaims(
-			tokenStr,
-			claims,
-			func(token *jwt.Token) (any, error) {
-				return JwtSecret, nil
-			},
-			jwt.WithValidMethods([]string{"HS256"}),
-		)
-
-		if err != nil || token == nil {
+		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (any, error) {
+			return JwtSecret, nil
+		}, jwt.WithValidMethods([]string{"HS256"}))
+		if err != nil || token == nil || !token.Valid {
 			invalidTokenResponse(c)
 			return
 		}
@@ -65,7 +58,6 @@ func AuthMiddleware() gin.HandlerFunc {
 			invalidTokenResponse(c)
 			return
 		}
-
 		c.Set("id", userID)
 		c.Next()
 	}
