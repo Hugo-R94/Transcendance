@@ -31,6 +31,7 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		return
 	}
 
+	tmp := user1id
 	err = h.db.Transaction(func(tx *gorm.DB) error {
 		if user1id.String() > user2id.String() {
 			user1id, user2id = user2id, user1id
@@ -51,7 +52,11 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 			return err
 		}
 		if req.Accept {
-			conv.Accepted = true
+			if tmp == user1id {
+				conv.Accepted1 = true
+			} else {
+				conv.Accepted2 = true
+			}
 			return tx.Save(&conv).Error
 		}
 		return tx.Unscoped().Delete(&conv).Error
