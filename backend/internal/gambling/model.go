@@ -105,6 +105,7 @@ type Client struct {
 	Conn     *websocket.Conn
 	PlayerID uuid.UUID
 	Send     chan []byte
+	Username   string
 
 	Hub  *Hub
 	Room *Room

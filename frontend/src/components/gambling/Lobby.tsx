@@ -1,3 +1,5 @@
+import React from 'react';
+
 type Player = {
   playerId: string;
   username: string;
