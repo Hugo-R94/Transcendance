@@ -301,16 +301,14 @@ func (c *Client) handlePlaceBet(data []byte) {
 		return
 	}
 
-	betPlacedMsg := BetPlacedMessage{
+	c.Room.Hub.BroadcastJSON(BetPlacedMessage{
 		Type:         "bet_placed",
 		PlayerID:     c.PlayerID.String(),
 		PlayerNumber: player.PlayerNumber,
 		ChipValue:    message.ChipValue,
 		Target:       message.Target,
 		Balance:      player.Balance,
-	}
-
-	c.Room.Hub.BroadcastJSON(betPlacedMsg)
+	})
 }
 
 // ============================================================

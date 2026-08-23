@@ -11,19 +11,20 @@ import (
 // ROULETTE
 // ============================================================
 
-const MaxRouletteNumber = 21
+const MaxRouletteNumber = 24
 
 var redNumbers = map[int]bool{
 	1:  true,
+	2:  true,
 	3:  true,
 	5:  true,
-	7:  true,
-	9:  true,
-	12: true,
-	14: true,
-	16: true,
+	6:  true,
+	8: true,
+	9: true,
+	10: true,
+	11: true,
 	18: true,
-	19: true,
+	20: true,
 	21: true,
 }
 
@@ -76,7 +77,7 @@ type RouletteColor string
 
 const (
 	ColorRed   RouletteColor = "red"
-	ColorBlack RouletteColor = "black"
+	ColorGreen RouletteColor = "green"
 )
 
 // ============================================================
@@ -88,7 +89,7 @@ func getNumberColor(number int) RouletteColor {
 		return ColorRed
 	}
 
-	return ColorBlack
+	return ColorGreen
 }
 
 // ============================================================
@@ -97,7 +98,7 @@ func getNumberColor(number int) RouletteColor {
 
 func isValidTarget(target string) bool {
 	if target == "red" ||
-		target == "black" ||
+		target == "green" ||
 		target == "odd" ||
 		target == "even" {
 		return true
@@ -155,7 +156,7 @@ func isWinningBet(target string, winningNumber int) bool {
 		return getNumberColor(winningNumber) == ColorRed
 
 	case "black":
-		return getNumberColor(winningNumber) == ColorBlack
+		return getNumberColor(winningNumber) == ColorGreen
 
 	case "odd":
 		// 0 n'est ni pair ni impair.

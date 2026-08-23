@@ -317,7 +317,6 @@ func (r *Room) RunScratchPhase() {
 // ============================================================
 // BET
 // ============================================================
-
 func (r *Room) PlaceBet(
 	playerID uuid.UUID,
 	chip *Chip,
@@ -346,20 +345,34 @@ func (r *Room) PlaceBet(
 	}
 
 	player, exists := r.Players[playerID]
-
 	if !exists {
 		return errors.New("player not found")
 	}
 
+	// ==========================================================
+	// REMPLACEMENT DU PARI EXISTANT
+	// ==========================================================
+
 	if player.CurrentBet != nil {
-		return errors.New("player already has a bet")
+		// On rend l'ancien pari au joueur.
+		player.Balance += player.CurrentBet.ChipValue
+
+		// On supprime l'ancien pari.
+		player.CurrentBet = nil
 	}
+
+	// ==========================================================
+	// VÉRIFICATION DU NOUVEAU PARI
+	// ==========================================================
 
 	if chip.ChipValue > player.Balance {
 		return errors.New("insufficient balance")
 	}
 
-	// Retrait immédiat de la mise.
+	// ==========================================================
+	// NOUVEAU PARI
+	// ==========================================================
+
 	player.Balance -= chip.ChipValue
 
 	chip.PlayerID = playerID.String()
@@ -368,7 +381,6 @@ func (r *Room) PlaceBet(
 
 	return nil
 }
-
 // ============================================================
 // SCRATCH
 // ============================================================

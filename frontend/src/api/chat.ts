@@ -19,7 +19,8 @@ export interface Conversation {
   user2_id: string;
   user1: User;
   user2: User;
-  accepted: boolean | number | string;
+  accepted_1: boolean;
+  accepted_2: boolean;
   messages: Message[];
 }
 
