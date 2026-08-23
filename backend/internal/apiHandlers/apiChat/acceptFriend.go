@@ -51,6 +51,9 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 			First(&conv).Error; err != nil {
 			return err
 		}
+		if conv.Accepted1 == true && conv.Accepted2 == true {
+			return errors.New("Already accepted")
+		}
 		if req.Accept {
 			if tmp == user1id {
 				conv.Accepted1 = true
@@ -65,6 +68,10 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		if err.Error() == "not found" {
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": "Friend request not found",
+			})
+		} else if err.Error() == "Already accepted" {
+			c.JSON(http.StatusConflict, gin.H{
+				"error": "Friend request already accepted",
 			})
 		} else {
 			c.JSON(http.StatusInternalServerError, gin.H{
