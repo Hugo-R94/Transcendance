@@ -32,7 +32,7 @@ func (h *WSHandler) setup(c *gin.Context) {
 
 	queryToken := c.Query("token")
 
-	result := h.db.Where("token = ?", queryToken).Delete(&models.WSToken{})
+	result := h.db.Where("token_string = ?", queryToken).Unscoped().Delete(&models.WSToken{})
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Couldn't check token validity",

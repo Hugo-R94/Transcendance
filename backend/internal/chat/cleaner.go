@@ -18,7 +18,8 @@ func Cleaner(db *gorm.DB, ctx context.Context) {
 		case <-ctx.Done():
 			return
 		case <-ticker.C:
-			if err := db.Where("created_at < ?", time.Now().Add(-1*time.Minute)).
+			if err := db.Where("created_at < ?", time.Now().Add(-2*time.Minute)).
+				Unscoped().
 				Delete(&models.WSToken{}).Error; err != nil {
 				log.Printf("[ERROR] Coudn't delete wsToken: %v", err)
 			}
