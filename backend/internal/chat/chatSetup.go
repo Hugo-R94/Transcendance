@@ -1,13 +1,12 @@
 package chat
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"gorm.io/gorm"
@@ -28,95 +27,32 @@ var upgrader = websocket.Upgrader{
 }
 
 func (h *WSHandler) setup(c *gin.Context) {
+	idRaw, _ := c.Get("id")
+	id := idRaw.(uuid.UUID)
 
-	// =====================================================
-	// Récupération du token dans ?token=...
-	// =====================================================
+	queryToken := c.Query("token")
 
-	tokenStr := c.Query("token")
-
-	fmt.Printf("[WS] token present: %v\n", tokenStr != "")
-
-	if tokenStr == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Missing token",
+	result := h.db.Where("token = ?", queryToken).Delete(&models.WSToken{})
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Couldn't check token validity",
 		})
+		log.Printf("[ERROR] Couldn't check token validity: %v", result.Error)
 		return
 	}
-
-	// =====================================================
-	// Validation du JWT
-	// =====================================================
-
-	claims := &models.TokenClaims{}
-
-	token, err := jwt.ParseWithClaims(
-		tokenStr,
-		claims,
-		func(token *jwt.Token) (any, error) {
-			return utils.JwtSecret, nil
-		},
-		jwt.WithValidMethods([]string{"HS256"}),
-	)
-
-	if err != nil {
-		fmt.Printf("[WS] token error: %v\n", err)
-
+	if result.RowsAffected == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid token",
 		})
 		return
 	}
-
-	if token == nil || !token.Valid {
-		fmt.Println("[WS] token invalid")
-
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid token",
-		})
-		return
-	}
-
-	// =====================================================
-	// Récupération de l'ID utilisateur depuis le JWT
-	// =====================================================
-
-	if claims.ID == "" {
-		fmt.Println("[WS] token has no user ID")
-
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "User ID missing from token",
-		})
-		return
-	}
-
-	id, err := uuid.Parse(claims.ID)
-
-	if err != nil {
-		fmt.Printf("[WS] invalid user ID: %v\n", err)
-
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "Invalid user ID",
-		})
-		return
-	}
-
-	fmt.Printf("[WS] authenticated user: %s\n", id.String())
-
-	// =====================================================
-	// Upgrade HTTP -> WebSocket
-	// =====================================================
 
 	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
 
 	if err != nil {
-		fmt.Printf("[WS] upgrade error: %v\n", err)
+		log.Printf("[WS] upgrade error: %v\n", err)
 		return
 	}
-
-	// =====================================================
-	// Création du client
-	// =====================================================
 
 	client := &Client{
 		Hub:  h.hub,
@@ -136,6 +72,5 @@ func ChatSetup(router *gin.RouterGroup, db *gorm.DB, hub *Hub) {
 		db:  db,
 		hub: hub,
 	}
-
-	router.GET("/ws", h.setup)
+	router.GET("/ws", utils.WSMiddleware(), h.setup)
 }

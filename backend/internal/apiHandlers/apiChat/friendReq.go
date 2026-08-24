@@ -76,15 +76,12 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 				return err
 			}
 		}
-		var a1 bool
-		var a2 bool
+		var a1, a2 bool
 		if user1id.String() > user2id.String() {
 			user1id, user2id = user2id, user1id
-			a1 = false
-			a2 = true
+			a1, a2 = false, true
 		} else {
-			a1 = true
-			a2 = false
+			a1, a2 = true, false
 		}
 		newConv := models.Conversation{
 			User1ID:   user1id,

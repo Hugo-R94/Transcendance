@@ -21,14 +21,6 @@ func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 
-		// Dev uniquement : accepter aussi ?token=...
-		if authHeader == "" {
-			queryToken := c.Query("token")
-			if queryToken != "" {
-				authHeader = "Bearer " + queryToken
-			}
-		}
-
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"error": "Missing token",
@@ -42,6 +34,38 @@ func AuthMiddleware() gin.HandlerFunc {
 		claims := &models.TokenClaims{}
 		token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (any, error) {
 			return JwtSecret, nil
+		}, jwt.WithValidMethods([]string{"HS256"}))
+		if err != nil || token == nil || !token.Valid {
+			invalidTokenResponse(c)
+			return
+		}
+
+		if claims.ID == "" {
+			invalidTokenResponse(c)
+			return
+		}
+
+		userID, err := uuid.Parse(claims.ID)
+		if err != nil {
+			invalidTokenResponse(c)
+			return
+		}
+		c.Set("id", userID)
+		c.Next()
+	}
+}
+
+func WSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		queryToken := c.Query("token")
+		if queryToken == "" {
+			invalidTokenResponse(c)
+			return
+		}
+
+		claims := &models.TokenClaims{}
+		token, err := jwt.ParseWithClaims(queryToken, claims, func(token *jwt.Token) (any, error) {
+			return WSSecret, nil
 		}, jwt.WithValidMethods([]string{"HS256"}))
 		if err != nil || token == nil || !token.Valid {
 			invalidTokenResponse(c)

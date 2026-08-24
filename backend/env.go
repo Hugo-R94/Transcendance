@@ -41,4 +41,7 @@ func envCheck() {
 	if os.Getenv("REFRESH_SECRET") == "" {
 		log.Fatal("[ERROR] REFRESH_SECRET not found in env")
 	}
+	if os.Getenv("WS_SECRET") == "" {
+		log.Fatal("[ERROR] WS_SECRET not found in env")
+	}
 }
