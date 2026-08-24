@@ -35,6 +35,8 @@ func main() {
 	hub.HubInit(db)
 	go hub.Run(ctx)
 
+	go chat.Cleaner(db, ctx)
+
 	router := setupRouter(db, &hub)
 
 	server := &http.Server{
