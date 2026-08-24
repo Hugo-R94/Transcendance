@@ -1,4 +1,4 @@
-package gambling
+package apigambling
 
 import (
 	"gorm.io/gorm"

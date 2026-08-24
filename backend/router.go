@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/apiChat"
+	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/apigambling"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/comment"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/game"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
@@ -66,6 +67,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	apichat.GetBlockList(v1, db)
 	apichat.UnBlockUser(v1, db)
 	apichat.GenWSToken(v1, db)
+	apigambling.GetHistory(v1, db)
 	chat.ChatSetup(chatGroup, db, hub)
 	user.GetPP(v1, db)
 	user.GetUserComments(v1, db)
