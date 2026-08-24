@@ -53,7 +53,7 @@ function Chip({ value, userID, playerNumber }: ChipProps) {
 
   return (
     <div
-      className="pointer-events-none absolute -right-3 -top-5 z-[999] h-16 w-16"
+      className="pointer-events-none absolute -right-3 -top-5 z-[40] h-16 w-16"
       style={{ transform: `translate(${randomPosition.x}px, ${randomPosition.y}px)` }}
     >
       <div
