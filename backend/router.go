@@ -43,11 +43,11 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 		},
 	}))
 
-	//setup groups
 	v1 := router.Group("/api/v1")
 	v1.Use(utils.AuthMiddleware())
 	userGroup := router.Group("/")
 	gameGroup := v1.Group("/game")
+	chatGroup := router.Group("/chat")
 	commentGroup := v1.Group("/comments")
 	v1.GET("/gamble/ws", gambling.HandleWebSocket(db))
 	comment.CommentRoutes(commentGroup, db)
@@ -65,7 +65,8 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	apichat.BlockUser(v1, db)
 	apichat.GetBlockList(v1, db)
 	apichat.UnBlockUser(v1, db)
-	chat.ChatSetup(v1, db, hub)
+	apichat.GenWSToken(v1, db)
+	chat.ChatSetup(chatGroup, db, hub)
 	user.GetPP(v1, db)
 	user.GetUserComments(v1, db)
 	user.UserDescriptionRoutes(v1, db)

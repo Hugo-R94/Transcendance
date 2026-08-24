@@ -45,6 +45,18 @@ type (
 		DeletedAt     gorm.DeletedAt `gorm:"index" json:"-"`
 	}
 
+	WSToken struct {
+		ID          uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()"`
+		TokenString string         `gorm:"text; uniqueIndex"`
+		CreatedAt   time.Time      `json:"-"`
+		UpdatedAt   time.Time      `json:"-"`
+		DeletedAt   gorm.DeletedAt `gorm:"index" json:"-"`
+	}
+
+	WSTokenResponse struct {
+		Token string `json:"token"`
+	}
+
 	MessageSend struct {
 		ConversationID string `json:"conversation_id" binding:"required"`
 		Text           string `json:"text"`

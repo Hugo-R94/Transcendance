@@ -11,6 +11,7 @@ import (
 )
 
 var JwtSecret = []byte(os.Getenv("JWT_SECRET"))
+var WSSecret = []byte(os.Getenv("WS_SECRET"))
 var RefreshSecret = []byte(os.Getenv("REFRESH_SECRET"))
 
 func HashPassword(password string) (string, error) {
@@ -54,4 +55,12 @@ func GenerateRefreshToken(id string) (string, error) {
 		"exp": time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
 	return token.SignedString(RefreshSecret)
+}
+
+func GenerateWSToken(id string) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":  id,
+		"exp": time.Now().Add(time.Minute * 1).Unix(),
+	})
+	return token.SignedString(WSSecret)
 }
