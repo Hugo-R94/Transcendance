@@ -60,7 +60,7 @@ func GenerateRefreshToken(id string) (string, error) {
 func GenerateWSToken(id string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":  id,
-		"exp": time.Now().Add(time.Minute * 1).Unix(),
+		"exp": time.Now().Add(time.Minute * 1).UnixMicro(),
 	})
 	return token.SignedString(WSSecret)
 }
