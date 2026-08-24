@@ -13,7 +13,7 @@ type (
 		UserID       uuid.UUID      `gorm:"type:uuid;index" json:"user_id"`
 		User         User           `gorm:"foreignKey:UserID;references:ID" json:"user"`
 		HighestScore int            `gorm:"type:int" json:"highest_score"`
-		FinalScore   int            `gorm:"type:int" json:"final_score"`
+		FinalScore   int            `gorm:"type:int; index" json:"final_score"`
 		Rank         uint32         `gorm:"type:uint" json:"rank"`
 		Time         time.Time      `gorm:"index" json:"time"`
 		CreatedAt    time.Time      `json:"-"`
