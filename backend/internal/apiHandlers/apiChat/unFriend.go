@@ -13,8 +13,21 @@ import (
 )
 
 func (h *ChatHandler) unFriend(c *gin.Context) {
-	idRaw, _ := c.Get("id")
-	id := idRaw.(uuid.UUID)
+	idRaw, exists := c.Get("id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "User ID missing",
+		})
+		return
+	}
+
+	id, ok := idRaw.(uuid.UUID)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid user ID",
+		})
+		return
+	}
 
 	var req models.UnFriendRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -53,6 +66,11 @@ func (h *ChatHandler) unFriend(c *gin.Context) {
 		var conv models.Conversation
 		if err := tx.Where("user1_id = ? AND user2_id = ?", sortedID, sortedUserID).
 			First(&conv).Error; err != nil {
+
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return errors.New("not friend")
+			}
+
 			return err
 		}
 		return tx.Unscoped().Select("Messages").Delete(&conv).Error

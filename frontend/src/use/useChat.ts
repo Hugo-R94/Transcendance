@@ -473,7 +473,24 @@ export function useChat() {
         }
       );
 
+      // Le backend nous donne l'ID
+      // de la conversation
+      const conversationId =
+        res.data?.conversation_id;
+
+      console.log(
+        "[CHAT] Accepted conversation:",
+        conversationId
+      );
+
       await fetchConversations();
+
+      if (conversationId) {
+        sendWebSocketMessage(
+          String(conversationId),
+          "friend_accept"
+        );
+      }
 
       showNotification(
         `${req.username} est maintenant votre ami !`
