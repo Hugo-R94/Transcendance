@@ -47,8 +47,8 @@ services:
     ports:
       - "5173:5173"
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend:/app:Z
+      - /app/node_modules:Z
     restart: unless-stopped
 
 volumes:
