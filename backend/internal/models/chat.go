@@ -14,7 +14,7 @@ type (
 		ConversationID uuid.UUID      `gorm:"type:uuid; index; constraint:onDelete:CASCADE;" json:"conversation_id"`
 		Text           string         `gorm:"type:text" json:"text"`
 		Time           time.Time      `gorm:"index" json:"time"`
-		Type           string         `gorm:"type:varchar(10)" json:"type"`
+		Type           string         `gorm:"type:varchar(15)" json:"type"`
 		CreatedAt      time.Time      `json:"-"`
 		UpdatedAt      time.Time      `json:"-"`
 		DeletedAt      gorm.DeletedAt `gorm:"index" json:"-"`
@@ -86,9 +86,11 @@ type (
 )
 
 const (
-	MessageTypeChat         = "message"
-	MessageTypeConnect      = "connect"
-	MessageTypeDisconnect   = "disconnect"
-	MessageTypeFriendReq    = "friend_req"
-	MessageTypeFriendAccept = "friend_accept"
+	MessageTypeChat          = "message"
+	MessageTypeConnect       = "connect"
+	MessageTypeDisconnect    = "disconnect"
+	MessageTypeFriendReq     = "friend_req"
+	MessageTypeFriendAccept  = "friend_accept"
+	MessageTypeFriendRemove  = "friend_remove"
+	MessageTypeBlocked       = "blocked"
 )

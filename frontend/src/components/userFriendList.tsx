@@ -41,19 +41,37 @@ function FriendAvatar({ friendId, nickname, mobile = false }: { friendId: string
   );
 }
 
-function FriendCard({ friend, cardColor }: { friend: FriendItem; cardColor: string }) {
+function FriendCard({
+  friend,
+  cardColor,
+  showUnblock,
+  onUnblock,
+}: {
+  friend: FriendItem;
+  cardColor: string;
+  showUnblock: boolean;
+  onUnblock: (id: string) => void;
+}) {
   const nickname = friend.username || "Utilisateur";
 
   return (
-    <Link
-      to={`/profil/${friend.id}`}
-      className={`flex flex-col items-center balatro hover:z-100 justify-center p-3 rounded-2xl shadow-md shadow-black/25 ${cardColor} h-full w-full text-center gap-2 overflow-hidden hover:outline-3 hover:scale-[1.02] transition-all cursor-pointer`}
-    >
-      <div className="flex-1 flex items-center justify-center w-full">
+    <div className={`flex flex-col items-center balatro hover:z-100 justify-center p-3 rounded-2xl shadow-md shadow-black/25 ${cardColor} h-full w-full text-center gap-2 overflow-hidden hover:outline-3 hover:scale-[1.02] transition-all`}>
+      <Link to={`/profil/${friend.id}`} className="flex-1 flex items-center justify-center w-full">
         <FriendAvatar friendId={friend.id} nickname={nickname} />
-      </div>
+      </Link>
+
+      {showUnblock && (
+        <button
+          type="button"
+          onClick={() => onUnblock(friend.id)}
+          className="bg-byellow w-1/2 rounded-2xl balatro h-8 hover:outline-3"
+        >
+          UNBLOCK
+        </button>
+      )}
+
       <span className="font-bold text-gray-200 text-xs sm:text-sm truncate w-full">{nickname}</span>
-    </Link>
+    </div>
   );
 }
 
@@ -154,6 +172,21 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
     page * ITEMS_PER_PAGE
   );
 
+  const handleUnblock = async (id: string) => {
+    try {
+      await api.delete("/unblock", {
+        data: { id },
+      });
+
+      await fetchList();
+    } catch (err: any) {
+      console.error(
+        "Erreur lors du déblocage :",
+        err.response?.data || err.message
+      );
+    }
+  };
+
   const handleListChange = (value: string) => {
     setSelectedList(value);
     setPage(1);
@@ -195,6 +228,8 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
                   key={friend.id}
                   friend={friend}
                   cardColor={getCardColor(index, 4)}
+                  showUnblock={selectedList === "blocked"}
+                  onUnblock={handleUnblock}
                 />
               ))}
             </div>
@@ -248,20 +283,35 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
               const nickname = friend.username || "Utilisateur";
 
               return (
-                <Link
+                <div
                   key={friend.id}
-                  to={`/profil/${friend.id}`}
-                  className={`flex items-center gap-3 p-3 rounded-2xl shadow-md shadow-black/25 ${baseColors[index % baseColors.length]} hover:opacity-90 transition-all cursor-pointer`}
+                  className={`flex items-center gap-3 p-3 rounded-2xl shadow-md shadow-black/25 ${baseColors[index % baseColors.length]}`}
                 >
-                  <FriendAvatar
-                    friendId={friend.id}
-                    nickname={nickname}
-                    mobile
-                  />
-                  <span className="font-bold text-gray-200 text-sm truncate">
-                    {nickname}
-                  </span>
-                </Link>
+                  <Link
+                    to={`/profil/${friend.id}`}
+                    className="flex items-center gap-3 flex-1 min-w-0"
+                  >
+                    <FriendAvatar
+                      friendId={friend.id}
+                      nickname={nickname}
+                      mobile
+                    />
+
+                    <span className="font-bold text-gray-200 text-sm truncate">
+                      {nickname}
+                    </span>
+                  </Link>
+
+                  {selectedList === "blocked" && (
+                    <button
+                      type="button"
+                      onClick={() => handleUnblock(friend.id)}
+                      className="bg-byellow px-3 h-8 rounded-xl balatro hover:outline-2 shrink-0"
+                    >
+                      Débloquer
+                    </button>
+                  )}
+                </div>
               );
             })
           )}

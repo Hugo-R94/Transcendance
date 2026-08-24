@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import api from "../api/api";
+
 import type {
   Player,
   Ticket,
@@ -38,19 +40,27 @@ export function useGambling() {
   const [connected, setConnected] = useState(false);
   const [joined, setJoined] = useState(false);
 
-  const [roomId, setRoomId] = useState("room-123");
+  const [roomId, setRoomId] =
+    useState("room-123");
 
-  const [playerId, setPlayerId] = useState("");
-  const [playerNumber, setPlayerNumber] = useState(0);
-  const [username, setUsername] = useState("");
+  const [playerId, setPlayerId] =
+    useState("");
+
+  const [playerNumber, setPlayerNumber] =
+    useState(0);
+
+  const [username, setUsername] =
+    useState("");
 
   // ==========================================================
   // LOBBY
   // ==========================================================
 
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [players, setPlayers] =
+    useState<Player[]>([]);
 
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] =
+    useState(false);
 
   const [countdown, setCountdown] =
     useState<number | null>(null);
@@ -62,7 +72,8 @@ export function useGambling() {
   const [gameStarted, setGameStarted] =
     useState(false);
 
-  const [turn, setTurn] = useState(0);
+  const [turn, setTurn] =
+    useState(0);
 
   const [state, setState] =
     useState("waiting");
@@ -74,7 +85,8 @@ export function useGambling() {
   // BET
   // ==========================================================
 
-  const [balance, setBalance] = useState(1000);
+  const [balance, setBalance] =
+    useState(1000);
 
   const [balanceBefore, setBalanceBefore] =
     useState(1000);
@@ -123,7 +135,8 @@ export function useGambling() {
   // ERROR / LOGS
   // ==========================================================
 
-  const [error, setError] = useState("");
+  const [error, setError] =
+    useState("");
 
   const [jsonLogs, setJsonLogs] =
     useState<JsonLog[]>([]);
@@ -218,7 +231,8 @@ export function useGambling() {
   // ==========================================================
 
   const send = (message: object) => {
-    const socket = socketRef.current;
+    const socket =
+      socketRef.current;
 
     if (
       !socket ||
@@ -237,7 +251,10 @@ export function useGambling() {
       return false;
     }
 
-    addJsonLog("sent", message);
+    addJsonLog(
+      "sent",
+      message
+    );
 
     socket.send(
       JSON.stringify(message)
@@ -308,7 +325,9 @@ export function useGambling() {
           typeof data.balance ===
           "number"
         ) {
-          setBalance(data.balance);
+          setBalance(
+            data.balance
+          );
 
           setBalanceBefore(
             data.balance
@@ -326,7 +345,9 @@ export function useGambling() {
         if (
           Array.isArray(data.players)
         ) {
-          setPlayers(data.players);
+          setPlayers(
+            data.players
+          );
 
           const me =
             data.players.find(
@@ -794,6 +815,7 @@ export function useGambling() {
 
                 return {
                   ...player,
+
                   username:
                     result.username ??
                     player.username,
@@ -842,7 +864,7 @@ export function useGambling() {
       case "error": {
         setError(
           data.message ??
-            "Erreur serveur"
+          "Erreur serveur"
         );
 
         break;
@@ -864,44 +886,178 @@ export function useGambling() {
   };
 
   // ==========================================================
+  // WEBSOCKET TOKEN
+  // ==========================================================
+
+  const fetchWebSocketToken =
+    async (): Promise<string | null> => {
+      try {
+        const res =
+          await api.get("/wstoken");
+
+        const token =
+          res.data?.token;
+
+        if (!token) {
+          console.error(
+            "[GAMBLING] Aucun token WebSocket reçu."
+          );
+
+          return null;
+        }
+
+        return String(token);
+      } catch (err: any) {
+        console.error(
+          "[GAMBLING] Erreur récupération token WebSocket :",
+          err.response?.data ||
+            err.message
+        );
+
+        return null;
+      }
+    };
+
+  // ==========================================================
+  // WEBSOCKET URL
+  // ==========================================================
+
+  const getWebSocketUrl = (
+    wsToken: string
+  ) => {
+    const baseURL =
+      api.defaults.baseURL;
+
+    if (!baseURL) {
+      return null;
+    }
+
+    try {
+      const base = new URL(
+        baseURL,
+        window.location.origin
+      );
+
+      const wsProtocol =
+        base.protocol === "https:"
+          ? "wss:"
+          : "ws:";
+
+      const url = new URL(
+        `${wsProtocol}//${base.host}/gamble/ws`
+      );
+
+      url.searchParams.set(
+        "token",
+        wsToken
+      );
+
+      return url.toString();
+    } catch (err) {
+      console.error(
+        "[GAMBLING] Erreur URL WebSocket :",
+        err
+      );
+
+      return null;
+    }
+  };
+
+  // ==========================================================
   // CONNECT
   // ==========================================================
 
-	const connect = () => {
-	if (
-		socketRef.current &&
-		socketRef.current.readyState !== WebSocket.CLOSED
-	) {
-		return;
-	}
+  const connect = async () => {
+    if (
+      socketRef.current &&
+      socketRef.current.readyState !==
+        WebSocket.CLOSED
+    ) {
+      return;
+    }
 
-	setError("");
+    setError("");
 
-	const token = localStorage.getItem("token");
+    const jwt =
+      localStorage.getItem("token");
 
-	if (!token) {
-		setError("Token JWT manquant");
-		addJsonLog("system", {
-		type: "connection_error",
-		message: "Token JWT manquant",
-		});
-		return;
-	}
+    if (!jwt) {
+      setError(
+        "Token JWT manquant"
+      );
 
-	const socket = new WebSocket(
-		`ws://localhost:8080/api/v1/gamble/ws?token=${encodeURIComponent(token)}`
-	);
+      addJsonLog("system", {
+        type: "connection_error",
+        message:
+          "Token JWT manquant",
+      });
 
-	socket.onopen = () => {
-		console.log("WebSocket connecté");
+      return;
+    }
 
-		setConnected(true);
+    // ========================================================
+    // 1. HANDSHAKE HTTP
+    // ========================================================
 
-		addJsonLog("system", {
-		type: "connection_open",
-		});
-	};
+    const wsToken =
+      await fetchWebSocketToken();
 
+    if (!wsToken) {
+      setError(
+        "Impossible d'obtenir le token WebSocket"
+      );
+
+      addJsonLog("system", {
+        type: "connection_error",
+        message:
+          "Impossible d'obtenir le token WebSocket",
+      });
+
+      return;
+    }
+
+    // ========================================================
+    // 2. CONSTRUCTION URL WEBSOCKET
+    // ========================================================
+
+    const url =
+      getWebSocketUrl(wsToken);
+
+    if (!url) {
+      setError(
+        "Impossible de construire l'URL WebSocket"
+      );
+
+      addJsonLog("system", {
+        type: "connection_error",
+        message:
+          "URL WebSocket invalide",
+      });
+
+      return;
+    }
+
+    // ========================================================
+    // 3. CONNEXION WEBSOCKET
+    // ========================================================
+
+    const socket =
+      new WebSocket(url);
+
+    socketRef.current =
+      socket;
+
+    socket.onopen = () => {
+      console.log(
+        "WebSocket connecté"
+      );
+
+      setConnected(true);
+
+      addJsonLog("system", {
+        type: "connection_open",
+      });
+    };
 
     socket.onmessage = (
       event
@@ -989,10 +1145,9 @@ export function useGambling() {
 
       stopPhaseCountdown();
 
-      socketRef.current = null;
+      socketRef.current =
+        null;
     };
-
-    socketRef.current = socket;
   };
 
   // ==========================================================
@@ -1009,7 +1164,8 @@ export function useGambling() {
 
     socket.close();
 
-    socketRef.current = null;
+    socketRef.current =
+      null;
   };
 
   // ==========================================================
@@ -1053,37 +1209,55 @@ export function useGambling() {
   // ==========================================================
   // BET
   // ==========================================================
-	const placeBet = (
-	newTarget?: string,
-	amount?: number
-	) => {
-	const finalTarget = newTarget ?? target;
-	const finalAmount = amount ?? betAmount;
 
-	if (state !== "betting") {
-		setError("Les paris sont fermés");
-		return;
-	}
+  const placeBet = (
+    newTarget?: string,
+    amount?: number
+  ) => {
+    const finalTarget =
+      newTarget ?? target;
 
-	if (finalAmount <= 0) {
-		setError("Montant invalide");
-		return;
-	}
+    const finalAmount =
+      amount ?? betAmount;
 
-	if (finalAmount > balance) {
-		setError("Solde insuffisant");
-		return;
-	}
+    if (state !== "betting") {
+      setError(
+        "Les paris sont fermés"
+      );
 
-	setTarget(finalTarget);
-	setBetAmount(finalAmount);
+      return;
+    }
 
-	send({
-		type: "place_bet",
-		chipValue: finalAmount,
-		target: finalTarget,
-	});
-	};
+    if (finalAmount <= 0) {
+      setError(
+        "Montant invalide"
+      );
+
+      return;
+    }
+
+    if (finalAmount > balance) {
+      setError(
+        "Solde insuffisant"
+      );
+
+      return;
+    }
+
+    setTarget(finalTarget);
+
+    setBetAmount(
+      finalAmount
+    );
+
+    send({
+      type: "place_bet",
+      chipValue:
+        finalAmount,
+      target:
+        finalTarget,
+    });
+  };
 
   // ==========================================================
   // SCRATCH

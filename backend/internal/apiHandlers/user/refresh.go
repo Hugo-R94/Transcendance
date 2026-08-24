@@ -58,7 +58,6 @@ func (h *UserHandler) refresh(c *gin.Context) {
 }
 
 func RefreshUser(router *gin.RouterGroup, db *gorm.DB) {
-	//Using UserHandler struct to pass the db in the method login
 	h := &UserHandler{db: db}
 	router.POST("/refresh", h.refresh)
 }
