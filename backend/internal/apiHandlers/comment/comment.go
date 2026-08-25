@@ -114,7 +114,6 @@ func (h *CommentHandler) commentGet(c *gin.Context) {
 	// 2. Récupération des commentaires avec Preload du User
 	err := h.db.
 		Preload("Author", func(db *gorm.DB) *gorm.DB {
-			// Sélectionne uniquement ID et Username pour la sécurité et les perfs
 			return db.Select("id, username, profile_pic, title1, title2")
 		}).
 		Where("game_id = ?", gameID).
