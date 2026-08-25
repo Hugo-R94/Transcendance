@@ -19,7 +19,7 @@ type (
 		Description      string         `gorm:"type:text" json:"description"`
 		Title1           string         `gorm:"type:varchar(50)" json:"title_1"`
 		Title2           string         `gorm:"type:varchar(50)" json:"title_2"`
-		Comments         []Comment      `gorm:"foreignKey:UserID" json:"comments,omitempty"`
+		Comments         []Comment      `gorm:"foreignKey:AuthorID" json:"comments,omitempty"`
 		LikedGames       []Game         `gorm:"many2many:user_liked_games;" json:"liked_games,omitempty"`
 		DislikedGames    []Game         `gorm:"many2many:user_disliked_games;" json:"disliked_games,omitempty"`
 		WishlistedGames  []Game         `gorm:"many2many:user_wishlisted_games;" json:"wishlisted_games,omitempty"`
