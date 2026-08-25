@@ -4,7 +4,9 @@ import (
 	"errors"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +16,7 @@ import (
 
 func (h *ChatHandler) friendAccept(c *gin.Context) {
 	idRaw, _ := c.Get("id")
-	user1id := idRaw.(uuid.UUID)
+	accepterID := idRaw.(uuid.UUID)
 
 	var req models.FriendAccept
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -23,7 +25,7 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		})
 		return
 	}
-	user2id, err := uuid.Parse(req.ID)
+	otherID, err := uuid.Parse(req.ID)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "Invalid user ID",
@@ -31,7 +33,7 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		return
 	}
 
-	tmp := user1id
+	user1id, user2id := accepterID, otherID
 	err = h.db.Transaction(func(tx *gorm.DB) error {
 		if user1id.String() > user2id.String() {
 			user1id, user2id = user2id, user1id
@@ -55,7 +57,7 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 			return errors.New("Already accepted")
 		}
 		if req.Accept {
-			if tmp == user1id {
+			if accepterID == user1id {
 				conv.Accepted1 = true
 			} else {
 				conv.Accepted2 = true
@@ -82,6 +84,17 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 		return
 	}
 	if req.Accept {
+		// notif au demandeur original pour qu'il refresh sa liste d'amis
+		h.hub.Notify <- chat.Notification{
+			TargetID: otherID,
+			Message: models.Message{
+				SenderID: accepterID,
+				Text:     "friend_accept",
+				Time:     time.Now(),
+				Type:     models.MessageTypeFriendAccept,
+			},
+		}
+
 		c.JSON(http.StatusCreated, gin.H{
 			"message": "Friend request accepted",
 		})
@@ -92,7 +105,7 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 	})
 }
 
-func FriendAccept(router *gin.RouterGroup, db *gorm.DB) {
-	h := &ChatHandler{db: db}
+func FriendAccept(router *gin.RouterGroup, db *gorm.DB, hub *chat.Hub) {
+	h := &ChatHandler{db: db, hub: hub}
 	router.PUT("/friend_accept", h.friendAccept)
 }

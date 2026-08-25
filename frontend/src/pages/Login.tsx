@@ -59,7 +59,7 @@ function Login() {
         "token",
         result.token
       );
-
+	  localStorage.setItem("refresh_token", result.refresh_token);
       localStorage.setItem(
         "token_expiration",
         String(

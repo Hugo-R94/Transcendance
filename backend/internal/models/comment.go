@@ -31,3 +31,4 @@ type (
 		Rating       float64 `json:"rating" binding:"required"`
 	}
 )
+

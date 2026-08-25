@@ -20,10 +20,7 @@ export function useChat() {
 
   const showNotification = (message: string) => {
     setNotification(null);
-
-    window.setTimeout(() => {
-      setNotification(message);
-    }, 10);
+    window.setTimeout(() => setNotification(message), 10);
   };
 
   const fetchMyProfile = async () => {
@@ -32,7 +29,6 @@ export function useChat() {
 
       if (res.data?.id) {
         const id = String(res.data.id);
-
         setCurrentUserId(id);
         localStorage.setItem("userID", id);
       }
@@ -44,22 +40,29 @@ export function useChat() {
     }
   };
 
-  const fetchConversations = async () => {
-    try {
-      const res = await api.get("/convs");
+	const fetchConversations = async () => {
+	console.log("[CHAT] fetchConversations() START");
 
-      if (!Array.isArray(res.data?.conversations)) {
-        return;
-      }
+	try {
+		console.log("[CHAT] GET /convs");
 
-      setConvs(res.data.conversations as Conversation[]);
-    } catch (err: any) {
-      console.error(
-        "[CHAT] Erreur conversations :",
-        err.response?.data || err.message
-      );
-    }
-  };
+		const res = await api.get("/convs");
+
+		console.log("[CHAT] GET /convs RESPONSE", res.data);
+
+		if (!Array.isArray(res.data?.conversations)) {
+		setConvs([]);
+		return;
+		}
+
+		setConvs(res.data.conversations as Conversation[]);
+	} catch (err: any) {
+		console.error(
+		"[CHAT] Erreur conversations :",
+		err.response?.data || err.message
+		);
+	}
+	};
 
   const fetchWebSocketToken = async (): Promise<string | null> => {
     try {
@@ -85,15 +88,10 @@ export function useChat() {
   const getWebSocketUrl = (wsToken: string) => {
     const baseURL = api.defaults.baseURL;
 
-    if (!baseURL) {
-      return null;
-    }
+    if (!baseURL) return null;
 
     try {
-      const base = new URL(
-        baseURL,
-        window.location.origin
-      );
+      const base = new URL(baseURL, window.location.origin);
 
       const wsProtocol =
         base.protocol === "https:" ? "wss:" : "ws:";
@@ -106,22 +104,42 @@ export function useChat() {
 
       return url.toString();
     } catch (err) {
-      console.error(
-        "[CHAT] Erreur URL WebSocket :",
-        err
-      );
-
+      console.error("[CHAT] Erreur URL WebSocket :", err);
       return null;
     }
+  };
+
+  // Envoie un message via le WebSocket
+  const sendWebSocketMessage = (
+    conversationId: string,
+    type: string,
+    text = ""
+  ): boolean => {
+    const ws = wsRef.current;
+
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+      console.error("[CHAT] WebSocket non connecté.");
+      return false;
+    }
+
+    const message = {
+      conversation_id: conversationId,
+      text,
+      type,
+    };
+
+    ws.send(JSON.stringify(message));
+
+    console.log("[CHAT] WS ->", message);
+
+    return true;
   };
 
   useEffect(() => {
     let cancelled = false;
 
     const connectWebSocket = async () => {
-      if (cancelled) {
-        return;
-      }
+      if (cancelled) return;
 
       const jwt = localStorage.getItem("token");
 
@@ -166,9 +184,7 @@ export function useChat() {
       };
 
       ws.onmessage = (event) => {
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
 
         try {
           const data = JSON.parse(event.data);
@@ -176,8 +192,7 @@ export function useChat() {
           if (data.type === "message") {
             setConvs((prev) =>
               prev.map((conv) =>
-                String(conv.id) !==
-                String(data.conversation_id)
+                String(conv.id) !== String(data.conversation_id)
                   ? conv
                   : {
                       ...conv,
@@ -190,31 +205,35 @@ export function useChat() {
             );
 
             fetchConversations();
-          } else if (data.type === "friend_req") {
-            fetchConversations();
-            showNotification(
-              "Nouvelle demande d'ami !"
-            );
-          } else if (data.type === "friend_accept") {
-            fetchConversations();
-            showNotification(
-              "Demande d'ami acceptée !"
-            );
           }
+
+          // Quelqu'un nous envoie une demande d'ami
+          else if (data.type === "friend_req") {
+            fetchConversations();
+            showNotification("Nouvelle demande d'ami !");
+          }
+
+          // Demande acceptée
+			else if (data.type === "friend_accept") {
+			fetchConversations();
+			showNotification("Demande d'ami acceptée !");
+			}
+		  else if (data.type === "friend_remove"){
+			fetchConversations();
+			showNotification("Quelqu'un vous a retirer de sa liste d'ami.");
+		  }
+		  else if (data.type === "blocked"){
+			fetchConversations();
+			showNotification("Quelqu'un vous a bloquer.");
+		  }
+
         } catch (err) {
-          console.error(
-            "[CHAT] JSON invalide :",
-            err
-          );
+          console.error("[CHAT] JSON invalide :", err);
         }
       };
 
       ws.onerror = (err) => {
-        console.error(
-          "[CHAT] WebSocket error :",
-          err
-        );
-
+        console.error("[CHAT] WebSocket error :", err);
         setWsConnected(false);
       };
 
@@ -247,7 +266,6 @@ export function useChat() {
       cancelled = true;
 
       const ws = wsRef.current;
-
       wsRef.current = null;
 
       if (
@@ -267,21 +285,13 @@ export function useChat() {
   const getOtherUser = (conv: Conversation) => {
     const myUserId = localStorage.getItem("userID");
 
-    if (!myUserId) {
-      return null;
-    }
+    if (!myUserId) return null;
 
-    if (
-      String(conv.user1_id) ===
-      String(myUserId)
-    ) {
+    if (String(conv.user1_id) === String(myUserId)) {
       return conv.user2;
     }
 
-    if (
-      String(conv.user2_id) ===
-      String(myUserId)
-    ) {
+    if (String(conv.user2_id) === String(myUserId)) {
       return conv.user1;
     }
 
@@ -291,10 +301,7 @@ export function useChat() {
   const getAcceptance = (conv: Conversation) => {
     const myUserId = localStorage.getItem("userID");
 
-    if (
-      String(conv.user1_id) ===
-      String(myUserId)
-    ) {
+    if (String(conv.user1_id) === String(myUserId)) {
       return {
         myAccepted: conv.accepted_1,
         otherAccepted: conv.accepted_2,
@@ -309,10 +316,8 @@ export function useChat() {
 
   const friends: Friend[] = convs
     .filter((conv) => {
-      const {
-        myAccepted,
-        otherAccepted,
-      } = getAcceptance(conv);
+      const { myAccepted, otherAccepted } =
+        getAcceptance(conv);
 
       return (
         myAccepted === true &&
@@ -322,9 +327,7 @@ export function useChat() {
     .map((conv) => {
       const user = getOtherUser(conv);
 
-      if (!user) {
-        return null;
-      }
+      if (!user) return null;
 
       return {
         id: user.id,
@@ -332,16 +335,12 @@ export function useChat() {
         profilePic: user.profile_pic,
       };
     })
-    .filter(
-      (f): f is Friend => f !== null
-    );
+    .filter((f): f is Friend => f !== null);
 
   const requests: FriendRequest[] = convs
     .filter((conv) => {
-      const {
-        myAccepted,
-        otherAccepted,
-      } = getAcceptance(conv);
+      const { myAccepted, otherAccepted } =
+        getAcceptance(conv);
 
       return (
         myAccepted === false &&
@@ -351,9 +350,7 @@ export function useChat() {
     .map((conv) => {
       const user = getOtherUser(conv);
 
-      if (!user) {
-        return null;
-      }
+      if (!user) return null;
 
       return {
         id: user.id,
@@ -361,44 +358,31 @@ export function useChat() {
         profilePic: user.profile_pic,
       };
     })
-    .filter(
-      (r): r is FriendRequest => r !== null
-    );
+    .filter((r): r is FriendRequest => r !== null);
 
-  const handleFriendClick = async (
-    friend: Friend
-  ) => {
+  const handleFriendClick = async (friend: Friend) => {
     const conversation = convs.find((conv) => {
       const other = getOtherUser(conv);
 
       return (
         other &&
-        String(other.id) ===
-        String(friend.id)
+        String(other.id) === String(friend.id)
       );
     });
 
     if (!conversation) {
-      showNotification(
-        "Conversation introuvable."
-      );
-
+      showNotification("Conversation introuvable.");
       return;
     }
 
-    if (
-      !openConvIds.includes(
-        String(conversation.id)
-      )
-    ) {
+    if (!openConvIds.includes(String(conversation.id))) {
       setOpenConvIds((prev) => [
         ...prev,
         String(conversation.id),
       ]);
     }
 
-    const myUserId =
-      localStorage.getItem("userID");
+    const myUserId = localStorage.getItem("userID");
 
     const isUser1 =
       String(conversation.user1_id) ===
@@ -408,9 +392,7 @@ export function useChat() {
       String(conversation.user2_id) ===
       String(myUserId);
 
-    if (!isUser1 && !isUser2) {
-      return;
-    }
+    if (!isUser1 && !isUser2) return;
 
     try {
       await api.put(
@@ -427,14 +409,8 @@ export function useChat() {
           }
 
           return isUser1
-            ? {
-                ...conv,
-                user1_a_jour: true,
-              }
-            : {
-                ...conv,
-                user2_a_jour: true,
-              };
+            ? { ...conv, user1_a_jour: true }
+            : { ...conv, user2_a_jour: true };
         })
       );
     } catch (err: any) {
@@ -445,31 +421,37 @@ export function useChat() {
     }
   };
 
+  // ENVOI DEMANDE D'AMI
   const handleSendFriendRequest = async () => {
-    const username =
-      targetUsername.trim();
+    const username = targetUsername.trim();
 
     if (!username) {
-      showNotification(
-        "Entrez un nom d'utilisateur."
-      );
-
+      showNotification("Entrez un nom d'utilisateur.");
       return;
     }
 
     try {
-      await api.post(
+      const res = await api.post(
         "/friend_request",
         { username }
       );
 
       setTargetUsername("");
 
-      showNotification(
-        "Invitation envoyée !"
-      );
+	  console.log(res.data.conversation_id);
+      const conversationId =
+        res.data?.conversation_id;
 
       await fetchConversations();
+
+      if (conversationId) {
+        sendWebSocketMessage(
+          conversationId,
+          "friend_req"
+        );
+      }
+
+      showNotification("Invitation envoyée !");
     } catch (err: any) {
       showNotification(
         err.response?.data?.error ||
@@ -477,12 +459,13 @@ export function useChat() {
       );
     }
   };
-
+  
+  // ACCEPTATION DEMANDE D'AMI
   const handleAccept = async (
     req: FriendRequest
   ) => {
     try {
-      await api.put(
+      	await api.put(
         "/friend_accept",
         {
           id: String(req.id),
@@ -498,74 +481,161 @@ export function useChat() {
     } catch (err: any) {
       showNotification(
         err.response?.data?.error ||
-        "Erreur."
+          "Erreur."
       );
     }
   };
 
-  const handleReject = async (
-    req: FriendRequest
-  ) => {
-    try {
-      await api.put(
-        "/friend_accept",
-        {
-          id: String(req.id),
-          accept: false,
-        }
-      );
+	const handleReject = async (
+	req: FriendRequest
+	) => {
+	try {
+		const res = await api.put(
+		"/friend_accept",
+		{
+			id: String(req.id),
+			accept: false,
+		}
+		);
 
-      await fetchConversations();
+		const conversationId =
+		res.data?.conversation_id;
 
-      showNotification(
-        "Invitation refusée."
-      );
-    } catch (err: any) {
-      showNotification(
-        err.response?.data?.error ||
-        "Erreur."
-      );
-    }
-  };
+		console.log(
+		"[CHAT] Rejected conversation:",
+		conversationId
+		);
 
-  const handleBlock = (
-    req: FriendRequest
-  ) => {
+		if (conversationId) {
+		// Préviens l'autre utilisateur
+		const sent = sendWebSocketMessage(
+			String(conversationId),
+			"friend_reject"
+		);
+
+		console.log(
+			"[CHAT] friend_reject envoyé:",
+			sent
+		);
+
+		// Supprime immédiatement la demande
+		// de notre state local
+		setConvs((prev) =>
+			prev.filter(
+			(conv) =>
+				String(conv.id) !==
+				String(conversationId)
+			)
+		);
+
+		// Si la conversation était ouverte,
+		// on la ferme également
+		setOpenConvIds((prev) =>
+			prev.filter(
+			(id) =>
+				String(id) !==
+				String(conversationId)
+			)
+		);
+		}
+
+		// Recharge ensuite depuis le backend
+		await fetchConversations();
+
+		showNotification(
+		"Invitation refusée."
+		);
+	} catch (err: any) {
+		console.error(
+		"[CHAT] Erreur reject:",
+		err.response?.data ||
+			err.message
+		);
+
+		showNotification(
+		err.response?.data?.error ||
+			"Erreur."
+		);
+	}
+	};
+	
+	const handleUnfriend = async (friend: Friend, convID: Conversation.ID) => {
+	try {
+		console.log("[UNFRIEND] AVANT DELETE");
+		sendWebSocketMessage(convID,"friend_remove", "");
+		const res = await api.delete("/unfriend", {
+		data: {
+			id: String(friend.id),
+		},
+		});
+
+		console.log("[UNFRIEND] APRES DELETE", res);
+		console.log("TA MERE UN PEU");
+
+		await fetchConversations();
+
+		showNotification(
+		`${friend.username} supprimé de vos amis.`
+		);
+	} catch (err: any) {
+		console.error(
+		"[UNFRIEND] CATCH",
+		err.response?.data || err.message
+		);
+	}
+	};
+
+  // BLOCK
+ const handleBlock = async (friend: Friend) => {
+  try {
+    console.log("[BLOCK] AVANT BLOCK");
+
+    const res = await api.post("/block", {
+      username: friend.username,
+    });
+
+    console.log("[BLOCK] APRES BLOCK", res);
+
+    await fetchConversations();
+
     showNotification(
-      `${req.username} a été bloqué.`
+      `${friend.username} a été bloqué.`
     );
-  };
+  } catch (err: any) {
+    console.error(
+      "[BLOCK] CATCH",
+      err.response?.data || err.message
+    );
+
+    showNotification(
+      err.response?.data?.error ||
+      "Impossible de bloquer cet utilisateur."
+    );
+  }
+};
 
   return {
     activeTab,
     setActiveTab,
-
     isOpen,
     setIsOpen,
-
     currentUserId,
-
     convs,
-
     openConvIds,
     setOpenConvIds,
-
     wsConnected,
     wsRef,
-
     targetUsername,
     setTargetUsername,
-
     notification,
     setNotification,
-
     friends,
     requests,
-
     handleFriendClick,
     handleSendFriendRequest,
     handleAccept,
     handleReject,
     handleBlock,
+    handleUnfriend,
   };
 }

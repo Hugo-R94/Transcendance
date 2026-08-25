@@ -58,6 +58,8 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 		return
 	}
 
+	var newConv models.Conversation
+
 	err := h.db.Transaction(func(tx *gorm.DB) error {
 		user1id := id
 		user2id := user.ID
@@ -83,7 +85,7 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 		} else {
 			a1, a2 = true, false
 		}
-		newConv := models.Conversation{
+		newConv = models.Conversation{
 			User1ID:   user1id,
 			User2ID:   user2id,
 			Accepted1: a1,
@@ -115,6 +117,7 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 	}
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Friend request sent",
+		"conversation_id": newConv.ID,
 	})
 }
 

@@ -53,7 +53,6 @@ func (h *WSHandler) setup(c *gin.Context) {
 		log.Printf("[WS] upgrade error: %v\n", err)
 		return
 	}
-
 	client := &Client{
 		Hub:  h.hub,
 		Conn: conn,

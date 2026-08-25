@@ -479,7 +479,7 @@ func HandleWebSocket(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// ============================================================
-		// USER ID FOURNI PAR AuthMiddleware
+		// USER ID FOURNI PAR WSMiddleware
 		// ============================================================
 
 		userIDRaw, exists := c.Get("id")
@@ -506,11 +506,23 @@ func HandleWebSocket(db *gorm.DB) gin.HandlerFunc {
 
 		var user models.User
 
-		if err := db.First(&user, "id = ?", userID).Error; err != nil {
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"error": "user not found",
-				})
+		if err := db.First(
+			&user,
+			"id = ?",
+			userID,
+		).Error; err != nil {
+
+			if errors.Is(
+				err,
+				gorm.ErrRecordNotFound,
+			) {
+				c.JSON(
+					http.StatusUnauthorized,
+					gin.H{
+						"error": "user not found",
+					},
+				)
+
 				return
 			}
 
@@ -520,9 +532,13 @@ func HandleWebSocket(db *gorm.DB) gin.HandlerFunc {
 				err,
 			)
 
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "failed to find user",
-			})
+			c.JSON(
+				http.StatusInternalServerError,
+				gin.H{
+					"error": "failed to find user",
+				},
+			)
+
 			return
 		}
 
@@ -541,6 +557,7 @@ func HandleWebSocket(db *gorm.DB) gin.HandlerFunc {
 				"websocket upgrade error: %v",
 				err,
 			)
+
 			return
 		}
 
