@@ -1,9 +1,14 @@
-import { useState } from "react";
 import { useUserAvatar } from "../api/getUserAvatar";
 import DropdownMenu from "./dropdownFilter";
-import api from "../api/api";
+import NotificationSignal from "./notificationSignal";
 
-function FriendAvatar({ friendId, username }: { friendId: string; username: string }) {
+function FriendAvatar({
+  friendId,
+  username,
+}: {
+  friendId: string;
+  username: string;
+}) {
   const avatarUrl = useUserAvatar(friendId);
 
   return (
@@ -26,11 +31,13 @@ export default function FriendList({
   onFriendClick,
   onUnfriend,
   onBlock,
+  unreadUserIds,
 }: {
   friends: any[];
   onFriendClick: (friend: any) => void;
   onUnfriend: (friend: any) => void;
-  onBlock:  (friend: any) => void;
+  onBlock: (friend: any) => void;
+  unreadUserIds: string[];
 }) {
   if (!friends || friends.length === 0) {
     return (
@@ -53,9 +60,8 @@ export default function FriendList({
   ) => {
     try {
       if (action === "block") {
-      	onBlock(friend);
-        }
-	else if (action === "delete") {
+        onBlock(friend);
+      } else if (action === "delete") {
         onUnfriend(friend);
       }
     } catch (error) {
@@ -72,13 +78,13 @@ export default function FriendList({
         {friends.map((friend, index) => {
           const username = friend.username || "Utilisateur";
           const bgColor = colors[index % colors.length];
+          const hasUnread = unreadUserIds?.includes(String(friend.id));
 
           return (
             <div
               key={friend.id}
-              className={`flex items-center justify-between p-3 rounded-2xl ${bgColor} shadow-md transition-all group`}
+              className={`relative flex items-center justify-between p-3 rounded-2xl ${bgColor} shadow-md transition-all group`}
             >
-              {/* Infos de l'ami (cliquables) */}
               <div
                 onClick={() => onFriendClick(friend)}
                 className="flex items-center gap-3 min-w-0 cursor-pointer flex-1"
@@ -95,15 +101,21 @@ export default function FriendList({
                 </div>
               </div>
 
-              {/* Bouton Chat */}
-              <button
-                onClick={() => onFriendClick(friend)}
-                className="bg-black/20 px-3 py-1.5 rounded-lg text-white balatro hover:outline-2 active:scale-90 text-xs font-bold hover:bg-white/20 transition-colors mr-2 cursor-pointer shrink-0"
-              >
-                Chat
-              </button>
+              <div className="relative shrink-0 mr-2">
+                <button
+                  onClick={() => onFriendClick(friend)}
+                  className="bg-black/20 px-3 py-1.5 rounded-lg text-white balatro hover:outline-2 active:scale-90 text-xs font-bold hover:bg-white/20 transition-colors cursor-pointer"
+                >
+                  Chat
+                </button>
 
-              {/* Dropdown Menu "⋮" */}
+                {hasUnread && (
+                  <div className="absolute bottom-1 right-1 z-20 pointer-events-none">
+                    <NotificationSignal />
+                  </div>
+                )}
+              </div>
+
               <DropdownMenu
                 items={[
                   { label: "Bloquer", value: "block" },

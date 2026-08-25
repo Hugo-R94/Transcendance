@@ -15,7 +15,8 @@ export function useChat() {
   const [wsConnected, setWsConnected] = useState(false);
   const [targetUsername, setTargetUsername] = useState("");
   const [notification, setNotification] = useState<string | null>(null);
-
+  const [unreadUserIds, setUnreadUserIds] = useState<string[]>([]);
+  
   const wsRef = useRef<WebSocket | null>(null);
 
   const showNotification = (message: string) => {
@@ -63,7 +64,6 @@ export function useChat() {
 		);
 	}
 	};
-
   const fetchWebSocketToken = async (): Promise<string | null> => {
     try {
       const res = await api.get("/wstoken");
@@ -226,7 +226,20 @@ export function useChat() {
 			fetchConversations();
 			showNotification("Quelqu'un vous a bloquer.");
 		  }
+			else if (
+			data.type === "chat_notification" &&
+			String(data.sender_id) !== String(localStorage.getItem("userID"))
+			) {
+			setUnreadUserIds((prev) => {
+				const senderId = String(data.sender_id);
 
+				if (prev.includes(senderId)) {
+				return prev;
+				}
+
+				return [...prev, senderId];
+			});
+			}
         } catch (err) {
           console.error("[CHAT] JSON invalide :", err);
         }
@@ -359,67 +372,67 @@ export function useChat() {
       };
     })
     .filter((r): r is FriendRequest => r !== null);
+const handleFriendClick = async (friend: Friend) => {
+  // Le message de cet utilisateur n'est plus unread
+  setUnreadUserIds((prev) =>
+    prev.filter((id) => String(id) !== String(friend.id))
+  );
 
-  const handleFriendClick = async (friend: Friend) => {
-    const conversation = convs.find((conv) => {
-      const other = getOtherUser(conv);
+  const conversation = convs.find((conv) => {
+    const other = getOtherUser(conv);
 
-      return (
-        other &&
-        String(other.id) === String(friend.id)
-      );
-    });
+    return (
+      other &&
+      String(other.id) === String(friend.id)
+    );
+  });
 
-    if (!conversation) {
-      showNotification("Conversation introuvable.");
-      return;
-    }
+  if (!conversation) {
+    showNotification("Conversation introuvable.");
+    return;
+  }
 
-    if (!openConvIds.includes(String(conversation.id))) {
-      setOpenConvIds((prev) => [
-        ...prev,
-        String(conversation.id),
-      ]);
-    }
+  if (!openConvIds.includes(String(conversation.id))) {
+    setOpenConvIds((prev) => [
+      ...prev,
+      String(conversation.id),
+    ]);
+  }
 
-    const myUserId = localStorage.getItem("userID");
+  const myUserId = localStorage.getItem("userID");
 
-    const isUser1 =
-      String(conversation.user1_id) ===
-      String(myUserId);
+  const isUser1 =
+    String(conversation.user1_id) === String(myUserId);
 
-    const isUser2 =
-      String(conversation.user2_id) ===
-      String(myUserId);
+  const isUser2 =
+    String(conversation.user2_id) === String(myUserId);
 
-    if (!isUser1 && !isUser2) return;
+  if (!isUser1 && !isUser2) return;
 
-    try {
-      await api.put(
-        `/convs/${conversation.id}/read`
-      );
+  try {
+    await api.put(`/convs/${conversation.id}/read`);
 
-      setConvs((prev) =>
-        prev.map((conv) => {
-          if (
-            String(conv.id) !==
-            String(conversation.id)
-          ) {
-            return conv;
-          }
+    setConvs((prev) =>
+      prev.map((conv) => {
+        if (
+          String(conv.id) !==
+          String(conversation.id)
+        ) {
+          return conv;
+        }
 
-          return isUser1
-            ? { ...conv, user1_a_jour: true }
-            : { ...conv, user2_a_jour: true };
-        })
-      );
-    } catch (err: any) {
-      console.error(
-        "[CHAT] Erreur lecture :",
-        err.response?.data || err.message
-      );
-    }
-  };
+        return isUser1
+          ? { ...conv, user1_a_jour: true }
+          : { ...conv, user2_a_jour: true };
+      })
+    );
+  } catch (err: any) {
+    console.error(
+      "[CHAT] Erreur lecture :",
+      err.response?.data || err.message
+    );
+  }
+};
 
   // ENVOI DEMANDE D'AMI
   const handleSendFriendRequest = async () => {
@@ -631,6 +644,8 @@ export function useChat() {
     setNotification,
     friends,
     requests,
+	unreadUserIds,
+	setUnreadUserIds,
     handleFriendClick,
     handleSendFriendRequest,
     handleAccept,

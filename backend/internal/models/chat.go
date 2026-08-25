@@ -21,19 +21,29 @@ type (
 	}
 
 	Conversation struct {
-		ID        uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
-		User1ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users" json:"user1_id"`
-		User2ID   uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_conv_users" json:"user2_id"`
-		User1     User           `gorm:"foreignKey:User1ID;references:ID" json:"user1"`
-		User2     User           `gorm:"foreignKey:User2ID;references:ID" json:"user2"`
-		Accepted1 bool           `gorm:"default:false" json:"accepted_1"`
-		Accepted2 bool           `gorm:"default:false" json:"accepted_2"`
-		Messages  []Message      `gorm:"foreignKey:ConversationID;references:ID" json:"messages"`
+		ID        uuid.UUID `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
+		User1ID   uuid.UUID `gorm:"type:uuid;uniqueIndex:idx_conv_users" json:"user1_id"`
+		User2ID   uuid.UUID `gorm:"type:uuid;uniqueIndex:idx_conv_users" json:"user2_id"`
+
+		User1 User `gorm:"foreignKey:User1ID;references:ID" json:"user1"`
+		User2 User `gorm:"foreignKey:User2ID;references:ID" json:"user2"`
+
+		Accepted1 bool `gorm:"default:false" json:"accepted_1"`
+		Accepted2 bool `gorm:"default:false" json:"accepted_2"`
+
+		Messages []Message `gorm:"foreignKey:ConversationID;references:ID" json:"messages"`
+
+		LastMessageID uuid.UUID  `gorm:"type:uuid" json:"last_message_id"`
+		LastMessageAt *time.Time `json:"last_message_at"`
+
+		LastReadAtUser1 *time.Time `json:"last_read_at_user1"`
+		LastReadAtUser2 *time.Time `json:"last_read_at_user2"`
+
 		CreatedAt time.Time      `json:"-"`
 		UpdatedAt time.Time      `json:"-"`
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	}
-
+	
 	UserBlock struct {
 		ID            uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
 		UserID        uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_block_list" json:"-"`
@@ -93,4 +103,6 @@ const (
 	MessageTypeFriendAccept  = "friend_accept"
 	MessageTypeUnfriend 	 = "friend_remove"
 	MessageTypeBlocked       = "blocked"
+	MessageTypeRead			 = "read"
+	MessageTypeChatNotification = "chat_notification"
 )

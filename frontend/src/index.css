@@ -254,3 +254,19 @@ code {
     0 2px 4px -2px rgba(0, 0, 0, 0.5);
   outline: 3px solid #fff;
 }
+
+@keyframes notification-pulse {
+  0%, 100% {
+    opacity: 0;
+	scale: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+	scale: 1;
+  }
+}
+
+.animate-notification-pulse {
+  animation: notification-pulse 1.5s ease-in-out infinite;
+}

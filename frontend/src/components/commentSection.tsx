@@ -5,13 +5,13 @@ import { getComments } from "../api/comments";
 
 
 export interface CommentData {
-  id: number;
+  id: string;
   userID: string; // UUID de l'auteur du commentaire
   Nickname: string;
   comment: string;
-  CommentTitle: string;
-  Likes: number;
-  Dislikes: number;
+  comment_title: string;
+  likes: number;
+  dislikes: number;
   rating?: number;
   userVote?: number;
   title_1: string;
@@ -52,32 +52,33 @@ function CommentSection({
         const formattedComments: CommentData[] = (data.comments || []).map(
           (item: any, index: number) => {
             const rawId = item.ID ?? item.id ?? item.CommentID ?? item.comment_id;
-            const parsedId = Number(rawId);
 
-            // Extraction robuste de l'UUID de l'auteur (gestion des structures imbriquées GORM)
+            // Le backend renvoie maintenant un UUID
+            const commentId = String(rawId ?? "");
+
+            // Extraction de l'UUID de l'auteur
             const authorUUID = String(
-              item.userID ??
-              item.user_id ??
-              item.UserID ??
-              item.user?.id ??
-              item.user?.ID ??
-              item.user?.uuid ??
+              item.author?.id ??
+              item.author?.ID ??
               ""
             );
 
             return {
-              id: !isNaN(parsedId) && parsedId !== 0 ? parsedId : index + 1,
+              id: commentId,
               userID: authorUUID,
-              Nickname: item.author,
+              Nickname: item.author?.username ?? "Utilisateur",
               comment: item.comment || "",
-              CommentTitle: item.comment_title,
-              Likes: Number(item.likes ?? item.Likes ?? 0),
-              Dislikes: Number(item.dislikes ?? item.Dislikes ?? 0),
+              comment_title: item.comment_title,
+              likes: Number(item.likes ?? item.Likes ?? 0),
+              dislikes: Number(item.dislikes ?? item.Dislikes ?? 0),
               rating: Number(item.rating ?? item.Rating ?? 0),
               userVote: Number(item.user_vote ?? item.userVote ?? 0),
               title_1: String(item.title_1 ?? item.title1 ?? item.Title1 ?? 9),
               title_2: String(item.title_2 ?? item.title2 ?? item.Title2 ?? 10),
-              profile_picture: String(item.profile_picture),
+              profile_picture: String(
+                item.author?.profile_picture ??
+                "avatars/avatar_default.png"
+              ),
 
             };
           }
@@ -137,11 +138,11 @@ function CommentSection({
                 userId={normalizedCurrentUserId} // ID / UUID de l'utilisateur connecté
                 UUID={com.userID}                // UUID de l'auteur du commentaire
                 Nickname={com.Nickname}
-                CommentTitle={com.CommentTitle}
+                CommentTitle={com.comment_title}
                 comment={com.comment}
                 commentRowNb={(currentPage - 1) * commentsPerPage + index}
-                Likes={com.Likes}
-                Dislikes={com.Dislikes}
+                Likes={com.likes}
+                Dislikes={com.dislikes}
                 star={com.rating ?? 0}
                 initialUserVote={effectiveVote}
 				        title1={com.title_1}
