@@ -377,6 +377,7 @@ func (h *GameHandler) GetCommentsPage(c *gin.Context) {
 		Where("game_id = ?", gameID).
 		Offset(offset).
 		Limit(limit).
+		Preload("Author").
 		Find(&comments).Error
 
 	if err != nil {
