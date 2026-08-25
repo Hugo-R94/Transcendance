@@ -1,6 +1,7 @@
 package apichat
 
 import (
+	"errors"
 	"log"
 	"net/http"
 
@@ -12,8 +13,21 @@ import (
 )
 
 func (h *ChatHandler) unBlock(c *gin.Context) {
-	idRaw, _ := c.Get("id")
-	id := idRaw.(uuid.UUID)
+	idRaw, exists := c.Get("id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "User not authenticated",
+		})
+		return
+	}
+
+	id, ok := idRaw.(uuid.UUID)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid user ID",
+		})
+		return
+	}
 
 	var req models.UnBlockRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -31,38 +45,51 @@ func (h *ChatHandler) unBlock(c *gin.Context) {
 		return
 	}
 
-	var count int64
-	if err := h.db.
-		Model(&models.Conversation{}).
-		Where("user_id = ? AND blocked_user_id = ?", id, userID).
-		Count(&count).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Could not unblock",
-		})
-		log.Printf("[ERROR] Could not count in DB: %v", err)
-		return
-	}
-	if count < 1 {
+	if id == userID {
 		c.JSON(http.StatusConflict, gin.H{
-			"error": "User not Blocked",
+			"error": "Cannot unblock yourself",
 		})
 		return
 	}
-	if err = h.db.Transaction(func(tx *gorm.DB) error {
-		var block models.UserBlock
-		if err := tx.Where("user1_id = ? AND user2_id = ?", id, userID).
-			First(&block).Error; err != nil {
-			return err
-		}
-		return tx.Unscoped().Delete(&block).Error
-	}); err != nil {
+
+	var block models.UserBlock
+
+	err = h.db.
+		Where(
+			"user_id = ? AND blocked_user_id = ?",
+			id,
+			userID,
+		).
+		First(&block).Error
+
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		c.JSON(http.StatusConflict, gin.H{
+			"error": "User not blocked",
+		})
+		return
+	}
+
+	if err != nil {
+		log.Printf("[ERROR] Could not find block: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not check block",
+		})
+		return
+	}
+
+	if err := h.db.
+		Unscoped().
+		Delete(&block).Error; err != nil {
+
+		log.Printf("[ERROR] Could not delete block: %v", err)
+
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Could not unblock",
 		})
-		log.Printf("[ERROR] Could not delete blocked user: %v", err)
 		return
 	}
-	c.JSON(http.StatusCreated, gin.H{
+
+	c.JSON(http.StatusOK, gin.H{
 		"message": "User unblocked",
 	})
 }

@@ -33,6 +33,7 @@ export default function ChatMenu() {
     friends,
     requests,
     handleFriendClick,
+	handleUnfriend,
     handleSendFriendRequest,
     handleAccept,
     handleReject,
@@ -93,7 +94,7 @@ export default function ChatMenu() {
 
           <div className="flex-1 bg-white/20 rounded-2xl p-1 overflow-y-auto min-h-0">
             {activeTab === "friends" ? (
-              <FriendList friends={friends} onFriendClick={handleFriendClick} />
+              <FriendList friends={friends} onFriendClick={handleFriendClick} onUnfriend={handleUnfriend}  onBlock={handleBlock}/>
             ) : (
               <FriendRequestList requests={requests} onAccept={handleAccept} onReject={handleReject} onBlock={handleBlock} />
             )}

@@ -6,7 +6,7 @@ import (
 )
 
 type Comment struct {
-	gorm.Model
+	gorm.Model	
 
 	Comment      string    `gorm:"type:text" json:"comment"`
 	CommentTitle string    `json:"comment_title"`

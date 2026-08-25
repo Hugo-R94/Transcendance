@@ -97,12 +97,9 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
 
     return convs
       .filter(conv =>
-        conv.accepted === true ||
-        conv.accepted === 1 ||
-        conv.accepted === "1" ||
-        conv.accepted === "true"
+        conv.accepted_1 === true && conv.accepted_2
       )
-      .map(conv => {
+      .map(conv => { 
         const user = getOtherUser(conv, userId);
         if (!user) return null;
 

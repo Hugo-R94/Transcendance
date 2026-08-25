@@ -6,18 +6,26 @@ import (
 	"time"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
+
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
 type (
-	broadcastMessage struct {
+	BroadcastMessage struct {
 		Client  *Client
 		Message models.Message
 	}
 
+	Notification struct {
+		TargetID uuid.UUID
+		Message  models.Message
+	}
+
 	Hub struct {
 		Clients    map[*Client]bool
-		Broadcast  chan broadcastMessage
+		Broadcast  chan BroadcastMessage
+		Notify     chan Notification
 		Register   chan *Client
 		Unregister chan *Client
 		DB         *gorm.DB
@@ -26,7 +34,8 @@ type (
 
 func (hub *Hub) HubInit(db *gorm.DB) {
 	hub.Clients = make(map[*Client]bool)
-	hub.Broadcast = make(chan broadcastMessage)
+	hub.Broadcast = make(chan BroadcastMessage)
+	hub.Notify = make(chan Notification)
 	hub.Register = make(chan *Client)
 	hub.Unregister = make(chan *Client)
 	hub.DB = db
@@ -49,6 +58,8 @@ func (h *Hub) Run(ctx context.Context) {
 				delete(h.Clients, client)
 				close(client.Send)
 			}
+		case n := <-h.Notify:
+			h.sendToTarget(n.TargetID, n.Message)
 		case bm := <-h.Broadcast:
 			var conv models.Conversation
 			if err := h.DB.Where("id = ?", bm.Message.ConversationID).First(&conv).Error; err != nil {
@@ -60,6 +71,7 @@ func (h *Hub) Run(ctx context.Context) {
 				continue
 			}
 			if (!conv.Accepted1 || !conv.Accepted2) && bm.Message.Type != models.MessageTypeFriendReq {
+				log.Printf("[DEBUG] Message %s dropped: Accepted1=%v Accepted2=%v", bm.Message.Type, conv.Accepted1, conv.Accepted2)
 				continue
 			}
 			//add info in Message struct and register it
@@ -72,12 +84,12 @@ func (h *Hub) Run(ctx context.Context) {
 				continue
 			}
 
-			h.broadcastToRecipient(bm, conv)
+			h.BroadcastToRecipient(bm, conv)
 		}
 	}
 }
 
-func (h *Hub) broadcastToRecipient(bm broadcastMessage, conv models.Conversation) {
+func (h *Hub) BroadcastToRecipient(bm BroadcastMessage, conv models.Conversation) {
 	for client := range h.Clients {
 		if client.ID != conv.User1ID && client.ID != conv.User2ID {
 			continue
@@ -85,6 +97,21 @@ func (h *Hub) broadcastToRecipient(bm broadcastMessage, conv models.Conversation
 
 		select {
 		case client.Send <- bm.Message:
+		case <-time.After(1 * time.Second):
+			close(client.Send)
+			delete(h.Clients, client)
+		}
+	}
+}
+
+func (h *Hub) sendToTarget(targetID uuid.UUID, msg models.Message) {
+	for client := range h.Clients {
+		if client.ID != targetID {
+			continue
+		}
+
+		select {
+		case client.Send <- msg:
 		case <-time.After(1 * time.Second):
 			close(client.Send)
 			delete(h.Clients, client)

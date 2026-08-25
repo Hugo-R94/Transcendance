@@ -91,6 +91,6 @@ const (
 	MessageTypeDisconnect    = "disconnect"
 	MessageTypeFriendReq     = "friend_req"
 	MessageTypeFriendAccept  = "friend_accept"
-	MessageTypeFriendRemove  = "friend_remove"
+	MessageTypeUnfriend 	 = "friend_remove"
 	MessageTypeBlocked       = "blocked"
 )

@@ -17,7 +17,7 @@ type Client struct {
 }
 
 func validType(typeMsg string) bool {
-    if typeMsg == models.MessageTypeChat || typeMsg == models.MessageTypeConnect || typeMsg == models.MessageTypeDisconnect || typeMsg == models.MessageTypeFriendReq || typeMsg == models.MessageTypeFriendAccept {
+    if typeMsg == models.MessageTypeChat || typeMsg == models.MessageTypeConnect || typeMsg == models.MessageTypeDisconnect || typeMsg == models.MessageTypeFriendReq || typeMsg == models.MessageTypeFriendAccept || typeMsg == models.MessageTypeUnfriend{
         return true
     }
     return false
@@ -51,7 +51,7 @@ func (c *Client) readPump() {
             Type:           msg.Type,
         }
 		log.Printf("json{\ntype:\t%s\nmessage:\t%s\n}", newMsg.Type, newMsg.Text)
-        c.Hub.Broadcast <- broadcastMessage{Client: c, Message: newMsg}
+        c.Hub.Broadcast <- BroadcastMessage{Client: c, Message: newMsg}
     }
 }
 

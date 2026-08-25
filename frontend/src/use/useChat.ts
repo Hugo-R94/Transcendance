@@ -40,20 +40,29 @@ export function useChat() {
     }
   };
 
-  const fetchConversations = async () => {
-    try {
-      const res = await api.get("/convs");
+	const fetchConversations = async () => {
+	console.log("[CHAT] fetchConversations() START");
 
-      if (!Array.isArray(res.data?.conversations)) return;
+	try {
+		console.log("[CHAT] GET /convs");
 
-      setConvs(res.data.conversations as Conversation[]);
-    } catch (err: any) {
-      console.error(
-        "[CHAT] Erreur conversations :",
-        err.response?.data || err.message
-      );
-    }
-  };
+		const res = await api.get("/convs");
+
+		console.log("[CHAT] GET /convs RESPONSE", res.data);
+
+		if (!Array.isArray(res.data?.conversations)) {
+		setConvs([]);
+		return;
+		}
+
+		setConvs(res.data.conversations as Conversation[]);
+	} catch (err: any) {
+		console.error(
+		"[CHAT] Erreur conversations :",
+		err.response?.data || err.message
+		);
+	}
+	};
 
   const fetchWebSocketToken = async (): Promise<string | null> => {
     try {
@@ -205,29 +214,19 @@ export function useChat() {
           }
 
           // Demande acceptée
-          else if (data.type === "friend_accept") {
-            fetchConversations();
-            showNotification("Demande d'ami acceptée !");
-          }
+			else if (data.type === "friend_accept") {
+			fetchConversations();
+			showNotification("Demande d'ami acceptée !");
+			}
+		  else if (data.type === "friend_remove"){
+			fetchConversations();
+			showNotification("Quelqu'un vous a retirer de sa liste d'ami.");
+		  }
+		  else if (data.type === "blocked"){
+			fetchConversations();
+			showNotification("Quelqu'un vous a bloquer.");
+		  }
 
-          // Ami supprimé / utilisateur bloqué
-          else if (data.type === "friend_remove") {
-            setConvs((prev) =>
-              prev.filter(
-                (conv) =>
-                  String(conv.id) !==
-                  String(data.conversation_id)
-              )
-            );
-
-            setOpenConvIds((prev) =>
-              prev.filter(
-                (id) =>
-                  String(id) !==
-                  String(data.conversation_id)
-              )
-            );
-          }
         } catch (err) {
           console.error("[CHAT] JSON invalide :", err);
         }
@@ -466,7 +465,7 @@ export function useChat() {
     req: FriendRequest
   ) => {
     try {
-      const res = await api.put(
+      	await api.put(
         "/friend_accept",
         {
           id: String(req.id),
@@ -474,24 +473,7 @@ export function useChat() {
         }
       );
 
-      // Le backend nous donne l'ID
-      // de la conversation
-      const conversationId =
-        res.data?.conversation_id;
-
-      console.log(
-        "[CHAT] Accepted conversation:",
-        conversationId
-      );
-
       await fetchConversations();
-
-      if (conversationId) {
-        sendWebSocketMessage(
-          String(conversationId),
-          "friend_accept"
-        );
-      }
 
       showNotification(
         `${req.username} est maintenant votre ami !`
@@ -577,152 +559,60 @@ export function useChat() {
 	}
 	};
 	
-  // SUPPRESSION D'AMI
-  const handleUnfriend = async (
-  friend: Friend
-) => {
+	const handleUnfriend = async (friend: Friend, convID: Conversation.ID) => {
+	try {
+		console.log("[UNFRIEND] AVANT DELETE");
+		sendWebSocketMessage(convID,"friend_remove", "");
+		const res = await api.delete("/unfriend", {
+		data: {
+			id: String(friend.id),
+		},
+		});
+
+		console.log("[UNFRIEND] APRES DELETE", res);
+		console.log("TA MERE UN PEU");
+
+		await fetchConversations();
+
+		showNotification(
+		`${friend.username} supprimé de vos amis.`
+		);
+	} catch (err: any) {
+		console.error(
+		"[UNFRIEND] CATCH",
+		err.response?.data || err.message
+		);
+	}
+	};
+
+  // BLOCK
+ const handleBlock = async (friend: Friend) => {
   try {
-    const res = await api.delete(
-      "/unfriend",
-      {
-        data: {
-          id: String(friend.id),
-        },
-      }
-    );
+    console.log("[BLOCK] AVANT BLOCK");
 
-    // Le backend nous donne l'ID
-    // de la conversation supprimée
-    const conversationId =
-      res.data?.conversation_id;
+    const res = await api.post("/block", {
+      username: friend.username,
+    });
 
-    console.log(
-      "[CHAT] Unfriend conversation:",
-      conversationId
-    );
+    console.log("[BLOCK] APRES BLOCK", res);
 
-    if (conversationId) {
-      // Préviens l'autre utilisateur
-      const sent = sendWebSocketMessage(
-        String(conversationId),
-        "friend_remove"
-      );
-
-      console.log(
-        "[CHAT] friend_remove envoyé:",
-        sent
-      );
-
-      // Retire immédiatement chez nous
-      setConvs((prev) =>
-        prev.filter(
-          (conv) =>
-            String(conv.id) !==
-            String(conversationId)
-        )
-      );
-
-      // Ferme la conversation si elle était ouverte
-      setOpenConvIds((prev) =>
-        prev.filter(
-          (id) =>
-            String(id) !==
-            String(conversationId)
-        )
-      );
-    }
-
-    // Synchronisation avec le backend
     await fetchConversations();
 
     showNotification(
-      `${friend.username} supprimé de vos amis.`
+      `${friend.username} a été bloqué.`
     );
   } catch (err: any) {
     console.error(
-      "[CHAT] Erreur unfriend :",
-      err.response?.data ||
-        err.message
+      "[BLOCK] CATCH",
+      err.response?.data || err.message
     );
-
-    await fetchConversations();
 
     showNotification(
       err.response?.data?.error ||
-        "Impossible de supprimer cet ami."
+      "Impossible de bloquer cet utilisateur."
     );
   }
 };
-
-  // BLOCK
-  const handleBlock = async (friend: Friend) => {
-    const conversation = convs.find((conv) => {
-      const other = getOtherUser(conv);
-
-      return (
-        other &&
-        String(other.id) === String(friend.id)
-      );
-    });
-
-    if (!conversation) {
-      showNotification("Conversation introuvable.");
-      return;
-    }
-
-    // 1. Préviens l'autre utilisateur
-    const sent = sendWebSocketMessage(
-      String(conversation.id),
-      "friend_remove"
-    );
-
-    // 2. Retire immédiatement chez nous
-    setConvs((prev) =>
-      prev.filter(
-        (conv) =>
-          String(conv.id) !==
-          String(conversation.id)
-      )
-    );
-
-    setOpenConvIds((prev) =>
-      prev.filter(
-        (id) =>
-          String(id) !==
-          String(conversation.id)
-      )
-    );
-
-    // 3. Laisse le WS partir
-    if (sent) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, 200)
-      );
-    }
-
-    // 4. Block réel en DB
-    try {
-      await api.post("/block", {
-        username: friend.username,
-      });
-
-      showNotification(
-        `${friend.username} a été bloqué.`
-      );
-    } catch (err: any) {
-      console.error(
-        "[CHAT] Erreur block :",
-        err.response?.data || err.message
-      );
-
-      await fetchConversations();
-
-      showNotification(
-        err.response?.data?.error ||
-        "Impossible de bloquer cet utilisateur."
-      );
-    }
-  };
 
   return {
     activeTab,
