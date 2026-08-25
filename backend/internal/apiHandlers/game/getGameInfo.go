@@ -375,9 +375,11 @@ func (h *GameHandler) GetCommentsPage(c *gin.Context) {
 
 	err = h.db.
 		Where("game_id = ?", gameID).
+		Preload("Author", func(db *gorm.DB) *gorm.DB {
+			return db.Select("id, username, profile_pic, title1, title2")
+		}).
 		Offset(offset).
 		Limit(limit).
-		Preload("Author").
 		Find(&comments).Error
 
 	if err != nil {
