@@ -30,4 +30,8 @@ type (
 		CommentTitle string  `json:"comment_title" binding:"required"`
 		Rating       float64 `json:"rating" binding:"required"`
 	}
+<<<<<<< HEAD
 )
+=======
+)
+>>>>>>> 95fb434 (perfectionnement du chat avec maj auto des listes)
