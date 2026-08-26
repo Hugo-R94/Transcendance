@@ -1186,6 +1186,25 @@ export function useGambling() {
       roomId: roomId.trim(),
     });
   };
+  
+	const joinRoomByID = (roomIdToJoin: string) => {
+	if (!roomIdToJoin.trim()) {
+		setError("Room ID obligatoire");
+		return;
+	}
+
+	const waitForConnection = setInterval(() => {
+		if (connected) {
+		clearInterval(waitForConnection);
+
+		send({
+			type: "join_room",
+			roomId: roomIdToJoin.trim(),
+		});
+		}
+	}, 50);
+	};
+
 
   // ==========================================================
   // READY
@@ -1205,6 +1224,23 @@ export function useGambling() {
       ready: next,
     });
   };
+
+	// ==========================================================
+	// LEAVE ROOM
+	// ==========================================================
+	
+	const leaveRoom = () => {
+	console.log("[GAME] leaveRoom");
+
+	send({
+		type: "leave_room",
+	});
+
+	setJoined(false);
+	setPlayers([]);
+	setReady(false);
+	};
+
 
   // ==========================================================
   // BET
@@ -1330,10 +1366,11 @@ export function useGambling() {
     playerId,
     playerNumber,
     username,
-
+	leaveRoom,
     connect,
     disconnect,
     joinRoom,
+	joinRoomByID,
 
     // lobby
     players,
@@ -1373,7 +1410,6 @@ export function useGambling() {
     // scratch
     ticket,
     scratch,
-
     // roulette
     winningNumber,
 

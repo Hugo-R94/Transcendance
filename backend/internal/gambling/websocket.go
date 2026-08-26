@@ -193,6 +193,33 @@ func (c *Client) handleJoinRoom(data []byte) {
 	room.Hub.BroadcastJSON(room.GetRoomState())
 }
 
+
+func (c *Client) handleLeaveRoom(data []byte) {
+	if c.Room == nil {
+		c.SendJSON(ErrorMessage{
+			Type:    "error",
+			Message: "you are not in a room",
+		})
+		return
+	}
+
+	room := c.Room
+	hub := c.Hub
+
+	room.RemovePlayer(c.PlayerID)
+	hub.RemoveClient(c.PlayerID)
+
+	hub.BroadcastJSON(PlayerLeftMessage{
+		Type:     "player_left",
+		PlayerID: c.PlayerID.String(),
+	})
+
+	hub.BroadcastJSON(room.GetRoomState())
+
+	c.Room = nil
+	c.Hub = nil
+}
+
 // ============================================================
 // READY
 // ============================================================
@@ -383,6 +410,12 @@ func (c *Client) ReadPump() {
 
 		switch message.Type {
 
+		case "leave_room":
+			c.handleLeaveRoom(data)
+			
+		case "game_invit":
+			log.Printf("invitation\n")
+			
 		case "join_room":
 			c.handleJoinRoom(data)
 

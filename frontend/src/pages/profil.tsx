@@ -7,7 +7,7 @@ import UserReviews from "../components/userReviews";
 import UserFriendsList from "../components/userFriendList";
 import { fetchUserProfilePicture } from "../api/getUserAvatar";
 import api from "../api/api";
-
+import GambleHistory from "../components/gambleHistory";
 export type UserProfile = {
   id?: string;
   username: string;
@@ -122,7 +122,7 @@ export default function Profil() {
       case "friends":
         return <UserFriendsList userId={userID ?? profile?.id} />;
       case "gambles":
-        return <div className="flex h-full w-full items-center justify-center text-white font-bold">Section Gambles</div>;
+        return <GambleHistory userID={userID ?? profile?.id}  />;
       default:
         return <UserGameList />;
     }

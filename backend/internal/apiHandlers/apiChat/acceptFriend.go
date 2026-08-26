@@ -64,6 +64,12 @@ func (h *ChatHandler) friendAccept(c *gin.Context) {
 			}
 			return tx.Save(&conv).Error
 		}
+		if err := tx.Unscoped().
+			Where("conversation_id = ?", conv.ID).
+			Delete(&models.Message{}).Error; err != nil {
+			return err
+		}
+
 		return tx.Unscoped().Delete(&conv).Error
 	})
 	if err != nil {

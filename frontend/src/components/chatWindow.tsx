@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import type { Conversation, Message, Friend } from "../api/chat";
 import { useUserAvatar } from "../api/getUserAvatar";
 import NotificationSignal from "./notificationSignal";
+import InviteGame from "./invitateGame";
 
 interface ChatWindowProps {
   conversation: Conversation;
@@ -217,6 +218,8 @@ export default function ChatWindow({
                     ? `/profil/${otherUser.id}`
                     : "#";
 
+                const isGameInvite = msg.type === "game_invit";
+
                 return (
                   <div
                     key={msg.id}
@@ -233,15 +236,28 @@ export default function ChatWindow({
                           : "items-start"
                       }`}
                     >
-                      <div
-                        className={`p-3 rounded-2xl text-white ${bubbleColor} card max-w-full min-w-0 whitespace-pre-wrap break-words overflow-wrap-anywhere`}
-                        style={{
-                          overflowWrap: "anywhere",
-                          wordBreak: "break-word",
-                        }}
-                      >
-                        {msg.text}
-                      </div>
+                      {isGameInvite ? (
+                        <InviteGame
+						  color={bubbleColor}
+                          roomId={msg.text}
+                          isMine={isMine}
+                          senderUsername={
+                            isMine
+                              ? undefined
+                              : otherUser?.username
+                          }
+                        />
+                      ) : (
+                        <div
+                          className={`p-3 rounded-2xl text-white ${bubbleColor} card max-w-full min-w-0 whitespace-pre-wrap break-words overflow-wrap-anywhere`}
+                          style={{
+                            overflowWrap: "anywhere",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {msg.text}
+                        </div>
+                      )}
                     </div>
 
                     <Link

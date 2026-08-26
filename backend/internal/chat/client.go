@@ -24,14 +24,17 @@ func validType(typeMsg string) bool {
 		typeMsg == models.MessageTypeFriendReq ||
 		typeMsg == models.MessageTypeFriendAccept ||
 		typeMsg == models.MessageTypeUnfriend ||
+		typeMsg == models.MessageTypeGameInvit ||
 		typeMsg == models.MessageTypeRead {
 		return true
 	}
 
 	return false
 }
-
-func (h *Hub) MarkAsRead(userID, conversationID uuid.UUID) {
+func (h *Hub) MarkAsRead(
+	userID uuid.UUID,
+	conversationID uuid.UUID,
+) {
 	now := time.Now()
 
 	var conv models.Conversation
@@ -114,18 +117,10 @@ func (c *Client) readPump() {
 			continue
 		}
 
-		// --------------------------------------------------
-		// READ
-		// --------------------------------------------------
-
 		if msg.Type == models.MessageTypeRead {
 			c.Hub.MarkAsRead(c.ID, convID)
 			continue
 		}
-
-		// --------------------------------------------------
-		// MESSAGE NORMAL
-		// --------------------------------------------------
 
 		newMsg := models.Message{
 			ConversationID: convID,

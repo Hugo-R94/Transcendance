@@ -53,7 +53,7 @@ function DropdownMenu({
     // 1. Fermer le menu
     setMenuOpen(false);
 
-    // 2. Exécuter l'action personnalisée si elle existe
+    // 2. Exécuter l'a`ction personnalisée si elle existe
     if (item.onClick) {
       item.onClick();
     }
@@ -62,7 +62,7 @@ function DropdownMenu({
   return (
     <div ref={dropdownRef} className={`relative ${className}`}>
       {/* Wrapper bouton principal */}
-      <div className={`w-full h-full rounded-2xl ${color} balatro outline-white hover:outline-2`}>
+      <div className={`w-full h-full rounded-2xl ${color} balatro outline-white hover:outline-2 shadow-black/50 shadow-md`}>
         <button
           type="button"
           onClick={() => setMenuOpen((prev) => !prev)}
@@ -75,13 +75,13 @@ function DropdownMenu({
       {/* Menu déroulant */}
       {menuOpen && (
         <div
-          className={`flex flex-col gap-y-2 absolute right-0 top-[110%] sm:w-100 w-[500%] mt-2 rounded-xl overflow-visible shadow-lg p-3 bg-bdarkgreen z-50 ${menuClassName}`}
+          className={`flex flex-col gap-y-2 absolute right-0 top-[110%] sm:w-75 w-[500%] mt-2 rounded-xl overflow-visible shadow-lg p-3 bg-bdarkgreen z-50 shadow-md shadow-black/75 ${menuClassName}`}
         >
           {items.map((item, index) => {
             const itemStyles = `
               block w-full text-left px-4 py-3 text-white font-bold transition
               hover:brightness-110 shadow-black/75 shadow-md rounded-2xl
-              hover:outline-3 hover:outline-white balatro cursor-pointer
+              hover:outline-3 hover:outline-white balatro cursor-pointer 
               ${colors[index % colors.length]}
             `;
 

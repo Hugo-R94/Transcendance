@@ -4,9 +4,10 @@ import (
 	"errors"
 	"log"
 	"net/http"
-
+	"time"
+	
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
-
+	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -115,13 +116,29 @@ func (h *ChatHandler) friendRequest(c *gin.Context) {
 		}
 		return
 	}
+	
+	// Notification envoyée au destinataire de la demande
+	h.hub.Notify <- chat.Notification{
+		TargetID: user.ID,
+		Message: models.Message{
+			SenderID: id,
+			Text:     "Vous avez reçu une demande d'ami",
+			Time:     time.Now(),
+			Type:     models.MessageTypeFriendReq,
+		},
+	}
+	
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Friend request sent",
 		"conversation_id": newConv.ID,
 	})
 }
 
-func FriendReq(router *gin.RouterGroup, db *gorm.DB) {
-	h := &ChatHandler{db: db}
+func FriendReq(router *gin.RouterGroup, db *gorm.DB, hub *chat.Hub) {
+	h := &ChatHandler{
+		db:  db,
+		hub: hub,
+	}
+
 	router.POST("/friend_request", h.friendRequest)
 }

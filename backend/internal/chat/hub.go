@@ -18,7 +18,7 @@ type (
 
 	Notification struct {
 		TargetID uuid.UUID
-		Message  models.Message
+		Message models.Message
 	}
 
 	Hub struct {
@@ -62,7 +62,6 @@ func (h *Hub) Run(ctx context.Context) {
 				close(client.Send)
 			}
 
-		// Notifications venant des handlers HTTP/etc.
 		case n := <-h.Notify:
 			h.sendToTarget(n.TargetID, n.Message)
 
@@ -76,7 +75,6 @@ func (h *Hub) Run(ctx context.Context) {
 				continue
 			}
 
-			// Vérifie que l'utilisateur appartient bien à la conversation.
 			if bm.Client.ID != conv.User1ID && bm.Client.ID != conv.User2ID {
 				log.Printf(
 					"[ERROR] User %v not authorized in conversation %v",
@@ -86,7 +84,6 @@ func (h *Hub) Run(ctx context.Context) {
 				continue
 			}
 
-			// Vérifie que la conversation est acceptée.
 			if (!conv.Accepted1 || !conv.Accepted2) &&
 				bm.Message.Type != models.MessageTypeFriendReq {
 				log.Printf(
@@ -98,11 +95,9 @@ func (h *Hub) Run(ctx context.Context) {
 				continue
 			}
 
-			// Complète le message avec les informations serveur.
 			bm.Message.SenderID = bm.Client.ID
 			bm.Message.Time = time.Now()
 
-			// Sauvegarde du message.
 			if err := h.DB.Transaction(func(tx *gorm.DB) error {
 				return tx.Create(&bm.Message).Error
 			}); err != nil {
@@ -127,7 +122,6 @@ func (h *Hub) BroadcastToRecipient(
 		recipientID = conv.User1ID
 	}
 
-	// Envoie le message aux deux utilisateurs.
 	for client := range h.Clients {
 		if client.ID != conv.User1ID && client.ID != conv.User2ID {
 			continue
@@ -142,10 +136,33 @@ func (h *Hub) BroadcastToRecipient(
 		}
 	}
 
+	var lastRead *time.Time
+
+	if recipientID == conv.User1ID {
+		lastRead = conv.LastReadAtUser1
+	} else if recipientID == conv.User2ID {
+		lastRead = conv.LastReadAtUser2
+	}
+
+	if lastRead != nil && !bm.Message.Time.After(*lastRead) {
+		log.Printf(
+			"[CHAT] Message déjà lu, pas de notification. conv=%v",
+			conv.ID,
+		)
+		return
+	}
+
+	log.Printf(
+		"[CHAT] Notification non-lue -> user=%v conv=%v",
+		recipientID,
+		conv.ID,
+	)
+
 	h.sendToTarget(recipientID, models.Message{
-		SenderID: bm.Client.ID,
-		Type:     "chat_notification",
-		Time:     time.Now(),
+		SenderID:       bm.Client.ID,
+		ConversationID: conv.ID,
+		Type:           models.MessageTypeChatNotification,
+		Time:           bm.Message.Time,
 	})
 }
 
@@ -157,9 +174,11 @@ func (h *Hub) sendToTarget(targetID uuid.UUID, msg models.Message) {
 
 		select {
 		case client.Send <- msg:
+
 		case <-time.After(1 * time.Second):
 			close(client.Send)
 			delete(h.Clients, client)
 		}
 	}
 }
+

@@ -1,3 +1,5 @@
+import NotificationSignal from "./notificationSignal";
+
 type Tab = "friends" | "requests";
 
 interface ChatMenuHeaderProps {
@@ -28,7 +30,7 @@ export function ChatMenuHeader({
               e.stopPropagation();
               setActiveTab("friends");
             }}
-            className={`bg-bblue w-1/2 h-full rounded-2xl balatro transition-all ${
+            className={`bg-bblue w-1/2 h-full rounded-2xl balatro transition-all font-extrabold ${
               activeTab === "friends" ? "outline-3 outline-white" : ""
             } active:scale-90`}
           >
@@ -42,7 +44,7 @@ export function ChatMenuHeader({
                 e.stopPropagation();
                 setActiveTab("requests");
               }}
-              className={`bg-bred w-full h-full rounded-2xl balatro transition-all ${
+              className={`bg-bred w-full h-full rounded-2xl balatro transition-all font-extrabold ${
                 activeTab === "requests" ? "outline-3 outline-white" : ""
               } active:scale-90`}
             >
@@ -50,20 +52,9 @@ export function ChatMenuHeader({
             </button>
 
             {hasRequest && (
-              <span
-                className="
-                  absolute
-                  -top-1
-                  -right-1
-                  w-3
-                  h-3
-                  bg-red-500
-                  rounded-full
-                  border-2
-                  border-bdarkgreen
-                  z-20
-                "
-              />
+				<div className="absolute right-1 top-1">
+				<NotificationSignal />
+				</div>
             )}
           </div>
 

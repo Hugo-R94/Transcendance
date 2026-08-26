@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useGambling } from "../use/useGambling";
+import { useChat } from "../use/useChat"; // <-- ajouté, adapte le chemin si besoin
 
 import { Roulette } from "./gambling/roulette";
 import { PhaseTimer } from "./gambling/phaseTimer";
@@ -18,6 +19,7 @@ type JsonLog = {
 
 export default function Gambling() {
   const game = useGambling();
+  const chat = useChat(); // <-- ajouté
   const [showLogs, setShowLogs] = useState(true);
   const jsonLogs: JsonLog[] = game.jsonLogs ?? [];
 
@@ -34,10 +36,14 @@ export default function Gambling() {
           ready={game.ready}
           countdown={game.countdown}
           error={game.error}
+          friends={chat.friends}
+          invite={chat.invite}
           connect={game.connect}
           disconnect={game.disconnect}
           joinRoom={game.joinRoom}
           toggleReady={game.toggleReady}
+          leaveRoom={game.leaveRoom}
+		  joinRoomByID={game.joinRoomByID}
         />
 
         <JsonDebugger
@@ -49,6 +55,7 @@ export default function Gambling() {
       </>
     );
   }
+
 
   return (
     <>

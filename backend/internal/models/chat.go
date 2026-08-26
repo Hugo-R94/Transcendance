@@ -88,7 +88,7 @@ type (
 	BlockRequest struct {
 		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 	}
-
+	
 	FriendAccept struct {
 		ID     string `json:"id" binding:"required"`
 		Accept bool   `json:"accept"`
@@ -105,4 +105,5 @@ const (
 	MessageTypeBlocked       = "blocked"
 	MessageTypeRead			 = "read"
 	MessageTypeChatNotification = "chat_notification"
+	MessageTypeGameInvit	 = "game_invit"
 )
