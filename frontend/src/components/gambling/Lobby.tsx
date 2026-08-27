@@ -144,7 +144,7 @@ export default function Lobby({
           </div>
         )}
 
-        <div className="mb-6 rounded-2xl bg-bdarkgreen aspect-[2/3] outline-10 sm:w-100 w-80 p-6 shadow-black/75 shadow-2xl">
+        <div className="mb-6 rounded-2xl bg-bdarkgreen aspect-[2/3] outline-10 md:90 sm:w-90 w-65 p-6 shadow-black/75 shadow-2xl">
 
           {/* CONNEXION AUTOMATIQUE */}
 
@@ -264,7 +264,7 @@ export default function Lobby({
                   return (
                     <div
                       key={player.playerId}
-                      className={`flex items-center gap-3 rounded-xl ${bgColor} p-3 shadow-md`}
+                      className={`flex  items-center gap-3 rounded-xl ${bgColor} p-3 shadow-md`}
                     >
 
                       {/* AVATAR */}

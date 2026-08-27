@@ -2,7 +2,10 @@ package gambling
 
 import (
 	"errors"
+	"fmt"
 	"sort"
+	"github.com/Hugo-R94/Transcendance/backend/internal/models"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -624,10 +627,6 @@ func (r *Room) RunGame() {
 			return
 		}
 
-		// ======================================================
-		// GAME OVER
-		// ======================================================
-
 		r.mu.Lock()
 
 		if r.CurrentTurn >= MaxTurns {
@@ -635,10 +634,19 @@ func (r *Room) RunGame() {
 
 			turn := r.CurrentTurn
 
+			type result struct {
+				ID      uuid.UUID
+				Balance int
+			}
+
+			balances := make([]result, 0, len(r.Players))
+
 			var winnerID string
 			winnerBalance := -1
 
 			for _, player := range r.Players {
+				balances = append(balances, result{ID: player.ID, Balance: player.Balance})
+
 				if player.Balance > winnerBalance {
 					winnerBalance = player.Balance
 					winnerID = player.ID.String()
@@ -647,26 +655,42 @@ func (r *Room) RunGame() {
 
 			r.mu.Unlock()
 
-			// IMPORTANT :
-			// envoyer game_finished AVANT de supprimer la room.
+			// ==================================================
+			// SAVE RESULT
+			// ==================================================
+
+			sort.Slice(balances, func(i, j int) bool {
+				return balances[i].Balance > balances[j].Balance
+			})
+
+			scores := make([]models.GameScore, 0, len(balances))
+			now := time.Now()
+			totalPlayers := len(balances)				
+			for i, b := range balances {
+				scores = append(scores, models.GameScore{
+					UserID:     b.ID,
+					FinalScore: b.Balance,
+					Rank:       fmt.Sprintf("%d/%d", i+1, totalPlayers),
+					Time:       now,
+				})
+			}
+
+			if r.Manager != nil && r.Manager.DB != nil {
+				if err := r.Manager.DB.Create(&scores).Error; err != nil {
+					log.Printf("erreur sauvegarde scores room %s: %v", r.ID, err)
+				}
+			}
+
 			r.Hub.BroadcastJSON(GameFinishedMessage{
 				Type:     "game_finished",
 				Turn:     turn,
 				WinnerID: winnerID,
 			})
 
-			// Petit délai pour laisser les clients recevoir
-			// le dernier message.
 			time.Sleep(500 * time.Millisecond)
-
-			// ==================================================
-			// DESTROY ROOM
-			// ==================================================
-
 			r.DestroyRoom()
-
 			return
-		}
+		} // <-- fin du if r.CurrentTurn >= MaxTurns
 
 		// ======================================================
 		// NEXT TURN

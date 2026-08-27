@@ -301,7 +301,7 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
           )}
         </div>
 
-        <div className="relative z-20 flex h-[10%] min-h-[55px] w-full items-center justify-center gap-4 rounded-b-2xl bg-byellow px-4 backdrop-blur-md">
+        <div className="relative z-20 flex h-20 w-full items-center justify-center gap-4 rounded-b-2xl bg-byellow px-4 backdrop-blur-md">
           <Pagination
             page={page}
             totalPages={totalPages}

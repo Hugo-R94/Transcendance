@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"gorm.io/gorm"	
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -132,18 +133,23 @@ func NewHub() *Hub {
 // ============================================================
 
 type RoomManager struct {
-	mu sync.RWMutex
-
-	Rooms map[string]*Room
+    mu    sync.RWMutex
+    Rooms map[string]*Room
+    DB    *gorm.DB // nouveau
 }
 
-func NewRoomManager() *RoomManager {
-	return &RoomManager{
-		Rooms: make(map[string]*Room),
-	}
+func NewRoomManager(db *gorm.DB) *RoomManager {
+    return &RoomManager{
+        Rooms: make(map[string]*Room),
+        DB:    db,
+    }
 }
 
-var roomManager = NewRoomManager()
+var roomManager *RoomManager
+
+func InitRoomManager(db *gorm.DB) {
+	roomManager = NewRoomManager(db)
+}
 
 // ============================================================
 // CLIENT -> SERVER

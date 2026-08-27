@@ -233,7 +233,7 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
           )}
         </div>
 
-        <div className="relative z-20 flex h-[15%] min-h-[65px] w-full items-center justify-center gap-4 rounded-b-2xl bg-byellow px-4 backdrop-blur-md">
+        <div className="relative z-20 flex h-20 min-h-[65px] w-full items-center justify-center gap-4 rounded-b-2xl bg-byellow px-4 backdrop-blur-md">
           <DropdownMenu
             pos={-1}
             items={listOptions}

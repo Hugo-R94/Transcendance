@@ -97,7 +97,7 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
           )}
         </div>
 
-        <div className="relative z-50 flex h-[15%] min-h-[65px] w-full items-center justify-center gap-4 rounded-b-2xl bg-byellow px-4 overflow-visible backdrop-blur-md">
+        <div className="relative z-50 flex h-20 min-h-[65px] w-full items-center justify-center gap-4 rounded-b-2xl bg-byellow px-4 overflow-visible backdrop-blur-md">
           <div className="flex items-center justify-center gap-2 py-1 sm:gap-4 overflow-visible">
             <DropdownMenu
               pos={-1}
