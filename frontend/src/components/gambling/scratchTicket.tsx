@@ -54,6 +54,7 @@ export function ScratchTicket({
       >
         <div
           className={`
+			balatro-star
             relative ouline-z outline-white shadow-lg shadow-black/80
             flex
             min-h-[220px]

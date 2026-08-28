@@ -211,6 +211,7 @@ type PlayerReadyMessageResponse struct {
 type PlayerInfo struct {
 	PlayerID string `json:"playerId"`
 	Username string `json:"username"`
+	PlayerNumber int `json:"playerNumber"`
 	Balance  int    `json:"balance"`
 	Ready    bool   `json:"ready"`
 }
@@ -267,6 +268,8 @@ type ScratchResultMessage struct {
 
 type SpinningStartedMessage struct {
 	Type     string `json:"type"`
+	WinningNumber int `json:"winning_number"`
+	RotationDegree		int		`json:"rotation_degree"`
 	Turn     int    `json:"turn"`
 	Duration int    `json:"duration"`
 }
@@ -291,4 +294,10 @@ type GameFinishedMessage struct {
 	Type     string `json:"type"`
 	Turn     int    `json:"turn"`
 	WinnerID string `json:"winnerId,omitempty"`
+}
+
+type winningNumberMessage struct{
+	Type				string  `json:"type"`
+	Turn    			int     `json:"turn"`
+	WinningNumber 		int		`json:"winning_number"`
 }

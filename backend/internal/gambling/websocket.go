@@ -193,13 +193,16 @@ func (c *Client) handleJoinRoom(data []byte) {
 	room.Hub.BroadcastJSON(room.GetRoomState())
 }
 
+func (r *Room) IsEmpty() bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	return len(r.Players) == 0
+}
+
 
 func (c *Client) handleLeaveRoom(data []byte) {
 	if c.Room == nil {
-		c.SendJSON(ErrorMessage{
-			Type:    "error",
-			Message: "you are not in a room",
-		})
 		return
 	}
 
@@ -207,18 +210,27 @@ func (c *Client) handleLeaveRoom(data []byte) {
 	hub := c.Hub
 
 	room.RemovePlayer(c.PlayerID)
-	hub.RemoveClient(c.PlayerID)
+
+	// Le client quitte la room, mais PAS le WebSocket.
+	c.Room = nil
+	c.Hub = nil
 
 	hub.BroadcastJSON(PlayerLeftMessage{
 		Type:     "player_left",
-		PlayerID: c.PlayerID.String(),
+		PlayerID:  c.PlayerID.String(),
+		Username: c.Username,
 	})
 
-	hub.BroadcastJSON(room.GetRoomState())
+	// Vérifie si la room est maintenant vide.
+	if room.IsEmpty() {
+		log.Printf("[ROOM] destroying empty room %s", room.ID)
+		room.DestroyRoom()
+		return
+	}
 
-	c.Room = nil
-	c.Hub = nil
+	hub.BroadcastJSON(room.GetRoomState())
 }
+
 
 // ============================================================
 // READY

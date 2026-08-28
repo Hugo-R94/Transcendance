@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useUserAvatar } from '../../api/getUserAvatar';
 import type { Friend } from '../../api/chat';
 import DropdownMenu from '../DropdownMenu';
+import Notification from '../notification';
 
 function PlayerAvatar({
   playerId,
@@ -126,11 +127,13 @@ export default function Lobby({
           LOBBY
         </h1>
 
-        {error && (
-          <div className="mb-4 rounded-xl bg-red-900 p-4 text-red-200">
-            {error}
-          </div>
-        )}
+		{error && (
+			<Notification
+				message={error}
+				onClose={() => {
+				}}
+			/>
+			)}
 
         {countdown !== null && (
           <div className="mb-4 rounded-xl bg-yellow-900 p-4 text-center">

@@ -1,11 +1,15 @@
+import { useGambling } from "../../use/useGambling";
+
 type PhaseTimerProps = {
   state: string;
   countdown: number | null;
+  turn:	number,
 };
 
 export function PhaseTimer({
   state,
   countdown,
+  turn,
 }: PhaseTimerProps) {
   const getLabel = () => {
     switch (state) {
@@ -30,25 +34,59 @@ export function PhaseTimer({
   };
 
   return (
-    <div className="flex flex-col h-10 w-full items-center justify-between px-4">
+	<div className="flex h-fit sm:w-full w-[90%] items-center gap-4">
 
+	{/* TIMER */}
+	<div className="flex sm:h-full h-10 flex-1 items-center justify-center rounded-2xl bg-bred p-2 card">
+		<div
+		className="flex items-center justify-center gap-2 whitespace-nowrap"
+		style={{
+			fontSize: "clamp(0.6rem, 1.2vw, 1rem)",
+		}}
+		>
+		<span className="font-semibold">
+			REMAINS:
+		</span>
 
-      {countdown !== null && (
-        <div className="flex gap-2 bg-bred w-fit h-fit p-2 rounded-2xl card mb-3 justify-center items-center">
-          <span className="font-semibold text-xl">REMAINS : </span>
+		<strong>
+			{countdown}s
+		</strong>
+		</div>
+	</div>
 
-          <p className="text-4xl font-extrabold">
-            {countdown}s
-          </p>
-        </div>
-		
-      )}
-		<div className="bg-bgreen w-fit h-fit p-2 rounded-2xl card">
-        Phase :{" "}
-        <strong>
-          {getLabel()}
-        </strong>
-      </div>
-    </div>
+	{/* TURN */}
+	<div
+		className="flex sm:h-full h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-bgreen p-2 card whitespace-nowrap"
+		style={{
+		fontSize: "clamp(0.6rem, 1.2vw, 1rem)",
+		}}
+	>
+		<span className="font-semibold">
+		Turn:
+		</span>
+
+		<strong>
+		{turn}
+		</strong>
+	</div>
+
+	{/* PHASE */}
+	<div
+		className="flex sm:h-full h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-bgreen p-2 card whitespace-nowrap"
+		style={{
+		fontSize: "clamp(0.55rem, 1vw, 1rem)",
+		}}
+	>
+		<span className="font-semibold">
+		Phase:
+		</span>
+
+		<strong>
+		{getLabel()}
+		</strong>
+	</div>
+
+	</div>
+
   );
 }

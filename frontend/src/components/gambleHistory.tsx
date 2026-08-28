@@ -27,8 +27,8 @@ function HistoryComponent({ rank, time, final_score }: HistoryComponentProps) {
     const rankColor = isRankInSecondHalf(rank) ? "text-bgreen" : "text-bred";
 
     return (
-        <div className="bg-byellow w-full h-15 shrink-0 font-extrabold flex items-center border-t border-l border-8 border-black/25 rounded-2xl hover:scale-101 hover:z-50 shadow-md shadow-black/75 hover:shadow-lg">
-            <div className="w-1/3 h-full flex items-center justify-center">
+        <div className="bg-byellow w-full h-15 shrink-0 font-extrabold md:text-2xl text-lg flex items-center border-t border-l border-8 border-black/25 rounded-2xl hover:scale-101 hover:z-50 shadow-md shadow-black/75 hover:shadow-lg">
+            <div className="w-1/3 h-full flex items-center justify-center ">
                 <p>
                     score : <span className={scoreColor}>{final_score}</span>
                 </p>

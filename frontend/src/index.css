@@ -181,39 +181,34 @@ code {
 }
 
 
-@keyframes balatro-star {
+@keyframes balatro-float {
   0% {
-    transform: translateY(0px) rotate(-3deg) scale(1);
+    transform: translate3d(0, 0px, 0) rotate(-2deg);
   }
 
-  18% {
-    transform: translateY(-2px) rotate(2deg) scale(1.02);
+  25% {
+    transform: translate3d(2px, -3px, 0) rotate(0deg);
   }
 
-  37% {
-    transform: translateY(1px) rotate(-1deg) scale(1);
+  50% {
+    transform: translate3d(0, -6px, 0) rotate(2deg);
   }
 
-  58% {
-    transform: translateY(-1px) rotate(3deg) scale(1.01);
-  }
-
-  76% {
-    transform: translateY(2px) rotate(-2deg) scale(1);
+  75% {
+    transform: translate3d(-2px, -3px, 0) rotate(0deg);
   }
 
   100% {
-    transform: translateY(0px) rotate(-3deg) scale(1);
+    transform: translate3d(0, 0px, 0) rotate(-2deg);
   }
 }
 
 .balatro-star {
-  animation-name: balatro-star;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-  transform-origin: center;
+  animation: balatro-float 4s linear infinite;
   will-change: transform;
 }
+
+
 
 .bg-bblue{
 	background: #00509f;

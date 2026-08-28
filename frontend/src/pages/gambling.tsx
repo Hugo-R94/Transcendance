@@ -49,62 +49,34 @@ type JsonLog = {
 export default function Gambling() {
   const socketRef = useRef<WebSocket | null>(null);
 
-  /*
-   * IMPORTANT :
-   *
-   * Le WebSocket possède des callbacks qui peuvent conserver
-   * une ancienne valeur de playerId.
-   *
-   * La ref permet d'avoir TOUJOURS le playerId courant.
-   */
   const playerIdRef = useRef("");
-
   const logIdRef = useRef(0);
 
   // ==========================================================
   // CONNECTION
   // ==========================================================
 
-  const [connected, setConnected] =
-    useState(false);
-
-  const [joined, setJoined] =
-    useState(false);
-
-  const [roomId, setRoomId] =
-    useState("room-123");
-
-  const [playerId, setPlayerId] =
-    useState("");
-
-  const [username, setUsername] =
-    useState("");
+  const [connected, setConnected] = useState(false);
+  const [joined, setJoined] = useState(false);
+  const [roomId, setRoomId] = useState("room-123");
+  const [playerId, setPlayerId] = useState("");
+  const [username, setUsername] = useState("");
 
   // ==========================================================
   // LOBBY
   // ==========================================================
 
-  const [players, setPlayers] =
-    useState<Player[]>([]);
-
-  const [ready, setReady] =
-    useState(false);
-
-  const [countdown, setCountdown] =
-    useState<number | null>(null);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [ready, setReady] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
 
   // ==========================================================
   // GAME
   // ==========================================================
 
-  const [gameStarted, setGameStarted] =
-    useState(false);
-
-  const [turn, setTurn] =
-    useState(0);
-
-  const [state, setState] =
-    useState("waiting");
+  const [gameStarted, setGameStarted] = useState(false);
+  const [turn, setTurn] = useState(0);
+  const [state, setState] = useState("waiting");
 
   // ==========================================================
   // GAME PHASE COUNTDOWN
@@ -114,134 +86,93 @@ export default function Gambling() {
     useState<number | null>(null);
 
   const phaseCountdownIntervalRef =
-    useRef<ReturnType<typeof setInterval> | null>(
-      null
-    );
+    useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ==========================================================
   // PLAYER MONEY
   // ==========================================================
 
-  const [balance, setBalance] =
-    useState(1000);
-
-  const [balanceBefore, setBalanceBefore] =
-    useState(1000);
-
-  const [betAmount, setBetAmount] =
-    useState(50);
-
-  const [target, setTarget] =
-    useState("red");
-
-  const [currentBet, setCurrentBet] =
-    useState<Bet | null>(null);
-
-  const [hasBet, setHasBet] =
-    useState(false);
+  const [balance, setBalance] = useState(1000);
+  const [balanceBefore, setBalanceBefore] = useState(1000);
+  const [betAmount, setBetAmount] = useState(50);
+  const [target, setTarget] = useState("red");
+  const [currentBet, setCurrentBet] = useState<Bet | null>(null);
+  const [hasBet, setHasBet] = useState(false);
 
   // ==========================================================
   // SCRATCH
   // ==========================================================
 
-  const [ticket, setTicket] =
-    useState<Ticket | null>(null);
+  const [ticket, setTicket] = useState<Ticket | null>(null);
 
   // ==========================================================
   // ROULETTE
   // ==========================================================
 
-  const [winningNumber, setWinningNumber] =
-    useState<number | null>(null);
+  const [winningNumber, setWinningNumber] = useState<number | null>(
+    null
+  );
 
   // ==========================================================
   // RESULTS
   // ==========================================================
 
-  const [myResult, setMyResult] =
-    useState<Result | null>(null);
-
-  const [results, setResults] =
-    useState<Result[]>([]);
+  const [myResult, setMyResult] = useState<Result | null>(null);
+  const [results, setResults] = useState<Result[]>([]);
 
   // ==========================================================
   // ERRORS
   // ==========================================================
 
-  const [error, setError] =
-    useState("");
+  const [error, setError] = useState("");
 
   // ==========================================================
   // JSON DEBUGGER
   // ==========================================================
 
-  const [jsonLogs, setJsonLogs] =
-    useState<JsonLog[]>([]);
+  const [jsonLogs, setJsonLogs] = useState<JsonLog[]>([]);
 
   // ==========================================================
   // PHASE COUNTDOWN
   // ==========================================================
 
   const stopPhaseCountdown = () => {
-    if (
-      phaseCountdownIntervalRef.current
-    ) {
-      clearInterval(
-        phaseCountdownIntervalRef.current
-      );
-
-      phaseCountdownIntervalRef.current =
-        null;
+    if (phaseCountdownIntervalRef.current) {
+      clearInterval(phaseCountdownIntervalRef.current);
+      phaseCountdownIntervalRef.current = null;
     }
 
     setPhaseCountdown(null);
   };
 
-  const startPhaseCountdown = (
-    seconds: number
-  ) => {
+  const startPhaseCountdown = (seconds: number) => {
     stopPhaseCountdown();
 
-    if (
-      !Number.isFinite(seconds) ||
-      seconds <= 0
-    ) {
+    if (!Number.isFinite(seconds) || seconds <= 0) {
       setPhaseCountdown(null);
       return;
     }
 
-    let remaining =
-      Math.ceil(seconds);
+    let remaining = Math.ceil(seconds);
 
-    setPhaseCountdown(
-      remaining
-    );
+    setPhaseCountdown(remaining);
 
-    phaseCountdownIntervalRef.current =
-      setInterval(() => {
-        remaining -= 1;
+    phaseCountdownIntervalRef.current = setInterval(() => {
+      remaining -= 1;
 
-        if (remaining <= 0) {
-          setPhaseCountdown(0);
+      if (remaining <= 0) {
+        setPhaseCountdown(0);
 
-          if (
-            phaseCountdownIntervalRef.current
-          ) {
-            clearInterval(
-              phaseCountdownIntervalRef.current
-            );
-
-            phaseCountdownIntervalRef.current =
-              null;
-          }
-
-          return;
+        if (phaseCountdownIntervalRef.current) {
+          clearInterval(phaseCountdownIntervalRef.current);
+          phaseCountdownIntervalRef.current = null;
         }
 
-        setPhaseCountdown(
-          remaining
-        );
-      }, 1000);
+        return;
+      }
+
+      setPhaseCountdown(remaining);
+    }, 1000);
   };
 
   // ==========================================================
@@ -256,14 +187,10 @@ export default function Gambling() {
       id: ++logIdRef.current,
       direction,
       data,
-      timestamp:
-        new Date().toLocaleTimeString(),
+      timestamp: new Date().toLocaleTimeString(),
     };
 
-    setJsonLogs((current) => [
-      log,
-      ...current,
-    ]);
+    setJsonLogs((current) => [log, ...current]);
   };
 
   // ==========================================================
@@ -277,55 +204,39 @@ export default function Gambling() {
 
     setError("");
 
-    const socket = new WebSocket(
-      "ws://localhost:8080/ws"
-    );
+    const socket = new WebSocket("ws://localhost:8080/ws");
 
     socket.onopen = () => {
       setConnected(true);
 
       addJsonLog("system", {
-        type:
-          "connection_open",
-        message:
-          "WebSocket connecté",
+        type: "connection_open",
+        message: "WebSocket connecté",
       });
     };
 
     socket.onmessage = (event) => {
       try {
-        const data: ServerMessage =
-          JSON.parse(event.data);
+        const data: ServerMessage = JSON.parse(event.data);
 
-        addJsonLog(
-          "received",
-          data
-        );
+        addJsonLog("received", data);
 
-        handleServerMessage(
-          data
-        );
+        handleServerMessage(data);
       } catch {
         addJsonLog("system", {
-          type:
-            "invalid_json",
+          type: "invalid_json",
           raw: event.data,
         });
 
-        setError(
-          "JSON invalide reçu du serveur"
-        );
+        setError("JSON invalide reçu du serveur");
       }
     };
 
     socket.onerror = () => {
-      setError(
-        "Erreur WebSocket"
-      );
+      setError("Erreur WebSocket");
 
       addJsonLog("system", {
-        type:
-          "websocket_error",
+        type: "websocket_error",
       });
     };
 
@@ -336,19 +247,15 @@ export default function Gambling() {
 
       stopPhaseCountdown();
 
-      socketRef.current =
-        null;
+      socketRef.current = null;
 
       addJsonLog("system", {
-        type:
-          "connection_closed",
-        message:
-          "WebSocket déconnecté",
+        type: "connection_closed",
+        message: "WebSocket déconnecté",
       });
     };
 
-    socketRef.current =
-      socket;
+    socketRef.current = socket;
   };
 
   // ==========================================================
@@ -363,32 +270,21 @@ export default function Gambling() {
   // SEND JSON
   // ==========================================================
 
-  const send = (
-    message: object
-  ) => {
-    const socket =
-      socketRef.current;
+  const send = (message: object) => {
+    const socket = socketRef.current;
 
     if (
       !socket ||
-      socket.readyState !==
-        WebSocket.OPEN
+      socket.readyState !== WebSocket.OPEN
     ) {
-      setError(
-        "WebSocket non connecté"
-      );
+      setError("WebSocket non connecté");
 
       return false;
     }
 
-    addJsonLog(
-      "sent",
-      message
-    );
+    addJsonLog("sent", message);
 
-    socket.send(
-      JSON.stringify(message)
-    );
+    socket.send(JSON.stringify(message));
 
     return true;
   };
@@ -397,208 +293,121 @@ export default function Gambling() {
   // SERVER MESSAGE
   // ==========================================================
 
-  const handleServerMessage = (
-    data: ServerMessage
-  ) => {
+  const handleServerMessage = (data: ServerMessage) => {
     switch (data.type) {
-      // ======================================================
-      // CONNECTED
-      // ======================================================
-
       case "connected": {
-        const newPlayerId =
-          data.playerId ?? "";
+        const newPlayerId = data.playerId ?? "";
 
-        setPlayerId(
-          newPlayerId
-        );
-
-        playerIdRef.current =
-          newPlayerId;
+        setPlayerId(newPlayerId);
+        playerIdRef.current = newPlayerId;
 
         break;
       }
 
-      // ======================================================
-      // ROOM JOINED
-      // ======================================================
-
       case "room_joined": {
-        const newPlayerId =
-          data.playerId ?? "";
+        const newPlayerId = data.playerId ?? "";
 
         setJoined(true);
 
-        setPlayerId(
-          newPlayerId
-        );
+        setPlayerId(newPlayerId);
+        playerIdRef.current = newPlayerId;
 
-        playerIdRef.current =
-          newPlayerId;
+        setUsername(data.username ?? "");
 
-        setUsername(
-          data.username ?? ""
-        );
-
-        if (
-          typeof data.balance ===
-          "number"
-        ) {
-          setBalance(
-            data.balance
-          );
-
-          setBalanceBefore(
-            data.balance
-          );
+        if (typeof data.balance === "number") {
+          setBalance(data.balance);
+          setBalanceBefore(data.balance);
         }
 
         break;
       }
 
-      // ======================================================
-      // ROOM STATE
-      // ======================================================
-
       case "room_state": {
-        if (
-          Array.isArray(
-            data.players
-          )
-        ) {
-          setPlayers(
-            data.players
+        if (Array.isArray(data.players)) {
+          setPlayers(data.players);
+
+          const me = data.players.find(
+            (p: Player) =>
+              p.playerId === playerIdRef.current
           );
 
-          const me =
-            data.players.find(
-              (p: Player) =>
-                p.playerId ===
-                playerIdRef.current
-            );
-
           if (me) {
-            setReady(
-              me.ready
-            );
-
-            setBalance(
-              me.balance
-            );
+            setReady(me.ready);
+            setBalance(me.balance);
           }
         }
 
         break;
       }
-
-      // ======================================================
-      // PLAYER JOINED
-      // ======================================================
 
       case "player_joined": {
         const newPlayer: Player = {
-          playerId:
-            data.playerId,
-          username:
-            data.username,
+          playerId: data.playerId,
+          username: data.username,
           balance:
-            typeof data.balance ===
-            "number"
+            typeof data.balance === "number"
               ? data.balance
               : 1000,
-          ready:
-            data.ready ??
-            false,
+          ready: data.ready ?? false,
         };
 
-        setPlayers(
-          (current) => {
-            const exists =
-              current.some(
-                (p) =>
-                  p.playerId ===
-                  newPlayer.playerId
-              );
+        setPlayers((current) => {
+          const exists = current.some(
+            (p) =>
+              p.playerId ===
+              newPlayer.playerId
+          );
 
-            if (exists) {
-              return current;
-            }
-
-            return [
-              ...current,
-              newPlayer,
-            ];
+          if (exists) {
+            return current;
           }
-        );
+
+          return [...current, newPlayer];
+        });
 
         break;
       }
-
-      // ======================================================
-      // PLAYER LEFT
-      // ======================================================
 
       case "player_left": {
-        setPlayers(
-          (current) =>
-            current.filter(
-              (p) =>
-                p.playerId !==
-                data.playerId
-            )
+        setPlayers((current) =>
+          current.filter(
+            (p) =>
+              p.playerId !== data.playerId
+          )
         );
 
         break;
       }
 
-      // ======================================================
-      // PLAYER READY
-      // ======================================================
-
       case "player_ready": {
-        setPlayers(
-          (current) =>
-            current.map(
-              (player) =>
-                player.playerId ===
-                data.playerId
-                  ? {
-                      ...player,
-                      ready:
-                        data.ready,
-                    }
-                  : player
-            )
+        setPlayers((current) =>
+          current.map((player) =>
+            player.playerId === data.playerId
+              ? {
+                  ...player,
+                  ready: data.ready,
+                }
+              : player
+          )
         );
 
         if (
           data.playerId ===
           playerIdRef.current
         ) {
-          setReady(
-            data.ready
-          );
+          setReady(data.ready);
         }
 
         break;
       }
 
-      // ======================================================
-      // ROOM READY STATE
-      // ======================================================
-
       case "room_ready_state": {
         break;
       }
 
-      // ======================================================
-      // GAME STARTING
-      // ======================================================
-
       case "game_starting": {
         setCountdown(
-          typeof data.countdown ===
-          "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : null
         );
@@ -606,87 +415,44 @@ export default function Gambling() {
         break;
       }
 
-      // ======================================================
-      // GAME STARTED
-      // ======================================================
-
       case "game_started": {
-        setGameStarted(
-          true
-        );
-
+        setGameStarted(true);
         setCountdown(null);
 
-        setTurn(
-          data.turn ?? 1
-        );
-
-        setState(
-          "betting"
-        );
+        setTurn(data.turn ?? 1);
+        setState("betting");
 
         setResults([]);
-
         setMyResult(null);
-
-        setWinningNumber(
-          null
-        );
-
-        setCurrentBet(
-          null
-        );
-
+        setWinningNumber(null);
+        setCurrentBet(null);
         setHasBet(false);
-
         setTicket(null);
 
         startPhaseCountdown(
-          typeof data.countdown ===
-          "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 15
         );
 
         break;
       }
-
-      // ======================================================
-      // TURN STARTED
-      // ======================================================
 
       case "turn_started": {
-        setGameStarted(
-          true
-        );
+        setGameStarted(true);
 
-        setTurn(
-          data.turn
-        );
-
-        setState(
-          "betting"
-        );
+        setTurn(data.turn);
+        setState("betting");
 
         setHasBet(false);
-
-        setCurrentBet(
-          null
-        );
-
+        setCurrentBet(null);
         setTicket(null);
-
-        setWinningNumber(
-          null
-        );
-
+        setWinningNumber(null);
         setMyResult(null);
-
         setResults([]);
 
         startPhaseCountdown(
-          typeof data.countdown ===
-          "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 15
         );
@@ -694,27 +460,15 @@ export default function Gambling() {
         break;
       }
 
-      // ======================================================
-      // BETTING STARTED
-      // ======================================================
-
       case "betting_started": {
-        setState(
-          "betting"
-        );
+        setState("betting");
 
-        if (
-          typeof data.turn ===
-          "number"
-        ) {
-          setTurn(
-            data.turn
-          );
+        if (typeof data.turn === "number") {
+          setTurn(data.turn);
         }
 
         startPhaseCountdown(
-          typeof data.countdown ===
-          "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 15
         );
@@ -722,18 +476,11 @@ export default function Gambling() {
         break;
       }
 
-      // ======================================================
-      // BETTING ENDED
-      // ======================================================
-
       case "betting_ended": {
-        setState(
-          "scratch"
-        );
+        setState("scratch");
 
         startPhaseCountdown(
-          typeof data.countdown ===
-          "number"
+          typeof data.countdown === "number"
             ? data.countdown
             : 10
         );
@@ -741,19 +488,7 @@ export default function Gambling() {
         break;
       }
 
-      // ======================================================
-      // BET PLACED
-      // ======================================================
-
       case "bet_placed": {
-        /*
-         * IMPORTANT :
-         *
-         * On compare avec playerIdRef.current
-         * et non avec playerId provenant de la
-         * closure du WebSocket.
-         */
-
         if (
           data.playerId ===
           playerIdRef.current
@@ -761,66 +496,42 @@ export default function Gambling() {
           setHasBet(true);
 
           setCurrentBet({
-            chipValue:
-              data.chipValue,
-            target:
-              data.target,
+            chipValue: data.chipValue,
+            target: data.target,
           });
-
-          /*
-           * Le serveur est la source
-           * de vérité du solde.
-           */
 
           if (
             typeof data.balance ===
             "number"
           ) {
-            setBalance(
-              data.balance
-            );
+            setBalance(data.balance);
           }
         }
-
-        /*
-         * Mise à jour de la liste
-         * des joueurs.
-         */
 
         if (
           typeof data.balance ===
           "number"
         ) {
-          setPlayers(
-            (current) =>
-              current.map(
-                (player) =>
-                  player.playerId ===
-                  data.playerId
-                    ? {
-                        ...player,
-                        balance:
-                          data.balance,
-                      }
-                    : player
-              )
+          setPlayers((current) =>
+            current.map((player) =>
+              player.playerId ===
+              data.playerId
+                ? {
+                    ...player,
+                    balance:
+                      data.balance,
+                  }
+                : player
+            )
           );
         }
 
         break;
       }
 
-      // ======================================================
-      // PLAYER BET PLACED
-      // ======================================================
-
       case "player_bet_placed": {
         break;
       }
-
-      // ======================================================
-      // SCRATCH RESULT
-      // ======================================================
 
       case "scratch_result": {
         if (
@@ -830,26 +541,18 @@ export default function Gambling() {
           const receivedTicket =
             data.ticket as Ticket;
 
-          setTicket(
-            receivedTicket
-          );
+          setTicket(receivedTicket);
         }
 
         break;
       }
 
-      // ======================================================
-      // SPINNING STARTED
-      // ======================================================
-
       case "spinning_started": {
-        setState(
-          "spinning"
-        );
+        setState("spinning");
 
         startPhaseCountdown(
           typeof data.countdown ===
-          "number"
+            "number"
             ? data.countdown
             : 5
         );
@@ -857,35 +560,14 @@ export default function Gambling() {
         break;
       }
 
-      // ======================================================
-      // TURN RESOLVED
-      // ======================================================
-      // ======================================================
-      // TURN RESOLVED
-      // ======================================================
-
       case "turn_resolved": {
-        /*
-         * La roulette vient de donner son résultat.
-         *
-         * Le serveur est la source de vérité.
-         */
-
         stopPhaseCountdown();
 
         setState("resolving");
 
-        // ----------------------------------------------------
-        // TURN
-        // ----------------------------------------------------
-
         if (typeof data.turn === "number") {
           setTurn(data.turn);
         }
-
-        // ----------------------------------------------------
-        // WINNING NUMBER
-        // ----------------------------------------------------
 
         if (
           typeof data.winningNumber ===
@@ -896,244 +578,105 @@ export default function Gambling() {
           );
         }
 
-        // ----------------------------------------------------
-        // RESULTS
-        // ----------------------------------------------------
-
         const serverResults: Result[] =
           Array.isArray(data.players)
             ? data.players
             : [];
 
-        setResults(
-          serverResults
-        );
-
-        // ----------------------------------------------------
-        // CURRENT PLAYER ID
-        // ----------------------------------------------------
+        setResults(serverResults);
 
         const currentPlayerId =
           playerIdRef.current;
 
-        /*
-         * Recherche du joueur actuel.
-         *
-         * On utilise playerIdRef.current
-         * plutôt que directement playerId,
-         * afin d'éviter un problème de closure
-         * avec les messages WebSocket.
-         */
-
-        const me =
-          serverResults.find(
-            (result: Result) =>
-              result.playerId ===
-              currentPlayerId
-          );
-
-        // ----------------------------------------------------
-        // MY BALANCE
-        // ----------------------------------------------------
+        const me = serverResults.find(
+          (result: Result) =>
+            result.playerId ===
+            currentPlayerId
+        );
 
         if (me) {
-          /*
-           * Résultat personnel.
-           */
-
           setMyResult(me);
-
-          /*
-           * Solde AVANT le pari.
-           */
 
           setBalanceBefore(
             me.balanceBefore
           );
-
-          /*
-           * IMPORTANT :
-           *
-           * C'est le solde FINAL fourni
-           * par le serveur.
-           *
-           * Exemple :
-           *
-           * balanceBefore = 1000
-           * gain          = +500
-           * balanceAfter  = 1500
-           *
-           * Le frontend doit donc afficher 1500.
-           */
 
           setBalance(
             me.balanceAfter
           );
         }
 
-        // ----------------------------------------------------
-        // PLAYERS BALANCES
-        // ----------------------------------------------------
+        setPlayers((currentPlayers) => {
+          if (currentPlayers.length > 0) {
+            return currentPlayers.map(
+              (player) => {
+                const result =
+                  serverResults.find(
+                    (r: Result) =>
+                      r.playerId ===
+                      player.playerId
+                  );
 
-        /*
-         * Une seule mise à jour de players.
-         *
-         * On synchronise chaque joueur
-         * avec balanceAfter envoyé par le serveur.
-         */
-
-        setPlayers(
-          (currentPlayers) => {
-            /*
-             * Si on possède déjà des joueurs
-             * dans la room, on met simplement
-             * leurs soldes à jour.
-             */
-
-            if (
-              currentPlayers.length > 0
-            ) {
-              return currentPlayers.map(
-                (player) => {
-                  const result =
-                    serverResults.find(
-                      (r: Result) =>
-                        r.playerId ===
-                        player.playerId
-                    );
-
-                  if (!result) {
-                    return player;
-                  }
-
-                  return {
-                    ...player,
-
-                    /*
-                     * Le username du serveur
-                     * est prioritaire.
-                     */
-
-                    username:
-                      result.username ??
-                      player.username,
-
-                    /*
-                     * IMPORTANT :
-                     * solde définitif serveur.
-                     */
-
-                    balance:
-                      result.balanceAfter,
-                  };
+                if (!result) {
+                  return player;
                 }
-              );
-            }
 
-            /*
-             * Si players est vide mais que
-             * le serveur nous donne les résultats,
-             * on peut reconstruire la liste.
-             */
-
-            return serverResults.map(
-              (result) => ({
-                playerId:
-                  result.playerId,
-
-                username:
-                  result.username ??
-                  result.playerId,
-
-                balance:
-                  result.balanceAfter,
-
-                ready: false,
-              })
+                return {
+                  ...player,
+                  username:
+                    result.username ??
+                    player.username,
+                  balance:
+                    result.balanceAfter,
+                };
+              }
             );
           }
-        );
 
-        // ----------------------------------------------------
-        // DEBUG
-        // ----------------------------------------------------
+          return serverResults.map(
+            (result) => ({
+              playerId:
+                result.playerId,
+              username:
+                result.username ??
+                result.playerId,
+              balance:
+                result.balanceAfter,
+              ready: false,
+            })
+          );
+        });
 
-        addJsonLog(
-          "system",
-          {
-            type:
-              "balance_synchronized",
-
-            playerId:
-              currentPlayerId,
-
-            found:
-              !!me,
-
-            balanceBefore:
-              me?.balanceBefore ??
-              null,
-
-            gain:
-              me?.gain ??
-              null,
-
-            balanceAfter:
-              me?.balanceAfter ??
-              null,
-          }
-        );
-
-        /*
-         * Si "found" vaut false dans les logs,
-         * alors le problème vient du playerId :
-         *
-         * playerIdRef.current
-         *
-         * ne correspond pas au playerId
-         * envoyé dans turn_resolved.
-         */
+        addJsonLog("system", {
+          type: "balance_synchronized",
+          playerId: currentPlayerId,
+          found: !!me,
+          balanceBefore:
+            me?.balanceBefore ?? null,
+          gain: me?.gain ?? null,
+          balanceAfter:
+            me?.balanceAfter ?? null,
+        });
 
         break;
       }
 
-      // ======================================================
-      // GAME FINISHED
-      // ======================================================
-
       case "game_finished": {
         stopPhaseCountdown();
 
-        setGameStarted(
-          false
-        );
-
-        setState(
-          "finished"
-        );
-
+        setGameStarted(false);
+        setState("finished");
         setCountdown(null);
-
-        /*
-         * Si le serveur envoie le solde
-         * final directement, on le prend.
-         */
 
         if (
           typeof data.balance ===
           "number"
         ) {
-          setBalance(
-            data.balance
-          );
+          setBalance(data.balance);
         }
 
         break;
       }
-
-      // ======================================================
-      // ERROR
-      // ======================================================
 
       case "error": {
         setError(
@@ -1144,13 +687,8 @@ export default function Gambling() {
         break;
       }
 
-      // ======================================================
-      // DEFAULT
-      // ======================================================
-
-      default: {
+      default:
         break;
-      }
     }
   };
 
@@ -1160,16 +698,12 @@ export default function Gambling() {
 
   const joinRoom = () => {
     if (!roomId.trim()) {
-      setError(
-        "Room ID obligatoire"
-      );
-
+      setError("Room ID obligatoire");
       return;
     }
 
     send({
-      type:
-        "join_room",
+      type: "join_room",
       roomId,
     });
   };
@@ -1183,14 +717,12 @@ export default function Gambling() {
       return;
     }
 
-    const next =
-      !ready;
+    const next = !ready;
 
     setReady(next);
 
     send({
-      type:
-        "player_ready",
+      type: "player_ready",
       ready: next,
     });
   };
@@ -1200,66 +732,38 @@ export default function Gambling() {
   // ==========================================================
 
   const placeBet = () => {
-    if (
-      state !==
-      "betting"
-    ) {
-      setError(
-        "Les paris sont fermés"
-      );
-
+    if (state !== "betting") {
+      setError("Les paris sont fermés");
       return;
     }
 
     if (hasBet) {
-      setError(
-        "Tu as déjà parié"
-      );
-
+      setError("Tu as déjà parié");
       return;
     }
 
-    if (
-      phaseCountdown ===
-      0
-    ) {
+    if (phaseCountdown === 0) {
       setError(
         "Le temps des paris est terminé"
       );
-
       return;
     }
 
-    if (
-      betAmount <=
-      0
-    ) {
-      setError(
-        "Montant invalide"
-      );
-
+    if (betAmount <= 0) {
+      setError("Montant invalide");
       return;
     }
 
-    if (
-      betAmount >
-      balance
-    ) {
-      setError(
-        "Solde insuffisant"
-      );
-
+    if (betAmount > balance) {
+      setError("Solde insuffisant");
       return;
     }
 
-    const success =
-      send({
-        type:
-          "place_bet",
-        chipValue:
-          betAmount,
-        target,
-      });
+    const success = send({
+      type: "place_bet",
+      chipValue: betAmount,
+      target,
+    });
 
     if (!success) {
       return;
@@ -1271,14 +775,10 @@ export default function Gambling() {
   // ==========================================================
 
   const scratch = () => {
-    if (
-      state !==
-      "scratch"
-    ) {
+    if (state !== "scratch") {
       setError(
         "Le scratch n'est pas disponible"
       );
-
       return;
     }
 
@@ -1286,7 +786,6 @@ export default function Gambling() {
       setError(
         "Tu dois d'abord miser"
       );
-
       return;
     }
 
@@ -1294,20 +793,15 @@ export default function Gambling() {
       return;
     }
 
-    if (
-      phaseCountdown ===
-      0
-    ) {
+    if (phaseCountdown === 0) {
       setError(
         "Le temps du scratch est terminé"
       );
-
       return;
     }
 
     send({
-      type:
-        "scratch",
+      type: "scratch",
     });
   };
 
@@ -1404,13 +898,11 @@ export default function Gambling() {
   if (!gameStarted) {
     return (
       <div className="min-h-screen bg-slate-950 p-8 text-white">
-
         <div className="mx-auto max-w-6xl">
 
           {/* HEADER */}
 
           <div className="mb-8">
-
             <h1 className="text-4xl font-black">
               🎰 Roulette
             </h1>
@@ -1418,7 +910,6 @@ export default function Gambling() {
             <p className="mt-1 text-slate-500">
               Lobby
             </p>
-
           </div>
 
           {/* ERROR */}
@@ -1452,18 +943,14 @@ export default function Gambling() {
 
               {!connected ? (
                 <button
-                  onClick={
-                    connect
-                  }
+                  onClick={connect}
                   className="rounded-xl bg-green-600 px-6 py-3 font-black hover:bg-green-500"
                 >
                   CONNECTER
                 </button>
               ) : (
                 <button
-                  onClick={
-                    disconnect
-                  }
+                  onClick={disconnect}
                   className="rounded-xl bg-red-600 px-6 py-3 font-black hover:bg-red-500"
                 >
                   DÉCONNECTER
@@ -1471,9 +958,7 @@ export default function Gambling() {
               )}
 
               <button
-                onClick={
-                  joinRoom
-                }
+                onClick={joinRoom}
                 disabled={
                   !connected ||
                   joined
@@ -1628,10 +1113,9 @@ export default function Gambling() {
 
           </div>
 
-          {/* LOBBY COUNTDOWN */}
+          {/* COUNTDOWN */}
 
-          {countdown !==
-            null && (
+          {countdown !== null && (
             <div className="mt-6 rounded-2xl border border-yellow-700 bg-yellow-950 p-10 text-center">
 
               <div className="text-sm font-bold uppercase text-yellow-400">
@@ -1649,17 +1133,12 @@ export default function Gambling() {
             </div>
           )}
 
-          {/* JSON DEBUG */}
-
           <JsonDebugger
             logs={jsonLogs}
-            clearLogs={
-              clearLogs
-            }
+            clearLogs={clearLogs}
           />
 
         </div>
-
       </div>
     );
   }
@@ -1669,34 +1148,33 @@ export default function Gambling() {
   // ==========================================================
 
   return (
-    <div className="min-h-screen bg-slate-950 p-8 text-white">
+    <div className="min-h-screen bg-slate-950 p-4 text-white sm:p-8">
 
-      <div className="mx-auto max-w-7xl">
+      <div className="mx-auto w-full max-w-7xl">
 
-        {/* HEADER */}
+        {/* =====================================================
+            HEADER
+        ====================================================== */}
 
-        <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+        <div className="mb-6 flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
 
           <div>
-
-            <h1 className="text-4xl font-black">
+            <h1 className="text-3xl font-black sm:text-4xl">
               🎰 Roulette
             </h1>
 
             <div className="mt-1 text-slate-500">
-              Tour{" "}
-              {turn} / 5
+              Tour {turn} / 5
             </div>
-
           </div>
 
-          <div className="rounded-2xl border border-yellow-700 bg-yellow-950 px-8 py-4 text-right">
+          <div className="rounded-2xl border border-yellow-700 bg-yellow-950 px-6 py-4 text-right">
 
             <div className="text-xs uppercase text-yellow-600">
               Ton solde
             </div>
 
-            <div className="text-4xl font-black text-yellow-400">
+            <div className="text-3xl font-black text-yellow-400 sm:text-4xl">
               {balance}
             </div>
 
@@ -1712,31 +1190,24 @@ export default function Gambling() {
             PHASE
         ====================================================== */}
 
-        <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 text-center">
+        <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900 p-4 text-center sm:p-5">
 
           <div>
-
             <span className="text-slate-500">
               Phase :
             </span>
 
             <span className="ml-3 text-xl font-black text-blue-400">
-              {
-                getPhaseLabel()
-              }
+              {getPhaseLabel()}
             </span>
-
           </div>
 
-          {phaseCountdown !==
-            null && (
+          {phaseCountdown !== null && (
             <div
-              className={`mt-5 rounded-xl border p-5 transition-all ${
-                phaseCountdown <=
-                3
+              className={`mt-4 rounded-xl border p-4 transition-all ${
+                phaseCountdown <= 3
                   ? "border-red-700 bg-red-950"
-                  : phaseCountdown <=
-                    5
+                  : phaseCountdown <= 5
                   ? "border-orange-700 bg-orange-950"
                   : "border-yellow-700 bg-yellow-950"
               }`}
@@ -1747,24 +1218,19 @@ export default function Gambling() {
               </div>
 
               <div
-                className={`mt-1 font-mono text-6xl font-black ${
-                  phaseCountdown <=
-                  3
+                className={`mt-1 font-mono text-5xl font-black ${
+                  phaseCountdown <= 3
                     ? "text-red-400"
-                    : phaseCountdown <=
-                      5
+                    : phaseCountdown <= 5
                     ? "text-orange-400"
                     : "text-yellow-400"
                 }`}
               >
-                {
-                  phaseCountdown
-                }
+                {phaseCountdown}
 
                 <span className="ml-2 text-2xl">
                   s
                 </span>
-
               </div>
 
             </div>
@@ -1780,41 +1246,44 @@ export default function Gambling() {
           </div>
         )}
 
-        {/* MAIN GAME */}
+        {/* =====================================================
+            MAIN GAME FRAME
+        ====================================================== */}
 
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
 
-          {/* ROULETTE */}
+          {/* ===================================================
+              ROULETTE FRAME
+          ==================================================== */}
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8">
+          <section className="w-full min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6 lg:p-8">
 
-            <h2 className="mb-8 text-2xl font-black">
+            <h2 className="mb-5 text-xl font-black sm:mb-8 sm:text-2xl">
               Roulette
             </h2>
 
-            <div className="flex justify-center">
+            {/* Zone qui s'adapte au parent */}
 
-              <div
-                className={`flex h-72 w-72 items-center justify-center rounded-full border-[16px] border-slate-700 transition-all ${
-                  winningNumber ===
-                  0
-                    ? "bg-green-700"
-                    : winningNumber !==
-                        null &&
-                      winningNumber %
-                        2 !==
-                        0
-                    ? "bg-red-700"
-                    : "bg-slate-950"
-                }`}
-              >
+            <div className="mx-auto w-full max-w-[520px]">
 
-                <div className="flex h-36 w-36 items-center justify-center rounded-full bg-slate-900 text-6xl font-black">
+              <div className="relative aspect-square w-full">
 
-                  {
-                    winningNumber ??
-                    "?"
-                  }
+                <div
+                  className={`absolute inset-0 flex items-center justify-center rounded-full border-[10px] border-slate-700 transition-all sm:border-[16px] ${
+                    winningNumber === 0
+                      ? "bg-green-700"
+                      : winningNumber !== null &&
+                        winningNumber % 2 !== 0
+                      ? "bg-red-700"
+                      : "bg-slate-950"
+                  }`}
+                >
+
+                  <div className="flex h-[50%] w-[50%] items-center justify-center rounded-full bg-slate-900 text-[clamp(2rem,8vw,4rem)] font-black">
+
+                    {winningNumber ?? "?"}
+
+                  </div>
 
                 </div>
 
@@ -1822,63 +1291,58 @@ export default function Gambling() {
 
             </div>
 
-            {state ===
-              "spinning" && (
-              <div className="mt-8 rounded-xl border border-purple-700 bg-purple-950 p-5 text-center">
+            {state === "spinning" && (
+              <div className="mt-6 rounded-xl border border-purple-700 bg-purple-950 p-4 text-center sm:mt-8 sm:p-5">
 
                 <div className="text-sm font-black uppercase text-purple-400">
                   🎡 Roulette en cours
                 </div>
 
-                {phaseCountdown !==
-                  null && (
-                  <div className="mt-2 text-4xl font-black text-purple-300">
-                    {
-                      phaseCountdown
-                    }
-                    s
+                {phaseCountdown !== null && (
+                  <div className="mt-2 text-3xl font-black text-purple-300">
+                    {phaseCountdown}s
                   </div>
                 )}
 
               </div>
             )}
 
-            {winningNumber !==
-              null && (
-              <div className="mt-8 rounded-xl bg-slate-800 p-6 text-center">
+            {winningNumber !== null && (
+              <div className="mt-6 rounded-xl bg-slate-800 p-5 text-center sm:mt-8 sm:p-6">
 
                 <div className="text-sm text-slate-500">
                   NUMÉRO GAGNANT
                 </div>
 
-                <div className="mt-2 text-6xl font-black">
-                  {
-                    winningNumber
-                  }
+                <div className="mt-2 text-5xl font-black sm:text-6xl">
+                  {winningNumber}
                 </div>
 
               </div>
             )}
 
-          </div>
+          </section>
 
-          {/* BET */}
+          {/* ===================================================
+              BETTING FRAME
+          ==================================================== */}
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-8">
+          <section className="w-full min-w-0 rounded-2xl border border-slate-800 bg-slate-900 p-4 sm:p-6 lg:p-8">
 
+            <h2 className="mb-5 text-xl font-black sm:text-2xl">
+              Pari
+            </h2>
 
             {/* BALANCE */}
 
-            <div className="mb-5 rounded-xl bg-slate-950 p-5">
+            <div className="mb-5 rounded-xl bg-slate-950 p-4 sm:p-5">
 
               <div className="text-sm text-slate-500">
                 Solde disponible
               </div>
 
               <div className="text-3xl font-black text-yellow-400">
-                {
-                  balance
-                }
+                {balance}
               </div>
 
             </div>
@@ -1892,20 +1356,15 @@ export default function Gambling() {
             <input
               type="number"
               min={1}
-              value={
-                betAmount
-              }
+              value={betAmount}
               onChange={(e) =>
                 setBetAmount(
-                  Number(
-                    e.target.value
-                  )
+                  Number(e.target.value)
                 )
               }
               disabled={
                 hasBet ||
-                state !==
-                  "betting"
+                state !== "betting"
               }
               className="mb-4 w-full rounded-xl border border-slate-700 bg-slate-800 p-4 text-2xl font-black outline-none disabled:opacity-50"
             />
@@ -1919,48 +1378,29 @@ export default function Gambling() {
             <div className="grid grid-cols-2 gap-3">
 
               {[
-                [
-                  "red",
-                  "🔴 Rouge",
-                ],
-                [
-                  "green",
-                  "⚫ Noir",
-                ],
-                [
-                  "odd",
-                  "Impair",
-                ],
-                [
-                  "even",
-                  "Pair",
-                ],
+                ["red", "🔴 Rouge"],
+                ["green", "⚫ Noir"],
+                ["odd", "Impair"],
+                ["even", "Pair"],
               ].map(
                 ([value, label]) => (
                   <button
-                    key={
-                      value
-                    }
+                    key={value}
                     disabled={
                       hasBet ||
                       state !==
                         "betting"
                     }
                     onClick={() =>
-                      setTarget(
-                        value
-                      )
+                      setTarget(value)
                     }
                     className={`rounded-xl p-4 font-black ${
-                      target ===
-                      value
+                      target === value
                         ? "bg-blue-600"
                         : "bg-slate-800"
                     } disabled:opacity-40`}
                   >
-                    {
-                      label
-                    }
+                    {label}
                   </button>
                 )
               )}
@@ -1975,48 +1415,34 @@ export default function Gambling() {
                 {
                   length: 22,
                 },
-                (_, i) =>
-                  i
-              ).map(
-                (number) => (
-                  <button
-                    key={
-                      number
-                    }
-                    disabled={
-                      hasBet ||
-                      state !==
-                        "betting"
-                    }
-                    onClick={() =>
-                      setTarget(
-                        String(
-                          number
-                        )
-                      )
-                    }
-                    className={`rounded-lg p-2 text-sm font-black ${
-                      target ===
-                      String(
-                        number
-                      )
-                        ? "bg-blue-600"
-                        : number ===
-                          0
-                        ? "bg-green-700"
-                        : number %
-                            2 !==
-                          0
-                        ? "bg-red-700"
-                        : "bg-slate-800"
-                    } disabled:opacity-40`}
-                  >
-                    {
-                      number
-                    }
-                  </button>
-                )
-              )}
+                (_, i) => i
+              ).map((number) => (
+                <button
+                  key={number}
+                  disabled={
+                    hasBet ||
+                    state !==
+                      "betting"
+                  }
+                  onClick={() =>
+                    setTarget(
+                      String(number)
+                    )
+                  }
+                  className={`rounded-lg p-2 text-sm font-black ${
+                    target ===
+                    String(number)
+                      ? "bg-blue-600"
+                      : number === 0
+                      ? "bg-green-700"
+                      : number % 2 !== 0
+                      ? "bg-red-700"
+                      : "bg-slate-800"
+                  } disabled:opacity-40`}
+                >
+                  {number}
+                </button>
+              ))}
 
             </div>
 
@@ -2039,12 +1465,10 @@ export default function Gambling() {
                 sur{" "}
 
                 <span className="font-black text-white">
-                  {
-                    getTargetLabel(
-                      currentBet?.target ??
-                        target
-                    )
-                  }
+                  {getTargetLabel(
+                    currentBet?.target ??
+                      target
+                  )}
                 </span>
 
               </div>
@@ -2054,15 +1478,12 @@ export default function Gambling() {
             {/* BET BUTTON */}
 
             <button
-              onClick={
-                placeBet
-              }
+              onClick={placeBet}
               disabled={
                 state !==
                   "betting" ||
                 hasBet ||
-                betAmount <=
-                  0 ||
+                betAmount <= 0 ||
                 betAmount >
                   balance ||
                 phaseCountdown ===
@@ -2078,9 +1499,7 @@ export default function Gambling() {
             {/* SCRATCH */}
 
             <button
-              onClick={
-                scratch
-              }
+              onClick={scratch}
               disabled={
                 state !==
                   "scratch" ||
@@ -2113,17 +1532,12 @@ export default function Gambling() {
                 </div>
 
                 <div className="mt-2 text-4xl font-black">
-                  {
-                    getTicketLabel(
-                      ticket
-                    )
-                  }
+                  {getTicketLabel(ticket)}
                 </div>
 
                 <div className="mt-3 text-2xl font-black">
 
-                  {ticket.value >=
-                  0
+                  {ticket.value >= 0
                     ? "+"
                     : ""}
 
@@ -2145,7 +1559,7 @@ export default function Gambling() {
               </div>
             )}
 
-          </div>
+          </section>
 
         </div>
 
@@ -2154,7 +1568,7 @@ export default function Gambling() {
         ====================================================== */}
 
         {myResult && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
 
             <h2 className="mb-5 text-2xl font-black">
               Mon résultat
@@ -2164,9 +1578,7 @@ export default function Gambling() {
 
               <InfoCard
                 label="Résultat"
-                value={
-                  myResult.result
-                }
+                value={myResult.result}
                 color={
                   myResult.result ===
                   "win"
@@ -2188,16 +1600,12 @@ export default function Gambling() {
               <InfoCard
                 label="Gain"
                 value={`${
-                  myResult.gain >=
-                  0
+                  myResult.gain >= 0
                     ? "+"
                     : ""
-                }${
-                  myResult.gain
-                }`}
+                }${myResult.gain}`}
                 color={
-                  myResult.gain >=
-                  0
+                  myResult.gain >= 0
                     ? "text-green-400"
                     : "text-red-400"
                 }
@@ -2221,7 +1629,7 @@ export default function Gambling() {
         ====================================================== */}
 
         {results.length > 0 && (
-          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <div className="mt-6 rounded-2xl border border-slate-800 bg-slate-900 p-5 sm:p-6">
 
             <h2 className="mb-5 text-2xl font-black">
               🏆 Résultats du tour
@@ -2297,9 +1705,7 @@ export default function Gambling() {
                               : "text-yellow-400"
                           }`}
                         >
-                          {
-                            result.result
-                          }
+                          {result.result}
                         </td>
 
                         <td className="p-4 text-center">
@@ -2310,19 +1716,15 @@ export default function Gambling() {
 
                         <td
                           className={`p-4 text-center font-black ${
-                            result.gain >=
-                            0
+                            result.gain >= 0
                               ? "text-green-400"
                               : "text-red-400"
                           }`}
                         >
-                          {result.gain >=
-                          0
+                          {result.gain >= 0
                             ? "+"
                             : ""}
-                          {
-                            result.gain
-                          }
+                          {result.gain}
                         </td>
 
                         <td className="p-4 text-center font-black text-yellow-400">
@@ -2350,13 +1752,10 @@ export default function Gambling() {
 
         <JsonDebugger
           logs={jsonLogs}
-          clearLogs={
-            clearLogs
-          }
+          clearLogs={clearLogs}
         />
 
       </div>
-
     </div>
   );
 }
@@ -2420,9 +1819,7 @@ function JsonDebugger({
         </div>
 
         <button
-          onClick={
-            clearLogs
-          }
+          onClick={clearLogs}
           className="rounded-lg bg-slate-800 px-4 py-2 text-sm font-bold hover:bg-slate-700"
         >
           Vider
@@ -2432,84 +1829,77 @@ function JsonDebugger({
 
       <div className="max-h-[600px] space-y-3 overflow-y-auto">
 
-        {logs.length ===
-          0 && (
+        {logs.length === 0 && (
           <div className="rounded-xl bg-slate-950 p-8 text-center text-slate-600">
             Aucun JSON
           </div>
         )}
 
-        {logs.map(
-          (log) => {
-            const isSent =
-              log.direction ===
-              "sent";
+        {logs.map((log) => {
+          const isSent =
+            log.direction ===
+            "sent";
 
-            const isReceived =
-              log.direction ===
-              "received";
+          const isReceived =
+            log.direction ===
+            "received";
 
-            return (
-              <div
-                key={
-                  log.id
-                }
-                className={`rounded-xl border p-4 ${
-                  isSent
-                    ? "border-green-800 bg-green-950/40"
-                    : isReceived
-                    ? "border-blue-800 bg-blue-950/40"
-                    : "border-slate-700 bg-slate-950"
-                }`}
-              >
+          return (
+            <div
+              key={log.id}
+              className={`rounded-xl border p-4 ${
+                isSent
+                  ? "border-green-800 bg-green-950/40"
+                  : isReceived
+                  ? "border-blue-800 bg-blue-950/40"
+                  : "border-slate-700 bg-slate-950"
+              }`}
+            >
 
-                <div className="mb-2 flex items-center justify-between">
+              <div className="mb-2 flex items-center justify-between">
 
-                  <div
-                    className={`text-xs font-black uppercase ${
-                      isSent
-                        ? "text-green-400"
-                        : isReceived
-                        ? "text-blue-400"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    {isSent
-                      ? "↑ ENVOYÉ"
-                      : isReceived
-                      ? "↓ REÇU"
-                      : "SYSTEM"}
-                  </div>
-
-                  <div className="text-xs text-slate-600">
-                    #{log.id} ·{" "}
-                    {
-                      log.timestamp
-                    }
-                  </div>
-
-                </div>
-
-                <pre
-                  className={`overflow-x-auto whitespace-pre-wrap break-words text-xs ${
+                <div
+                  className={`text-xs font-black uppercase ${
                     isSent
-                      ? "text-green-300"
+                      ? "text-green-400"
                       : isReceived
-                      ? "text-blue-300"
+                      ? "text-blue-400"
                       : "text-slate-400"
                   }`}
                 >
-                  {JSON.stringify(
-                    log.data,
-                    null,
-                    2
-                  )}
-                </pre>
+                  {isSent
+                    ? "↑ ENVOYÉ"
+                    : isReceived
+                    ? "↓ REÇU"
+                    : "SYSTEM"}
+                </div>
+
+                <div className="text-xs text-slate-600">
+                  #{log.id} ·{" "}
+                  {log.timestamp}
+                </div>
 
               </div>
-            );
-          }
-        )}
+
+              <pre
+                className={`overflow-x-auto whitespace-pre-wrap break-words text-xs ${
+                  isSent
+                    ? "text-green-300"
+                    : isReceived
+                    ? "text-blue-300"
+                    : "text-slate-400"
+                }`}
+              >
+                {JSON.stringify(
+                  log.data,
+                  null,
+                  2
+                )}
+              </pre>
+
+            </div>
+          );
+        })}
 
       </div>
 
