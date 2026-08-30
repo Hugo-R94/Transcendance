@@ -6,6 +6,7 @@ type ResultsTableProps = {
   results: Result[];
   playerId: string;
   players: Player[];
+  turn: number;
 };
 
 const chipColors = [
@@ -36,6 +37,7 @@ const chipColors = [
 ];
 
 export function ResultsTable({
+  turn,
   results,
   playerId,
   players,
@@ -98,7 +100,7 @@ export function ResultsTable({
   if (!results.length) {
     return null;
   }
-
+  const title = turn === 5 ? "🏆 Résultats de la partie" : "🏆 Résultats du tour";
   const ROW_HEIGHT = 52;
   const ROW_GAP = 8;
   const ROW_SIZE = ROW_HEIGHT + ROW_GAP;
@@ -137,7 +139,7 @@ export function ResultsTable({
 
         {/* TITRE */}
         <h2 className="mb-4 shrink-0 text-center text-xl font-black text-white sm:text-2xl">
-          🏆 Résultats du tour
+          {title}
         </h2>
 
         {/* HEADER */}

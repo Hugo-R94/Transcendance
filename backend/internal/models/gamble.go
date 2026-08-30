@@ -27,4 +27,12 @@ type (
 		Time         string		    `gorm:"index" json:"time"`
 
 	}
+	
+	LeaderboardResponse struct {
+		UserID      uuid.UUID `json:"user_id"`
+		Username    string    `json:"username"`
+		ProfilePic  string    `json:"profile_picture"`
+		FinalScore  int       `json:"final_score"`
+	}
+
 )

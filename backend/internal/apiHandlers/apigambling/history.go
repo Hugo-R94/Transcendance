@@ -144,7 +144,7 @@ func GetHistory(router *gin.RouterGroup, db *gorm.DB) {
 
 	// Historique de l'utilisateur connecté
 	router.GET("/history", h.myHistory)
-
+	router.GET("/leaderboard", h.leaderboard)
 	// Historique d'un utilisateur spécifique
 	router.GET("/history/:userID", h.history)
 }

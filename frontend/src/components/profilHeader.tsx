@@ -1,5 +1,6 @@
 import React from "react";
 import TitleManager from "./titleManager";
+import type { UserProfile } from "../pages/Profil";
 
 interface ProfileHeaderProps {
   profile: UserProfile;
@@ -8,7 +9,9 @@ interface ProfileHeaderProps {
   isSavingDesc: boolean;
   onDescriptionChange: (val: string) => void;
   onSaveDescription: () => void;
-  onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onImageChange: (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => void;
 }
 
 export function ProfileHeader({
@@ -22,14 +25,20 @@ export function ProfileHeader({
 }: ProfileHeaderProps) {
   return (
     <>
-      {/* -------------------- VERSION DESKTOP -------------------- */}
-      <div className="hidden sm:flex mt-3 w-full gap-3 lg:aspect-[12/1] sm:aspect-[8/1] p-2 flex-shrink-0">
-        <div className="relative bg-gray-400 h-full aspect-square rounded-full ml-5 shadow-md shadow-black overflow-hidden outline-3 outline-white group cursor-pointer bg-byellow">
+      {/* =====================================================
+          DESKTOP
+          ===================================================== */}
+
+      <div className="hidden sm:flex mt-3 w-full gap-3 h-32 lg:h-36 p-2 flex-shrink-0 min-w-0">
+        {/* ==================== PROFILE PICTURE ==================== */}
+
+        <div className="relative bg-gray-400 h-full aspect-square rounded-full ml-5 shadow-md shadow-black overflow-hidden outline-3 outline-white group cursor-pointer bg-byellow flex-shrink-0">
           <img
             className="w-full h-full object-cover group-hover:blur-sm transition-all duration-200"
             src={imageSrc}
-            alt="Profil picture"
+            alt="Profile picture"
           />
+
           <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -45,6 +54,7 @@ export function ProfileHeader({
                 d="M9 8.25H7.5a2.25 2.25 0 0 0-2.25 2.25v9a2.25 2.25 0 0 0 2.25 2.25h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25H15M9 12l3 3m0 0 3-3m-3 3V2.25"
               />
             </svg>
+
             <input
               type="file"
               accept="image/*"
@@ -54,7 +64,9 @@ export function ProfileHeader({
           </label>
         </div>
 
-        <div className="flex flex-col justify-center flex-shrink-0 p-1 text-left">
+        {/* ==================== USER INFO ==================== */}
+
+        <div className="flex flex-col justify-center flex-shrink-0 p-1 text-left min-w-0">
           <p className="font-bold text-md text-gray-300 whitespace-nowrap">
             {profile.username}
           </p>
@@ -65,38 +77,53 @@ export function ProfileHeader({
           />
         </div>
 
-        <div className="flex-1 flex flex-col bg-black/50 rounded-2xl shadow-md shadow-black p-3 backdrop-blur-md">
-          <div className="flex justify-between items-center mb-1">
+        {/* ==================== ABOUT ME ==================== */}
+
+        <div className="flex-1 min-w-0 min-h-0 flex flex-col bg-black/50 rounded-2xl shadow-md shadow-black p-3 backdrop-blur-md">
+          <div className="flex justify-between items-center mb-1 flex-shrink-0">
             <p className="font-bold md:text-md text-sm text-gray-300">
               ABOUT ME :
             </p>
+
             <button
               onClick={onSaveDescription}
               disabled={isSavingDesc}
-              className="bg-bblue hover:bg-bblue/80 text-white font-bold text-xs px-3 py-1 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+              className="bg-bblue hover:bg-bblue/80 text-white font-bold text-xs px-3 py-1 rounded-xl transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
             >
               {isSavingDesc ? "Saving..." : "Save"}
             </button>
           </div>
+
           <textarea
             value={description}
-            onChange={(e) => onDescriptionChange(e.target.value)}
+            onChange={(e) =>
+              onDescriptionChange(e.target.value)
+            }
             placeholder="No description yet..."
-            className="w-full flex-1 bg-transparent text-gray-300/90 focus:outline-none resize-none placeholder-gray-500"
+            className="w-full min-h-0 flex-1 bg-transparent text-gray-300/90 focus:outline-none resize-none placeholder-gray-500"
           />
         </div>
       </div>
 
-      {/* -------------------- VERSION MOBILE -------------------- */}
+      {/* =====================================================
+          MOBILE
+          ===================================================== */}
+
       <div className="sm:hidden flex flex-col w-full">
-        <div className="relative bg-byellow w-[50%] mt-20 mx-auto overflow-hidden aspect-square rounded-full shadow-md shadow-black/75 outline-5 group cursor-pointer">
+        {/* ==================== PROFILE PICTURE ==================== */}
+
+        <div className="relative bg-byellow w-[50%] max-w-[260px] mt-20 mx-auto overflow-hidden aspect-square rounded-full shadow-md shadow-black/75 outline-5 group cursor-pointer">
           <img
             className="w-full h-full object-cover group-hover:blur-sm transition-all duration-200"
             src={imageSrc}
             alt="Profil"
           />
+
           <label className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-            <span className="text-white text-sm font-bold">Changer</span>
+            <span className="text-white text-sm font-bold">
+              Changer
+            </span>
+
             <input
               type="file"
               accept="image/*"
@@ -106,28 +133,41 @@ export function ProfileHeader({
           </label>
         </div>
 
-        <div className="bg-bgreen p-3 mx-auto mt-3 w-fit rounded-2xl shadow-black shadow-md text-center">
-          <p className="font-bold text-2xl text-white">{profile.username}</p>
+        {/* ==================== USER INFO ==================== */}
+
+        <div className="bg-bgreen p-3 mx-auto mt-3 w-fit max-w-[90%] rounded-2xl shadow-black shadow-md text-center">
+          <p className="font-bold text-2xl text-white break-words">
+            {profile.username}
+          </p>
+
           <TitleManager
             initialTitle1={profile.title_1}
             initialTitle2={profile.title_2}
           />
         </div>
 
-        <div className="bg-black/50 w-[90%] mx-auto h-fit p-3 rounded-2xl shadow-md shadow-black/70 my-3 flex flex-col gap-2">
-          <div className="flex justify-between items-center">
-            <p className="text-white text-xl font-bold">ABOUT ME :</p>
+        {/* ==================== ABOUT ME ==================== */}
+
+        <div className="bg-black/50 w-[90%] mx-auto min-h-[150px] p-3 rounded-2xl shadow-md shadow-black/70 my-3 flex flex-col gap-2">
+          <div className="flex justify-between items-center flex-shrink-0">
+            <p className="text-white text-xl font-bold">
+              ABOUT ME :
+            </p>
+
             <button
               onClick={onSaveDescription}
               disabled={isSavingDesc}
-              className="bg-bblue hover:bg-bblue/80 text-white font-bold text-xs px-3 py-1 rounded-xl transition-colors cursor-pointer disabled:opacity-50"
+              className="bg-bblue hover:bg-bblue/80 text-white font-bold text-xs px-3 py-1 rounded-xl transition-colors cursor-pointer disabled:opacity-50 flex-shrink-0"
             >
               {isSavingDesc ? "Saving..." : "Save"}
             </button>
           </div>
+
           <textarea
             value={description}
-            onChange={(e) => onDescriptionChange(e.target.value)}
+            onChange={(e) =>
+              onDescriptionChange(e.target.value)
+            }
             placeholder="No description yet..."
             rows={4}
             className="w-full bg-transparent text-white/75 focus:outline-none resize-none placeholder-gray-500"

@@ -547,31 +547,39 @@ export function useGambling() {
       // TURN STARTED
       // ======================================================
 
-		case "turn_started": {
-		setGameStarted(true);
+	case "turn_started": {
+	setGameStarted(true);
 
-		if (typeof data.turn === "number") {
-			setTurn(data.turn);
-		}
-		console.log("turn = %d", turn);
-		setState("betting");
+	if (typeof data.turn === "number") {
+		setTurn(data.turn);
+	}
 
-		setHasBet(false);
-		setCurrentBet(null);
-		setTicket(null);
-		setWinningNumber(null);
-		setMyResult(null);
-		setResults([]);
-		setPlayerBets([]);
+	// Nouveau tour = on oublie complètement
+	// les données du tour précédent.
+	setState("betting");
 
-		startPhaseCountdown(
-			typeof data.countdown === "number"
-			? data.countdown
-			: 15
-		);
+	setHasBet(false);
+	setCurrentBet(null);
 
-		break;
-		}
+	setTicket(null);
+	setWinningNumber(null);
+	setMyResult(null);
+	setResults([]);
+	setBetAmount(100);
+	setTarget("0");
+	// Très important :
+	// aucune mise du tour précédent ne doit survivre.
+	setPlayerBets([]);
+
+	startPhaseCountdown(
+		typeof data.countdown === "number"
+		? data.countdown
+		: 15
+	);
+
+	break;
+	}
+
 
 
       // ======================================================

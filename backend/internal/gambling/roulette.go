@@ -65,7 +65,7 @@ func generateScratchTicket() *Ticket {
 
 	return &Ticket{
 		Type:  "malus",
-		Value: -0.5,
+		Value: -0.25,
 	}
 }
 
@@ -119,10 +119,11 @@ func isValidTarget(target string) bool {
 
 func getNumberMultiplier(target string) int {
 	if number, err := strconv.Atoi(target); err == nil {
-		if number >= 0 && number <= MaxRouletteNumber {
+		if number > 0 && number <= MaxRouletteNumber {
 			return 21
 		}
-
+		if number == 0{
+			return 41}
 		return 0
 	}
 

@@ -6,6 +6,7 @@ import UserReviews from "../components/userReviews";
 import UserFriendsList from "../components/userFriendList";
 import { UserProfileHeader } from "../components/UserProfileHeader";
 import api from "../api/api"; // Utilisation de ton instance api configurée
+import GambleHistory from "../components/gambleHistory";
 
 type UserProfile = {
   id: string;
@@ -86,7 +87,7 @@ export default function UserProfil() {
       case "friends":
         return <UserFriendsList userId={userid} />;
       case "clicker":
-        return <div className="flex h-full w-full items-center justify-center text-white font-bold">Section Clicker</div>;
+		return <GambleHistory userID={userid}  />;
       default:
         return <UserGameList userId={userid} />;
     }

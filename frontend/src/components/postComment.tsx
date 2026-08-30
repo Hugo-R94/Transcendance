@@ -15,6 +15,7 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
     const [rating, setRating] = useState(0);
     const [ppURL, setPpURL] = useState<string | null>(null);
     const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
         let objectUrl = "";
@@ -22,6 +23,7 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
         const loadAvatar = async () => {
             try {
                 const url = await fetchUserProfilePicture();
+
                 if (url) {
                     objectUrl = url;
                     setPpURL(url);
@@ -34,42 +36,76 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
         loadAvatar();
 
         return () => {
-            if (objectUrl) URL.revokeObjectURL(objectUrl);
+            if (objectUrl && objectUrl.startsWith("blob:")) {
+                URL.revokeObjectURL(objectUrl);
+            }
         };
     }, []);
 
     const handlePostComment = async () => {
+        if (isSubmitting) {
+            return;
+        }
+
         if (!gameId || gameId === 0) {
-            setNotificationMessage("Erreur : Impossible de publier, l'ID du jeu est introuvable.");
+            setNotificationMessage(
+                "Erreur : Impossible de publier, l'ID du jeu est introuvable."
+            );
+            return;
+        }
+
+        if (!title.trim()) {
+            setNotificationMessage(
+                "Veuillez ajouter un titre avant d'envoyer votre commentaire."
+            );
             return;
         }
 
         if (!comment.trim()) {
-            setNotificationMessage("Veuillez écrire un commentaire avant d'envoyer.");
+            setNotificationMessage(
+                "Veuillez écrire un commentaire avant d'envoyer."
+            );
             return;
         }
+
+        if (rating <= 0) {
+            setNotificationMessage(
+                "Veuillez donner une note avant d'envoyer votre commentaire."
+            );
+            return;
+        }
+
+        setIsSubmitting(true);
 
         try {
             await postComment({
                 game_id: gameId,
-                comment: comment,
-                comment_title: title,
+                comment: comment.trim(),
+                comment_title: title.trim(),
                 rating,
             });
 
             setComment("");
             setTitle("");
             setRating(0);
-            setNotificationMessage("Commentaire publié avec succès !");
+
+            setNotificationMessage(
+                "Commentaire publié avec succès !"
+            );
 
             if (onCommentPosted) {
                 onCommentPosted();
             }
         } catch (error: any) {
             console.error("Error posting comment:", error);
+
             setNotificationMessage(
-                error?.response?.data?.error || error?.message || "Impossible d'envoyer le commentaire."
+                error?.response?.data?.error ||
+                error?.message ||
+                "Impossible d'envoyer le commentaire."
             );
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -85,12 +121,17 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
             <div className="w-full h-15 flex items-center gap-3">
                 <div className="bg-gray-400 w-15 h-15 rounded-full overflow-hidden flex items-center justify-center">
                     {ppURL ? (
-                        <img src={ppURL} alt="Avatar" className="w-full h-full object-cover" />
+                        <img
+                            src={ppURL}
+                            alt="Avatar"
+                            className="w-full h-full object-cover"
+                        />
                     ) : (
                         <div className="w-full h-full bg-gray-500 animate-pulse" />
                     )}
                 </div>
-                <p className="font-bold inset-x-0 my-auto">
+
+                <p className="font-bold">
                     Did you like this game ?
                 </p>
             </div>
@@ -117,9 +158,10 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
 
             <button
                 onClick={handlePostComment}
-                className="bg-[#00509f] w-30 h-15 mt-3 rounded-2xl balatro shadow-md shadow-black font-bold active:scale-90 hover:outline-2 hover:outline-white block mx-auto"
+                disabled={isSubmitting}
+                className="bg-[#00509f] w-30 h-15 mt-3 rounded-2xl balatro shadow-md shadow-black font-bold active:scale-90 hover:outline-2 hover:outline-white block mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                SUBMIT
+                {isSubmitting ? "..." : "SUBMIT"}
             </button>
         </div>
     );

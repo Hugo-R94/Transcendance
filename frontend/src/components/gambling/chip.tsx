@@ -1,32 +1,45 @@
 import { useMemo } from "react";
-import { useUserAvatar } from "../../api/getUserAvatar";
+import Coin from "./coin";
 
 type ChipProps = {
   value: number;
   userID: string;
   playerNumber: number;
-  stackIndex?: number; // NOUVEAU : position dans la pile si plusieurs mises sur la même case
+  stackIndex?: number;
 };
 
-function Chip({ value, userID, playerNumber, stackIndex = 0 }: ChipProps) {
-  const myUserID = localStorage.getItem("userID");
-  const myUserPP = localStorage.getItem("userPP");
+function Chip({
+  value,
+  userID,
+  playerNumber,
+  stackIndex = 0,
+}: ChipProps) {
+  /*
+   * 1 coin = 100
+   *
+   * 100  -> 1
+   * 200  -> 2
+   * 300  -> 3
+   * 500  -> 5
+   */
+  const coinCount = Math.max(
+    1,
+    Math.floor(value / 100),
+  );
 
-  const chipColors = [
-    { bg: "bg-bblue", border: "border-blue-950", shadow: "shadow-[0_4px_0_#172554,0_6px_8px_rgba(0,0,0,0.5)]" },
-    { bg: "bg-bred", border: "border-red-950", shadow: "shadow-[0_4px_0_#450a0a,0_6px_8px_rgba(0,0,0,0.5)]" },
-    { bg: "bg-byellow", border: "border-yellow-950", shadow: "shadow-[0_4px_0_#451a03,0_6px_8px_rgba(0,0,0,0.5)]" },
-    { bg: "bg-bgreen", border: "border-green-950", shadow: "shadow-[0_4px_0_#052e16,0_6px_8px_rgba(0,0,0,0.5)]" },
-  ];
+  /*
+   * Décalage de la pile lorsqu'il y a plusieurs
+   * joueurs sur la même case.
+   */
+  const stackShiftX =
+    stackIndex * 16;
 
-  const color = chipColors[Math.abs(playerNumber) % chipColors.length];
-  const avatar = useUserAvatar(userID);
+  const stackShiftY =
+    stackIndex * -12;
 
-  const isValidUserID = Boolean(userID && userID.trim().length > 0);
-  const isMe = isValidUserID && userID === myUserID;
-
-  const avatarUrl = isMe && myUserPP ? myUserPP : avatar;
-
+  /*
+   * Petit décalage aléatoire propre à chaque pile.
+   */
   const randomPosition = useMemo(
     () => ({
       x: Math.floor(Math.random() * 9) - 4,
@@ -35,46 +48,81 @@ function Chip({ value, userID, playerNumber, stackIndex = 0 }: ChipProps) {
     [],
   );
 
-  const chipOffsets = useMemo(() => {
-    const randomOffset = (xRange: number, yRange: number) => ({
-      x: Math.floor(Math.random() * (xRange * 2 + 1)) - xRange,
-      y: Math.floor(Math.random() * (yRange * 2 + 1)) - yRange,
-    });
-
-    return [randomOffset(2, 1), randomOffset(2, 1), randomOffset(2, 1)];
-  }, []);
-
-  // NOUVEAU : décalage en escalier pour chaque mise supplémentaire sur la même case
-  const stackShiftX = stackIndex * 16;
-  const stackShiftY = stackIndex * -12;
+  /*
+   * Chaque coin est légèrement décalé
+   * horizontalement et verticalement.
+   *
+   * Cela donne une vraie impression de pile
+   * plutôt qu'une colonne parfaitement droite.
+   */
+  const coinOffsets = useMemo(() => {
+    return Array.from(
+      { length: coinCount },
+      (_, index) => ({
+        x:
+          Math.floor(Math.random() * 5) - 2,
+        y:
+          Math.floor(Math.random() * 3) - 1 -
+          index * 3,
+      }),
+    );
+  }, [coinCount]);
 
   return (
     <div
-      className="pointer-events-none absolute -right-3 -top-5 h-16 w-16"
+      className="pointer-events-none absolute -right-3 -top-5"
       style={{
-        transform: `translate(${randomPosition.x + stackShiftX}px, ${randomPosition.y + stackShiftY}px)`,
-        zIndex: 40 + stackIndex,
+        width: 64,
+        height:
+          40 + coinCount * 3,
+
+        transform: `translate(
+          ${randomPosition.x + stackShiftX}px,
+          ${randomPosition.y + stackShiftY}px
+        )`,
+
+        zIndex:
+          40 +
+          stackIndex +
+          coinCount,
       }}
     >
-      <div
-        className={`absolute h-10 w-10 rounded-full border-4 ${color.border} ${color.bg} ${color.shadow}`}
-        style={{ left: chipOffsets[0].x, top: 8 + chipOffsets[0].y }}
-      />
+      {coinOffsets.map(
+        (offset, index) => {
+          const isTop =
+            index === coinCount - 1;
 
-      <div
-        className={`absolute h-10 w-10 rounded-full border-4 ${color.border} ${color.bg} shadow-[0_3px_0_rgba(0,0,0,0.45)]`}
-        style={{ left: chipOffsets[1].x, top: 4 + chipOffsets[1].y }}
-      />
+          return (
+            <div
+              key={index}
+              className="absolute"
+              style={{
+                left:
+                  12 + offset.x,
+                top:
+                  (coinCount - 1 - index) *
+                    3 +
+                  offset.y,
 
-      <div
-        className={`absolute flex h-10 w-10 flex-col items-center justify-center overflow-hidden rounded-full border-4 ${color.border} ${color.bg} shadow-[inset_2px_2px_3px_rgba(255,255,255,0.4),inset_-3px_-3px_5px_rgba(0,0,0,0.45)]`}
-        style={{ left: chipOffsets[2].x, top: chipOffsets[2].y }}
-      >
-        <img src={avatarUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        <span className="relative z-10 text-xs font-black text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-          {value}
-        </span>
-      </div>
+                zIndex:
+                  index,
+              }}
+            >
+              <Coin
+                userID={userID}
+                playerNumber={
+                  playerNumber
+                }
+                value={
+                  isTop
+                    ? value
+                    : 100
+                }
+              />
+            </div>
+          );
+        },
+      )}
     </div>
   );
 }
