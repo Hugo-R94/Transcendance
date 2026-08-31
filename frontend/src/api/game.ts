@@ -12,10 +12,10 @@ export interface GameRatingStats {
 }
 
 
-export interface GameRatingStats {
-  average_rating: number;
-  total_reviews: number;
-}
+// export interface GameRatingStats {
+//   average_rating: number;
+//   total_reviews: number;
+// }
 
 export async function getGameRatingStats(appid: string): Promise<GameRatingStats> {
   const response = await api.get<GameRatingStats>(`/game/${appid}/rating`);

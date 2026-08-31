@@ -109,7 +109,7 @@ function GameList({ games }: GameListProps) {
         ref={containerRef}
         className="w-full h-auto md:h-full flex items-center justify-center relative p-2 z-10"
       >
-       {/* ==================== DESKTOP : pointer-events-none appliqué ici ==================== */}
+       {/* Desktop */}
         <div className="hidden sm:flex sm:flex-col justify-around items-center w-full h-full relative -translate-y-20 pointer-events-none">
           {rowArray.map((rowIndex) => {
             const rowGames = displayGames.slice(rowIndex * cols, rowIndex * cols + cols);
@@ -147,7 +147,6 @@ function GameList({ games }: GameListProps) {
                           transformOrigin: "center center",
                         }}
                       >
-                        {/* pointer-events-auto rétabli uniquement sur chaque carte pour qu'elles restent cliquables et survolables */}
                         <div
                           className="transition-transform duration-300 group-hover:scale-125 group-hover:-translate-y-6 group-hover:rotate-0 hover:z-100 shadow-2xl rounded-xl pointer-events-auto"
                           style={{
@@ -167,7 +166,7 @@ function GameList({ games }: GameListProps) {
           })}
         </div>
 
-        {/* ==================== MOBILE : grille simple avec un gap marqué ==================== */}
+        {/* MOBILE */}
         <div className="grid grid-cols-2 gap-6 sm:hidden w-full max-w-full h-auto p-4 overflow-x-hidden">
           {displayGames
             .filter((g) => !g._leaving)

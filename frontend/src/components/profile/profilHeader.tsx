@@ -1,6 +1,6 @@
 import React from "react";
 import TitleManager from "./titleManager";
-import type { UserProfile } from "../pages/Profil";
+import type { UserProfile } from "../../pages/profil";
 
 interface ProfileHeaderProps {
   profile: UserProfile;

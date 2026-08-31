@@ -78,16 +78,9 @@ function Coin({
         )`,
       }}
     >
-      {/* Partie inférieure */}
-		{/* Partie inférieure */}
 		<div
 		className={`
-			absolute
-			h-9
-			w-10
-			rounded-full
-			translate-y-1
-			border-[1px]
+			absolute h-9 w-10 rounded-full translate-y-1 border-[1px]
 			${color.border}
 			${color.bg}
 			overflow-hidden
@@ -107,23 +100,10 @@ function Coin({
 		</div>
 		
 		
-      {/* Partie supérieure */}
       <div
         className={`
-          absolute
-          left-0
-          top-[-3px]
-          flex
-          h-10
-          w-10
-          flex-col
-          items-center
-          justify-center
-          overflow-hidden
-          rounded-full
-          border-3
-		  border-white/95
-          ${color.bg}
+          absolute left-0 top-[-3px] flex h-10 w-10 flex-col items-center
+          justify-center overflow-hidden rounded-full border-3 border-white/95 ${color.bg}
           shadow-[inset_2px_2px_3px_rgba(255,255,255,0.4),inset_-3px_-3px_5px_rgba(0,0,0,0.45)]
         `}
       >

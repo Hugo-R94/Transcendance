@@ -1,4 +1,4 @@
-import type { Ticket } from "../../types/gambling";
+import type { Ticket } from "../../api/gambling";
 
 type ScratchTicketProps = {
   state: string;

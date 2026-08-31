@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Player } from "../../api/gambling";
-import type { Result } from "../../types/gambling";
+import type { Result } from "../../api/gambling";
 
 type ResultsTableProps = {
   results: Result[];
