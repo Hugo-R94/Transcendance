@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
-import ProfileMenu from "../components/profilMenu";
-import UserGameList from "../components/userGameList";
-import Notification from "../components/notification";
-import { ProfileHeader } from "../components/profilHeader";
-import UserReviews from "../components/userReviews";
-import UserFriendsList from "../components/userFriendList";
+import ProfileMenu from "../components/profile/profilMenu";
+import UserGameList from "../components/profile/userGameList";
+import Notification from "../components/utils/notification";
+import { ProfileHeader } from "../components/profile/profilHeader";
+import UserReviews from "../components/profile/userReviews";
+import UserFriendsList from "../components/chat/userFriendList";
 import { fetchUserProfilePicture } from "../api/getUserAvatar";
 import api from "../api/api";
-import GambleHistory from "../components/gambleHistory";
+import GambleHistory from "../components/profile/gambleHistory";
 
 export type UserProfile = {
   id?: string;

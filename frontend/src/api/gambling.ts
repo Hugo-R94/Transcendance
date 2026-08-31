@@ -6,12 +6,14 @@ export type Player = {
   ready: boolean;
 };
 
-// export type PlayerBet = {
-//   playerId: string;
-//   playerNumber: number;
-//   chipValue: number;
-//   target: string;
-// };
+
+
+export type PlayerBet = {
+  playerId: string;
+  playerNumber: number;
+  chipValue: number;
+  target: string;
+};
 
 export type Bet = {
   chipValue: number;

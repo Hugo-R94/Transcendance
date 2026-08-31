@@ -1,5 +1,5 @@
 import api from "./api";
-import type { CommentData } from "../components/commentSection";
+import type { CommentData } from "../components/gamepage/commentSection";
 
 export interface PostCommentRequest {
   game_id: number;

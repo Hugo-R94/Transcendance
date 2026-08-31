@@ -1,12 +1,12 @@
 import { useState, useEffect, Fragment } from "react";
 import { useParams, Navigate } from "react-router-dom";
-import DropdownFilter from "../components/dropdownFilter";
-import UserGameList from "../components/userGameList";
-import UserReviews from "../components/userReviews";
-import UserFriendsList from "../components/userFriendList";
-import { UserProfileHeader } from "../components/UserProfileHeader";
+import DropdownFilter from "../components/utils/dropdownFilter";
+import UserGameList from "../components/profile/userGameList";
+import UserReviews from "../components/profile/userReviews";
+import UserFriendsList from "../components/chat/userFriendList";
+import { UserProfileHeader } from "../components/profile/UserProfileHeader";
 import api from "../api/api"; // Utilisation de ton instance api configurée
-import GambleHistory from "../components/gambleHistory";
+import GambleHistory from "../components/profile/gambleHistory";
 
 type UserProfile = {
   id: string;

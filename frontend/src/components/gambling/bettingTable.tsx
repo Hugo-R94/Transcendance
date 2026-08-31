@@ -72,10 +72,8 @@ function BettingTable({
                   ${getNumberColor(number)}
                   hover:brightness-125 hover:card balatro
                   hover:z-[100] hover:outline-2
-                  active:scale-90
-                  disabled:cursor-not-allowed
-                  disabled:opacity-50
-                  shadow-sm shadow-black/50
+                  active:scale-90 disabled:cursor-not-allowed
+                  disabled:opacity-50 shadow-sm shadow-black/50
                   ${isSelected ? "outline-2 outline-white" : ""}
                 `}
               >
@@ -120,13 +118,9 @@ function BettingTable({
                 className={`
                   relative flex h-full w-full items-center justify-center
                   rounded-b-2xl ${bet.color}
-                  font-black
-                  hover:card balatro
-                  hover:outline-2
-                  active:scale-90
-                  disabled:cursor-not-allowed
-                  disabled:opacity-50
-                  shadow-sm shadow-black/50
+                  font-black hover:card balatro hover:outline-2
+                  active:scale-90 disabled:cursor-not-allowed
+                  disabled:opacity-50 shadow-sm shadow-black/50
                   ${isSelected ? "outline-2 outline-white" : ""}
                 `}
               >

@@ -1,5 +1,3 @@
-import support from "../pages/support";
-
 function supportContact(){
 	return(
 		<div className="bg-bdarkgreen w-full h-full rounded-2xl shadow-lg shadow-black/75 p-3">

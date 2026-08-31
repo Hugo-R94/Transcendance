@@ -14,32 +14,19 @@ function Chip({
   playerNumber,
   stackIndex = 0,
 }: ChipProps) {
-  /*
-   * 1 coin = 100
-   *
-   * 100  -> 1
-   * 200  -> 2
-   * 300  -> 3
-   * 500  -> 5
-   */
-  const coinCount = Math.max(
-    1,
-    Math.floor(value / 100),
-  );
 
-  /*
-   * Décalage de la pile lorsqu'il y a plusieurs
-   * joueurs sur la même case.
-   */
+	// calcul nombre de coin
+	const coinCount = Math.max(1, Math.floor(value / 100),);
+
+	// decalage en x des joueur  
   const stackShiftX =
     stackIndex * 16;
 
+	// decalage en y des joueur  
   const stackShiftY =
     stackIndex * -12;
 
-  /*
-   * Petit décalage aléatoire propre à chaque pile.
-   */
+	// offset randomiser de la pile
   const randomPosition = useMemo(
     () => ({
       x: Math.floor(Math.random() * 9) - 4,
@@ -48,13 +35,7 @@ function Chip({
     [],
   );
 
-  /*
-   * Chaque coin est légèrement décalé
-   * horizontalement et verticalement.
-   *
-   * Cela donne une vraie impression de pile
-   * plutôt qu'une colonne parfaitement droite.
-   */
+//   Decalage des coins les uns par rapport aux autre
   const coinOffsets = useMemo(() => {
     return Array.from(
       { length: coinCount },

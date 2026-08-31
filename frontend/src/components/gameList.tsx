@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import GameCard from "./gameCard";
+import GameCard from "./gamepage/gameCard";
 
 interface Game {
   appid: number;

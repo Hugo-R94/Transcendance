@@ -1,6 +1,6 @@
-import NavBar from "../components/navBar";
-import ShaderBackground from "../components/shaderBG";
-import Gambling from "../components/gambling";
+import NavBar from "../components/utils/navBar";
+import ShaderBackground from "../components/utils/shaderBG";
+import Gambling from "../components/gambling/gambling";
 import Leaderboard from "../components/gambling/leaderboard";
 
 function Clicker() {

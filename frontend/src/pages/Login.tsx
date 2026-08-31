@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Notification from "../components/notification";
+import Notification from "../components/utils/notification";
 import api from "../api/api";
 
 function Login() {

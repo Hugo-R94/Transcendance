@@ -128,7 +128,7 @@ function Coin({
         `}
       >
         <img
-          src={avatarUrl}
+          src={avatarUrl ?? undefined}
           alt=""
           className="absolute inset-0 h-full w-full object-cover"
         />

@@ -1,5 +1,4 @@
 import type { GameInfo } from "./client";
-import type { client } from "./client"
 import api from "./api";
 
 export async function getGameInfo(appid: string | number): Promise<GameInfo> {
@@ -9,14 +8,13 @@ export async function getGameInfo(appid: string | number): Promise<GameInfo> {
 
 export interface GameRatingStats {
   average_rating: number;
-  total_review: number;
+  total_reviews: number;
 }
 
-// src/api/game.ts
 
 export interface GameRatingStats {
   average_rating: number;
-  total_review: number;
+  total_reviews: number;
 }
 
 export async function getGameRatingStats(appid: string): Promise<GameRatingStats> {

@@ -25,7 +25,7 @@ type (
 		FinalScore   int            `gorm:"type:int; index" json:"final_score"`
 		Rank         string 		`json:"rank"`
 		Time         string		    `gorm:"index" json:"time"`
-
+		Total		 int64			`gorm:"total_game" json:"total"`
 	}
 	
 	LeaderboardResponse struct {
