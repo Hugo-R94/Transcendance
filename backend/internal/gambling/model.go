@@ -4,6 +4,7 @@ import (
 	"sync"
 	"time"
 
+	"gorm.io/gorm"	
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
@@ -132,18 +133,23 @@ func NewHub() *Hub {
 // ============================================================
 
 type RoomManager struct {
-	mu sync.RWMutex
-
-	Rooms map[string]*Room
+    mu    sync.RWMutex
+    Rooms map[string]*Room
+    DB    *gorm.DB // nouveau
 }
 
-func NewRoomManager() *RoomManager {
-	return &RoomManager{
-		Rooms: make(map[string]*Room),
-	}
+func NewRoomManager(db *gorm.DB) *RoomManager {
+    return &RoomManager{
+        Rooms: make(map[string]*Room),
+        DB:    db,
+    }
 }
 
-var roomManager = NewRoomManager()
+var roomManager *RoomManager
+
+func InitRoomManager(db *gorm.DB) {
+	roomManager = NewRoomManager(db)
+}
 
 // ============================================================
 // CLIENT -> SERVER
@@ -205,6 +211,7 @@ type PlayerReadyMessageResponse struct {
 type PlayerInfo struct {
 	PlayerID string `json:"playerId"`
 	Username string `json:"username"`
+	PlayerNumber int `json:"playerNumber"`
 	Balance  int    `json:"balance"`
 	Ready    bool   `json:"ready"`
 }
@@ -261,6 +268,8 @@ type ScratchResultMessage struct {
 
 type SpinningStartedMessage struct {
 	Type     string `json:"type"`
+	WinningNumber int `json:"winning_number"`
+	RotationDegree		int		`json:"rotation_degree"`
 	Turn     int    `json:"turn"`
 	Duration int    `json:"duration"`
 }
@@ -285,4 +294,10 @@ type GameFinishedMessage struct {
 	Type     string `json:"type"`
 	Turn     int    `json:"turn"`
 	WinnerID string `json:"winnerId,omitempty"`
+}
+
+type winningNumberMessage struct{
+	Type				string  `json:"type"`
+	Turn    			int     `json:"turn"`
+	WinningNumber 		int		`json:"winning_number"`
 }

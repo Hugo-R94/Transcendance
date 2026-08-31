@@ -1,9 +1,9 @@
 
-import axios from "axios";
+// import axios from "axios";
 
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
-}); 
+// export const api = axios.create({
+//   baseURL: import.meta.env.VITE_API_URL,
+// }); 
 
 
 export interface GameInfo {
@@ -17,10 +17,12 @@ export interface GameInfo {
   genres:	string[];
   developers:	string[];
   publishers:	string[];
-  total_review: number;
-  list_state: number;
+  total_reviews: number;
+  list_state: ListState;
 
 }
+
+export type ListState = 0 | 1 | 2 | 3;
 
 export interface GameListItem {
   appid: number;

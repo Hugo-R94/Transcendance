@@ -193,6 +193,45 @@ func (c *Client) handleJoinRoom(data []byte) {
 	room.Hub.BroadcastJSON(room.GetRoomState())
 }
 
+func (r *Room) IsEmpty() bool {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	return len(r.Players) == 0
+}
+
+
+func (c *Client) handleLeaveRoom(data []byte) {
+	if c.Room == nil {
+		return
+	}
+
+	room := c.Room
+	hub := c.Hub
+
+	room.RemovePlayer(c.PlayerID)
+
+	// Le client quitte la room, mais PAS le WebSocket.
+	c.Room = nil
+	c.Hub = nil
+
+	hub.BroadcastJSON(PlayerLeftMessage{
+		Type:     "player_left",
+		PlayerID:  c.PlayerID.String(),
+		Username: c.Username,
+	})
+
+	// Vérifie si la room est maintenant vide.
+	if room.IsEmpty() {
+		log.Printf("[ROOM] destroying empty room %s", room.ID)
+		room.DestroyRoom()
+		return
+	}
+
+	hub.BroadcastJSON(room.GetRoomState())
+}
+
+
 // ============================================================
 // READY
 // ============================================================
@@ -383,6 +422,12 @@ func (c *Client) ReadPump() {
 
 		switch message.Type {
 
+		case "leave_room":
+			c.handleLeaveRoom(data)
+			
+		case "game_invit":
+			log.Printf("invitation\n")
+			
 		case "join_room":
 			c.handleJoinRoom(data)
 

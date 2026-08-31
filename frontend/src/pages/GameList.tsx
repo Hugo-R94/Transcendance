@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import GameList from "../components/gameList";
-import NavBar from "../components/navBar";
-import Pagination from "../components/paginationController";
+import NavBar from "../components/utils/navBar";
+import Pagination from "../components/utils/paginationController";
 import api from "../api/api";
-import DropdownMenu from "../components/dropdownFilter";
+import DropdownMenu from "../components/utils/dropdownFilter";
 
 interface GameListItem {
   appid: number;
@@ -103,13 +103,8 @@ function Games() {
     <div className="min-h-screen text-white relative overflow-x-hidden">
       <NavBar />
 
-      {/* Cadre principal : 
-          - Sur mobile : flux normal (relative, h-auto, pt-20 pour laisser la place à la navbar)
-          - Sur desktop (sm:) : position fixe, centré, avec hauteur calculée nette 
-      */}
       <div className="relative pt-20 pb-10 px-2 flex flex-col items-center justify-between sm:fixed sm:left-1/2 sm:-translate-x-1/2 sm:w-4/5 lg:w-3/5 sm:h-[calc(100vh-120px)] sm:top-20 sm:p-2 sm:pb-2">
         
-		{/* Header filtres */}
 		<div className="w-full flex justify-center items-center mt-3 py-2 shrink-0 gap-4 z-30 relative">
 		<p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] hidden sm:block">
 			WHAT'S HOT ?
@@ -132,7 +127,6 @@ function Games() {
 		/>
 		</div>
 
-        {/* Zone centrale pour GameList */}
         <div className="w-full flex-1 sm:min-h-[300px] flex items-center justify-center my-2">
           {loading ? (
             <div className="flex h-40 sm:h-full w-full items-center justify-center text-gray-400">
@@ -151,7 +145,6 @@ function Games() {
           )}
         </div>
 
-        {/* Footer Pagination */}
         <div className="w-full flex justify-center items-center shrink-0 py-2 mt-4 sm:mt-0">
           <Pagination
             page={page}

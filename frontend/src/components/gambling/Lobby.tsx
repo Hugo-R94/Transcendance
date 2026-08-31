@@ -1,4 +1,11 @@
-import React from 'react';
+import { useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
+
+import { useUserAvatar } from "../../api/getUserAvatar";
+import type { Friend } from "../../api/chat";
+
+import DropdownMenu from "../utils/DropdownMenu";
+import Notification from "../utils/notification";
 
 type Player = {
   playerId: string;
@@ -10,23 +17,47 @@ type Player = {
 type LobbyProps = {
   connected: boolean;
   joined: boolean;
-
   roomId: string;
   setRoomId: (value: string) => void;
-
   players: Player[];
   playerId: string;
-
   ready: boolean;
   countdown: number | null;
-
   error: string;
+  friends: Friend[];
 
   connect: () => void;
   disconnect: () => void;
   joinRoom: () => void;
+  joinRoomByID: (roomId: string) => void;
+  leaveRoom: () => void;
+  invite: (friendId: string, roomId: string) => void;
   toggleReady: () => void;
 };
+
+function PlayerAvatar({
+  playerId,
+  username,
+}: {
+  playerId: string;
+  username: string;
+}) {
+  const avatarUrl = useUserAvatar(playerId);
+
+  return (
+    <div className="w-10 h-10 shrink-0 flex items-center justify-center overflow-hidden rounded-full border-2 border-white/20 bg-black/20 text-sm font-bold text-white shadow-md">
+      {avatarUrl ? (
+        <img
+          src={avatarUrl}
+          alt={username}
+          className="w-full h-full object-cover"
+        />
+      ) : (
+        <span>{username?.charAt(0).toUpperCase()}</span>
+      )}
+    </div>
+  );
+}
 
 export default function Lobby({
   connected,
@@ -38,29 +69,60 @@ export default function Lobby({
   ready,
   countdown,
   error,
+  friends,
   connect,
-  disconnect,
   joinRoom,
+  joinRoomByID,
+  leaveRoom,
+  invite,
   toggleReady,
 }: LobbyProps) {
+  const [searchParams] = useSearchParams();
+  const roomFromUrl = searchParams.get("room");
+
+  const colors = [
+    "bg-byellow",
+    "bg-bred",
+    "bg-bblue",
+  ];
+
+  useEffect(() => {
+    if (!connected) {
+      connect();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!connected || !roomFromUrl || joined) {
+      return;
+    }
+
+    console.log("WebSocket connecté");
+    console.log("Room trouvée dans URL :", roomFromUrl);
+    console.log("Join de la room...");
+
+    setRoomId(roomFromUrl);
+    joinRoomByID(roomFromUrl);
+  }, [connected]);
+
+  console.log("connected =", connected);
+  console.log("joined =", joined);
+  console.log("roomFromUrl =", roomFromUrl);
+  console.log("friends reçus dans Lobby :", friends);
+
   return (
     <div className="w-full p-6 text-white">
-
-      <div className="mx-auto max-w-4xl">
-
+      <div className="mx-auto flex max-w-3xl flex-col items-center justify-center">
         <h1 className="mb-6 text-3xl font-black">
           LOBBY
         </h1>
 
-        {/* ERREUR */}
-
         {error && (
-          <div className="mb-4 rounded-xl bg-red-900 p-4 text-red-200">
-            {error}
-          </div>
+          <Notification
+            message={error}
+            onClose={() => {}}
+          />
         )}
-
-        {/* COUNTDOWN */}
 
         {countdown !== null && (
           <div className="mb-4 rounded-xl bg-yellow-900 p-4 text-center">
@@ -74,152 +136,133 @@ export default function Lobby({
           </div>
         )}
 
-        {/* CONNEXION */}
+        <div className="mb-6 aspect-[2/3] w-65 rounded-2xl bg-bdarkgreen p-6 shadow-2xl shadow-black/75 outline-10 sm:w-90 md:90">
+          <div className="mb-3">
+            <span
+              className={
+                connected
+                  ? "text-green-400"
+                  : "text-yellow-400"
+              }
+            >
+              ● {connected ? "Connecté" : "Connexion..."}
+            </span>
+          </div>
 
-        <div className="mb-6 rounded-2xl bg-slate-900 p-6">
-
-          <h2 className="mb-4 text-xl font-black">
-            Connexion
-          </h2>
-
-          <div className="flex flex-col gap-3 md:flex-row">
-
+          <div className="flex flex-col gap-3">
             <input
               value={roomId}
-              onChange={(e) =>
-                setRoomId(e.target.value)
-              }
+              onChange={(e) => setRoomId(e.target.value)}
               placeholder="Nom de la room"
               disabled={joined}
               className="flex-1 rounded-xl bg-slate-800 px-4 py-3 outline-none"
             />
 
-            {!connected ? (
+            {connected && !joined && (
               <button
-                onClick={connect}
-                className="rounded-xl bg-green-600 px-6 py-3 font-black hover:bg-green-500"
+                onClick={joinRoom}
+                className="rounded-xl bg-blue-600 px-6 py-3 font-black hover:bg-blue-500"
               >
-                CONNECTER
+                REJOINDRE
               </button>
-            ) : (
-              <button
-                onClick={disconnect}
-                className="rounded-xl bg-red-600 px-6 py-3 font-black hover:bg-red-500"
-              >
-                DÉCONNECTER
-              </button>
-            )}
-
-            <button
-              onClick={joinRoom}
-              disabled={!connected || joined}
-              className="rounded-xl bg-blue-600 px-6 py-3 font-black hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-30"
-            >
-              REJOINDRE
-            </button>
-
-          </div>
-
-          <div className="mt-4 text-sm">
-            {connected ? (
-              <span className="text-green-400">
-                ● Connecté
-              </span>
-            ) : (
-              <span className="text-red-400">
-                ● Déconnecté
-              </span>
             )}
           </div>
 
-        </div>
+          {joined && (
+            <div className="rounded-2xl p-3">
+              <div className="mb-3 flex h-12 w-full gap-x-1">
+                <DropdownMenu
+                  className="h-full w-1/2"
+                  color="bg-byellow"
+                  items={friends.map((friend) => ({
+                    label: friend.username,
+                    onClick: () => {
+                      console.log("friend id =", friend.id);
+                      invite(friend.id, roomId);
+                    },
+                  }))}
+                >
+                  INVITE
+                </DropdownMenu>
 
-        {/* ROOM */}
-
-        {joined && (
-          <div className="rounded-2xl bg-slate-900 p-6">
-
-            <div className="mb-6 flex items-center justify-between">
-
-              <div>
-                <h2 className="text-xl font-black">
-                  Joueurs
-                </h2>
-
-                <p className="text-sm text-slate-500">
-                  {players.filter(
-                    (p) => p.ready
-                  ).length}
-                  {" / "}
-                  {players.length} prêts
-                </p>
+                <button
+                  onClick={leaveRoom}
+                  className="w-1/2 rounded-2xl bg-bred p-2 shadow-md shadow-black/75 hover:z-50 hover:outline-3"
+                >
+                  LEAVE
+                </button>
               </div>
 
-              <button
-                onClick={toggleReady}
-                className={`rounded-xl px-6 py-3 font-black ${
-                  ready
-                    ? "bg-green-600"
-                    : "bg-slate-700"
-                }`}
-              >
-                {ready
-                  ? "✓ READY"
-                  : "READY"}
-              </button>
+              <div className="mb-6 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-black">
+                    Joueurs
+                  </h2>
 
-            </div>
-
-            {/* JOUEURS */}
-
-            <div className="space-y-3">
-
-              {players.length === 0 && (
-                <div className="rounded-xl bg-slate-800 p-6 text-center text-slate-500">
-                  Aucun joueur
+                  <p className="text-sm text-slate-500">
+                    {players.filter((player) => player.ready).length}
+                    {" / "}
+                    {players.length} prêts
+                  </p>
                 </div>
-              )}
 
-              {players.map((player) => (
-                <div
-                  key={player.playerId}
-                  className="flex items-center justify-between rounded-xl bg-slate-800 p-4"
+                <button
+                  onClick={toggleReady}
+                  className={`rounded-xl px-6 py-3 font-black shadow-md shadow-black/75 hover:z-50 hover:outline-3 ${
+                    ready ? "bg-bgreen" : "bg-bblue"
+                  }`}
                 >
+                  {ready ? "READY" : "NOT READY"}
+                </button>
+              </div>
 
-                  <div>
-                    <div className="font-black">
-                      {player.username}
+              <div className="space-y-3">
+                {players.length === 0 && (
+                  <div className="rounded-xl bg-slate-800 p-6 text-center text-slate-500">
+                    Aucun joueur
+                  </div>
+                )}
 
-                      {player.playerId === playerId && (
-                        <span className="ml-2 text-blue-400">
-                          (toi)
-                        </span>
-                      )}
+                {players.map((player, index) => (
+                  <div
+                    key={player.playerId}
+                    className={`flex items-center gap-3 rounded-xl ${
+                      colors[index % colors.length]
+                    } p-3 shadow-md`}
+                  >
+                    <PlayerAvatar
+                      playerId={player.playerId}
+                      username={player.username}
+                    />
+
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-black">
+                        {player.username}
+
+                        {player.playerId === playerId && (
+                          <span className="ml-1 text-bblue">
+                            (toi)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div
+                      className={`shrink-0 font-black ${
+                        player.ready
+                          ? "text-bgreen"
+                          : "text-white/50"
+                      }`}
+                    >
+                      {player.ready ? "READY" : "WAITING"}
                     </div>
                   </div>
-
-                  <div
-                    className={
-                      player.ready
-                        ? "font-black text-green-400"
-                        : "text-slate-500"
-                    }
-                  >
-                    {player.ready
-                      ? "✓ READY"
-                      : "WAITING"}
-                  </div>
-
-                </div>
-              ))}
-
+                ))}
+              </div>
             </div>
-
-          </div>
-        )}
-
+          )}
+        </div>
       </div>
-
     </div>
   );
 }

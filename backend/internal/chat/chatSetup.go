@@ -3,6 +3,7 @@ package chat
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/Hugo-R94/Transcendance/backend/internal/utils"
@@ -32,27 +33,47 @@ func (h *WSHandler) setup(c *gin.Context) {
 
 	queryToken := c.Query("token")
 
-	result := h.db.Where("token_string = ?", queryToken).Unscoped().Delete(&models.WSToken{})
+	result := h.db.
+		Where("token_string = ?", queryToken).
+		Unscoped().
+		Delete(&models.WSToken{})
+
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": "Couldn't check token validity",
 		})
-		log.Printf("[ERROR] Couldn't check token validity: %v", result.Error)
+
+		log.Printf(
+			"[ERROR] Couldn't check token validity: %v",
+			result.Error,
+		)
+
 		return
 	}
+
 	if result.RowsAffected == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "Invalid token",
 		})
+
 		return
 	}
 
-	conn, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	conn, err := upgrader.Upgrade(
+		c.Writer,
+		c.Request,
+		nil,
+	)
 
 	if err != nil {
-		log.Printf("[WS] upgrade error: %v\n", err)
+		log.Printf(
+			"[WS] upgrade error: %v\n",
+			err,
+		)
+
 		return
 	}
+
 	client := &Client{
 		Hub:  h.hub,
 		Conn: conn,
@@ -62,14 +83,126 @@ func (h *WSHandler) setup(c *gin.Context) {
 
 	h.hub.Register <- client
 
+	/*
+	 * IMPORTANT :
+	 *
+	 * On démarre les pumps AVANT d'envoyer les éventuelles
+	 * notifications de messages non lus.
+	 */
 	go client.writePump()
 	go client.readPump()
+
+	/*
+	 * Vérification des messages non lus après connexion.
+	 */
+	go h.sendUnreadNotifications(client, id)
 }
 
-func ChatSetup(router *gin.RouterGroup, db *gorm.DB, hub *Hub) {
+func (h *WSHandler) sendUnreadNotifications(
+	client *Client,
+	userID uuid.UUID,
+) {
+	var convs []models.Conversation
+
+	if err := h.db.
+		Where(
+			"user1_id = ? OR user2_id = ?",
+			userID,
+			userID,
+		).
+		Find(&convs).Error; err != nil {
+
+		log.Printf(
+			"[ERROR] unread conversations: %v",
+			err,
+		)
+
+		return
+	}
+
+	for _, conv := range convs {
+		var lastRead *time.Time
+
+		if conv.User1ID == userID {
+			lastRead = conv.LastReadAtUser1
+		} else if conv.User2ID == userID {
+			lastRead = conv.LastReadAtUser2
+		} else {
+			continue
+		}
+
+		query := h.db.
+			Where(
+				"conversation_id = ?",
+				conv.ID,
+			).
+			Where(
+				"sender_id != ?",
+				userID,
+			).
+			Order("time DESC")
+
+		if lastRead != nil {
+			query = query.Where(
+				"time > ?",
+				*lastRead,
+			)
+		}
+
+		var messages []models.Message
+
+		if err := query.
+			Limit(1).
+			Find(&messages).Error; err != nil {
+
+			log.Printf(
+				"[ERROR] unread messages for conversation %v: %v",
+				conv.ID,
+				err,
+			)
+
+			continue
+		}
+
+		if len(messages) == 0 {
+			continue
+		}
+
+		msg := messages[0]
+
+		select {
+		case client.Send <- models.Message{
+			SenderID:       msg.SenderID,
+			ConversationID: conv.ID,
+			Text:           msg.Text,
+			Type:           models.MessageTypeChatNotification,
+			Time:           msg.Time,
+		}:
+
+		default:
+			log.Printf(
+				"[WARN] WebSocket send buffer full for user %v",
+				userID,
+			)
+
+			return
+		}
+	}
+}
+
+func ChatSetup(
+	router *gin.RouterGroup,
+	db *gorm.DB,
+	hub *Hub,
+) {
 	h := &WSHandler{
 		db:  db,
 		hub: hub,
 	}
-	router.GET("/ws", utils.WSMiddleware(), h.setup)
+
+	router.GET(
+		"/ws",
+		utils.WSMiddleware(),
+		h.setup,
+	)
 }

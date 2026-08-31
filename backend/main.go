@@ -9,7 +9,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
+	
+    "github.com/Hugo-R94/Transcendance/backend/internal/gambling"
 	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 )
 
@@ -27,6 +28,7 @@ func main() {
 	envCheck()
 
 	db, sqldb := dbSetup()
+	gambling.InitRoomManager(db)
 	defer sqldb.Close()
 
 	go dbUpdate(db, ctx)

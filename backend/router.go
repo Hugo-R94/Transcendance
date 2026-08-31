@@ -62,7 +62,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	user.ChangePP(v1, db)
 	apichat.FriendAccept(v1, db, hub)
 	apichat.UnFriendReq(v1, db, hub)
-	apichat.FriendReq(v1, db)
+	apichat.FriendReq(v1, db, hub)
 	apichat.GetConvs(v1, db)
 	apichat.BlockUser(v1, db, hub)
 	apichat.GetBlockList(v1, db)

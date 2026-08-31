@@ -1,6 +1,4 @@
-import Grid from "../components/grid";
-import NavBar from "../components/navBar";
-import ShaderBackground from "../components/shaderBG";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
@@ -19,18 +17,17 @@ function Home() {
 
         {/* Boutons positionnés côte à côte */}
         <div className="flex flex-col gap-4 mt-6">
+		  <Link to="/login">
+			<button className="balatro bg-byellow h-15 w-50 rounded-2xl shadow-black/75 shadow-md hover:outline-3 text-xl font-bold">
+				Se connecter
+			</button>
+		  </Link>
 		  
-		  <a href="http://localhost:5173/login">
-          <button className="balatro bg-byellow h-15 w-50 rounded-2xl shadow-black/75 shadow-md hover:outline-3 text-xl font-bold">
-            Se connecter
-          </button>
-		  </a>
-		  
-			<a href="http://localhost:5173/signin">
-          <button className="balatro bg-bred h-15 w-50 rounded-2xl shadow-black/75 shadow-md hover:outline-3 text-xl font-bold">
-            S'inscrire
-          </button>
-		  </a>
+		  <Link to="/signin">
+			<button className="balatro bg-bred h-15 w-50 rounded-2xl shadow-black/75 shadow-md hover:outline-3 text-xl font-bold">
+				S'inscrire
+			</button>
+		  </Link>
 		  
         </div>
       </div>

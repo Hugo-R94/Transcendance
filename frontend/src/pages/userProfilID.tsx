@@ -1,11 +1,12 @@
 import { useState, useEffect, Fragment } from "react";
 import { useParams, Navigate } from "react-router-dom";
-import DropdownFilter from "../components/dropdownFilter";
-import UserGameList from "../components/userGameList";
-import UserReviews from "../components/userReviews";
-import UserFriendsList from "../components/userFriendList";
-import { UserProfileHeader } from "../components/UserProfileHeader";
+import DropdownFilter from "../components/utils/dropdownFilter";
+import UserGameList from "../components/profile/userGameList";
+import UserReviews from "../components/profile/userReviews";
+import UserFriendsList from "../components/chat/userFriendList";
+import { UserProfileHeader } from "../components/profile/UserProfileHeader";
 import api from "../api/api"; // Utilisation de ton instance api configurée
+import GambleHistory from "../components/profile/gambleHistory";
 
 type UserProfile = {
   id: string;
@@ -86,7 +87,7 @@ export default function UserProfil() {
       case "friends":
         return <UserFriendsList userId={userid} />;
       case "clicker":
-        return <div className="flex h-full w-full items-center justify-center text-white font-bold">Section Clicker</div>;
+		return <GambleHistory userID={userid}  />;
       default:
         return <UserGameList userId={userid} />;
     }

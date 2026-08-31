@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
-
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -19,7 +18,7 @@ type (
 
 	Notification struct {
 		TargetID uuid.UUID
-		Message  models.Message
+		Message models.Message
 	}
 
 	Hub struct {
@@ -47,36 +46,58 @@ func (h *Hub) Run(ctx context.Context) {
 		case <-ctx.Done():
 			log.Println("[INFO] Hub shutting down")
 			close(h.Broadcast)
-			for Client := range h.Clients {
-				Client.Conn.Close()
+
+			for client := range h.Clients {
+				client.Conn.Close()
 			}
+
 			return
+
 		case client := <-h.Register:
 			h.Clients[client] = true
+
 		case client := <-h.Unregister:
 			if _, ok := h.Clients[client]; ok {
 				delete(h.Clients, client)
 				close(client.Send)
 			}
+
 		case n := <-h.Notify:
 			h.sendToTarget(n.TargetID, n.Message)
+
 		case bm := <-h.Broadcast:
 			var conv models.Conversation
-			if err := h.DB.Where("id = ?", bm.Message.ConversationID).First(&conv).Error; err != nil {
+
+			if err := h.DB.
+				Where("id = ?", bm.Message.ConversationID).
+				First(&conv).Error; err != nil {
 				log.Printf("[ERROR] Couldn't fetch conversation: %v", err)
 				continue
 			}
+
 			if bm.Client.ID != conv.User1ID && bm.Client.ID != conv.User2ID {
-				log.Printf("[ERROR] User %v not authorized in conversation %v", bm.Client.ID, bm.Message.ConversationID)
+				log.Printf(
+					"[ERROR] User %v not authorized in conversation %v",
+					bm.Client.ID,
+					bm.Message.ConversationID,
+				)
 				continue
 			}
-			if (!conv.Accepted1 || !conv.Accepted2) && bm.Message.Type != models.MessageTypeFriendReq {
-				log.Printf("[DEBUG] Message %s dropped: Accepted1=%v Accepted2=%v", bm.Message.Type, conv.Accepted1, conv.Accepted2)
+
+			if (!conv.Accepted1 || !conv.Accepted2) &&
+				bm.Message.Type != models.MessageTypeFriendReq {
+				log.Printf(
+					"[DEBUG] Message %s dropped: Accepted1=%v Accepted2=%v",
+					bm.Message.Type,
+					conv.Accepted1,
+					conv.Accepted2,
+				)
 				continue
 			}
-			//add info in Message struct and register it
+
 			bm.Message.SenderID = bm.Client.ID
 			bm.Message.Time = time.Now()
+
 			if err := h.DB.Transaction(func(tx *gorm.DB) error {
 				return tx.Create(&bm.Message).Error
 			}); err != nil {
@@ -89,7 +110,18 @@ func (h *Hub) Run(ctx context.Context) {
 	}
 }
 
-func (h *Hub) BroadcastToRecipient(bm BroadcastMessage, conv models.Conversation) {
+func (h *Hub) BroadcastToRecipient(
+	bm BroadcastMessage,
+	conv models.Conversation,
+) {
+	var recipientID uuid.UUID
+
+	if bm.Client.ID == conv.User1ID {
+		recipientID = conv.User2ID
+	} else {
+		recipientID = conv.User1ID
+	}
+
 	for client := range h.Clients {
 		if client.ID != conv.User1ID && client.ID != conv.User2ID {
 			continue
@@ -97,11 +129,41 @@ func (h *Hub) BroadcastToRecipient(bm BroadcastMessage, conv models.Conversation
 
 		select {
 		case client.Send <- bm.Message:
+
 		case <-time.After(1 * time.Second):
 			close(client.Send)
 			delete(h.Clients, client)
 		}
 	}
+
+	var lastRead *time.Time
+
+	if recipientID == conv.User1ID {
+		lastRead = conv.LastReadAtUser1
+	} else if recipientID == conv.User2ID {
+		lastRead = conv.LastReadAtUser2
+	}
+
+	if lastRead != nil && !bm.Message.Time.After(*lastRead) {
+		log.Printf(
+			"[CHAT] Message déjà lu, pas de notification. conv=%v",
+			conv.ID,
+		)
+		return
+	}
+
+	log.Printf(
+		"[CHAT] Notification non-lue -> user=%v conv=%v",
+		recipientID,
+		conv.ID,
+	)
+
+	h.sendToTarget(recipientID, models.Message{
+		SenderID:       bm.Client.ID,
+		ConversationID: conv.ID,
+		Type:           models.MessageTypeChatNotification,
+		Time:           bm.Message.Time,
+	})
 }
 
 func (h *Hub) sendToTarget(targetID uuid.UUID, msg models.Message) {
@@ -112,9 +174,11 @@ func (h *Hub) sendToTarget(targetID uuid.UUID, msg models.Message) {
 
 		select {
 		case client.Send <- msg:
+
 		case <-time.After(1 * time.Second):
 			close(client.Send)
 			delete(h.Clients, client)
 		}
 	}
 }
+

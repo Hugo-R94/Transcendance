@@ -8,14 +8,12 @@ import Signin from "./pages/Signin";
 import Profil from "./pages/profil";
 import Support from "./pages/support";
 import Clicker from "./pages/clicker";
-import ShaderBackground from "./components/shaderBG";
-import NavBar from "./components/navBar";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import ShaderBackground from "./components/utils/shaderBG";
+import NavBar from "./components/utils/navBar";
+import { ProtectedRoute } from "./components/utils/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
 import MinimalChat from "./pages/minichat";
-import ChatMenu from "./components/chatMenu";
-import Gambling from "./pages/gambling";
-
+import ChatMenu from "./components/chat/chatMenu";
 
 function ProtectedLayout() {
   return (
@@ -46,7 +44,6 @@ function App() {
             <Route path="/profil/:userid" element={<UserProfil />} /> 
             <Route path="/games" element={<Games />} />
             <Route path="/chat" element={<MinimalChat />} />
-            <Route path="/gambling" element={<Gambling />} />
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} /> 
           </Route>

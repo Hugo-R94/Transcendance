@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
-import ProfileMenu from "../components/profilMenu";
-import UserGameList from "../components/userGameList";
-import Notification from "../components/notification";
-import { ProfileHeader } from "../components/profilHeader";
-import UserReviews from "../components/userReviews";
-import UserFriendsList from "../components/userFriendList";
+import React, { useEffect, useState } from "react";
+import ProfileMenu from "../components/profile/profilMenu";
+import UserGameList from "../components/profile/userGameList";
+import Notification from "../components/utils/notification";
+import { ProfileHeader } from "../components/profile/profilHeader";
+import UserReviews from "../components/profile/userReviews";
+import UserFriendsList from "../components/chat/userFriendList";
 import { fetchUserProfilePicture } from "../api/getUserAvatar";
 import api from "../api/api";
+import GambleHistory from "../components/profile/gambleHistory";
 
 export type UserProfile = {
   id?: string;
@@ -21,32 +22,32 @@ export default function Profil() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [description, setDescription] = useState<string>("");
   const [imageSrc, setImageSrc] = useState<string>("");
-  
+
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [isSavingDesc, setIsSavingDesc] = useState<boolean>(false);
   const [notification, setNotification] = useState<string | null>(null);
-  
+
   const [activeTab, setActiveTab] = useState<string>("game");
+
   const userID = localStorage.getItem("userID");
 
-  // Récupération des données du profil et de l'avatar au montage
   useEffect(() => {
     let objectUrl = "";
 
     const loadProfileData = async () => {
       try {
         const token = localStorage.getItem("token");
+
         if (!token) {
           setError("Non authentifié");
           setLoading(false);
           return;
         }
 
-        // Chargement de l'avatar et du profil en parallèle
         const [ppUrl, profileRes] = await Promise.all([
           fetchUserProfilePicture().catch(() => ""),
-          api.get("/profil")
+          api.get("/profil"),
         ]);
 
         if (ppUrl) {
@@ -55,15 +56,19 @@ export default function Profil() {
         }
 
         const data: UserProfile = profileRes.data;
+
         setProfile(data);
         setDescription(data.description || "");
 
-        // Synchronisation éventuelle de l'ID utilisateur
         if (data.id) {
           localStorage.setItem("userID", String(data.id));
         }
       } catch (err: any) {
-        setError(err.response?.data?.error || err.message || "Une erreur est survenue");
+        setError(
+          err.response?.data?.error ||
+            err.message ||
+            "Une erreur est survenue"
+        );
       } finally {
         setLoading(false);
       }
@@ -72,13 +77,17 @@ export default function Profil() {
     loadProfileData();
 
     return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl);
+      if (objectUrl) {
+        URL.revokeObjectURL(objectUrl);
+      }
     };
   }, []);
 
-  // Gestion du changement de photo de profil
-  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
+
     if (!file) return;
 
     const formData = new FormData();
@@ -86,64 +95,108 @@ export default function Profil() {
 
     try {
       await api.post("/changePP", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      if (imageSrc) URL.revokeObjectURL(imageSrc);
-      setImageSrc(URL.createObjectURL(file));
+      if (imageSrc && imageSrc.startsWith("blob:")) {
+        URL.revokeObjectURL(imageSrc);
+      }
+
+      const newImageUrl = URL.createObjectURL(file);
+
+      setImageSrc(newImageUrl);
       setNotification("Photo de profil mise à jour avec succès !");
     } catch (err: any) {
-      alert(err.response?.data?.error || "Impossible de mettre à jour la photo de profil.");
+      alert(
+        err.response?.data?.error ||
+          "Impossible de mettre à jour la photo de profil."
+      );
     }
   };
 
-  // Sauvegarde de la description
   const handleSaveDescription = async () => {
     setIsSavingDesc(true);
-    try {
-      await api.post("/profil/description", { description });
 
-      if (profile) setProfile({ ...profile, description });
+    try {
+      await api.post("/profil/description", {
+        description,
+      });
+
+      if (profile) {
+        setProfile({
+          ...profile,
+          description,
+        });
+      }
+
       setNotification("Description sauvegardée avec succès !");
     } catch (err: any) {
-      alert(err.response?.data?.error || "Erreur lors de la sauvegarde.");
+      alert(
+        err.response?.data?.error ||
+          "Erreur lors de la sauvegarde."
+      );
     } finally {
       setIsSavingDesc(false);
     }
   };
 
-  // Routage du contenu des onglets
   const renderTabContent = () => {
     switch (activeTab) {
       case "game":
         return <UserGameList />;
+
       case "reviews":
         return <UserReviews />;
+
       case "friends":
-        return <UserFriendsList userId={userID ?? profile?.id} />;
+        return (
+          <UserFriendsList
+            userId={userID ?? profile?.id}
+          />
+        );
+
       case "gambles":
-        return <div className="flex h-full w-full items-center justify-center text-white font-bold">Section Gambles</div>;
+        return (
+          <GambleHistory
+            userID={userID ?? profile?.id}
+          />
+        );
+
       default:
         return <UserGameList />;
     }
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-white font-bold">Chargement du profil...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white font-bold">
+        Chargement du profil...
+      </div>
+    );
   }
 
   if (error || !profile) {
-    return <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">{error || "Profil introuvable"}</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">
+        {error || "Profil introuvable"}
+      </div>
+    );
   }
 
   return (
     <div className="relative min-h-screen flex flex-col">
       {notification && (
-        <Notification message={notification} onClose={() => setNotification(null)} />
+        <Notification
+          message={notification}
+          onClose={() => setNotification(null)}
+        />
       )}
 
-      {/* -------------------- VERSION DESKTOP -------------------- */}
-      <main className="hidden sm:flex-1 sm:flex flex-col mx-[5%] w-[90%] pt-22 pb-4 h-screen max-h-screen">
+      {/* ==================== DESKTOP ==================== */}
+
+      <main className="hidden sm:flex sm:flex-col mx-[5%] w-[90%] pt-20 pb-4 h-screen overflow-hidden">
         <ProfileHeader
           profile={profile}
           imageSrc={imageSrc}
@@ -154,16 +207,20 @@ export default function Profil() {
           onImageChange={handleImageChange}
         />
 
-        <div className="flex-shrink-0">
-          <ProfileMenu activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="flex-shrink-0 my-2">
+          <ProfileMenu
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
         </div>
 
-        <div className="flex-1 bg-black/50 rounded-2xl my-2 backdrop-blur-md shadow-black shadow-md flex flex-col min-h-0 overflow-visible">
+        <div className="flex-1 min-h-0 bg-black/50 rounded-2xl p-4 backdrop-blur-md shadow-black shadow-md flex flex-col overflow-y-auto">
           {renderTabContent()}
         </div>
       </main>
 
-      {/* -------------------- VERSION MOBILE -------------------- */}
+      {/* ==================== MOBILE ==================== */}
+
       <div className="sm:hidden flex flex-col w-full min-h-screen p-2">
         <ProfileHeader
           profile={profile}
@@ -175,9 +232,14 @@ export default function Profil() {
           onImageChange={handleImageChange}
         />
 
-        <ProfileMenu activeTab={activeTab} onTabChange={setActiveTab} />
+        <div className="flex-shrink-0">
+          <ProfileMenu
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        </div>
 
-        <div className="bg-black/50 rounded-2xl mt-3 w-full min-h-[400px] mb-5 flex flex-col overflow-visible p-2">
+        <div className="bg-black/50 rounded-2xl mt-3 w-full min-h-[400px] mb-5 flex flex-col overflow-y-auto p-2">
           {renderTabContent()}
         </div>
       </div>

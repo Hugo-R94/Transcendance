@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import GameCard from "../components/gameCard";
-import Button from "../components/buttonLink";
-import NavBar from "../components/navBar";
-import ShaderBackground from "../components/shaderBG";
+import GameCard from "../components/gamepage/gameCard";
+import Button from "../components/utils/buttonLink";
+import NavBar from "../components/utils/navBar";
+import ShaderBackground from "../components/utils/shaderBG";
 
 function Signin() {
   const [username, setUsername] = useState("");
