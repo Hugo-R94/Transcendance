@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useUserAvatar } from "../../api/getUserAvatar";
 import DropdownMenu from "../utils/dropdownFilter";
 import NotificationSignal from "../utils/notificationSignal";
@@ -39,10 +40,12 @@ export default function FriendList({
   onBlock: (friend: any) => void;
   unreadUserIds: string[];
 }) {
+  const { t } = useTranslation();
+
   if (!friends || friends.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-white/50 text-sm">
-        Aucun ami
+        {t("friendList.noFriends")}
       </div>
     );
   }
@@ -76,7 +79,7 @@ export default function FriendList({
     <div className="overflow-y-auto overflow-x-visible h-full">
       <div className="flex flex-col gap-3 p-3 overflow-x-visible">
         {friends.map((friend, index) => {
-          const username = friend.username || "Utilisateur";
+          const username = friend.username || t("chat.defaultUsername");
           const bgColor = colors[index % colors.length];
           const hasUnread = unreadUserIds?.includes(String(friend.id));
 
@@ -106,7 +109,7 @@ export default function FriendList({
                   onClick={() => onFriendClick(friend)}
                   className="bg-black/20 px-3 py-1.5 rounded-lg text-white balatro hover:outline-2 active:scale-90 text-xs font-bold hover:bg-white/20 transition-colors cursor-pointer"
                 >
-                  Chat
+                  {t("friendList.chat")}
                 </button>
 
                 {hasUnread && (
@@ -118,8 +121,8 @@ export default function FriendList({
 
               <DropdownMenu
                 items={[
-                  { label: "Bloquer", value: "block" },
-                  { label: "Supprimer", value: "delete" },
+                  { label: t("friendList.block"), value: "block" },
+                  { label: t("friendList.delete"), value: "delete" },
                 ]}
                 color="bg-black/20"
                 className="h-full flex items-center"

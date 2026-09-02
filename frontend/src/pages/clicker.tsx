@@ -11,7 +11,7 @@ function Clicker() {
 			<div className="relative flex min-h-0 flex-1">
 				<ShaderBackground />
 
-				<main className="relative z-10 mt-25 flex min-h-0 w-full flex-1 px-6">
+				<main className="relative  z-10 mt-25 flex min-h-0 w-full flex-1 px-6">
 					<div className="mx-auto flex min-h-0 w-full max-w-[2000px] flex-1 gap-5 py-5">
 
 						{/* JEU */}

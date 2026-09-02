@@ -1,4 +1,5 @@
-import Tooltip from "./utils/tooltip";
+import { useTranslation } from "react-i18next";
+import Tooltip from "../utils/tooltip";
 
 type WishlistGameButtonProps = {
   className?: string;
@@ -13,6 +14,8 @@ function WishlistGameButton({
   onClick,
   disabled = false,
 }: WishlistGameButtonProps) {
+  const { t } = useTranslation();
+
   return (
     <button
       type="button"
@@ -21,7 +24,7 @@ function WishlistGameButton({
       className={`relative flex items-center justify-center p-2 aspect-square active:scale-90 transition-all ${className}`}
     >
       <Tooltip>
-        {isActive ? "Retirer de la wishlist" : "Ajouter à ma wishlist"}
+        {isActive ? t("wishlistButton.remove") : t("wishlistButton.add")}
       </Tooltip>
 
       <svg

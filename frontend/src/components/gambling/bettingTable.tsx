@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import Chip from "./chip";
 
 export type Bet = {
@@ -26,19 +27,21 @@ const rouletteGrid = [
   [13, 1, 23, 10, 15],
 ];
 
-const specialBets = [
-  { id: "red", label: "RED", color: "bg-bred" },
-  { id: "even", label: "EVEN", color: "bg-bblue" },
-  { id: "odd", label: "ODD", color: "bg-bblue" },
-  { id: "green", label: "GREEN", color: "bg-bgreen" },
-];
-
 function BettingTable({
   target,
   setTarget,
   disabled,
   bets,
 }: BettingTableProps) {
+  const { t } = useTranslation();
+
+  const specialBets = [
+    { id: "red", label: t("bettingTable.red"), color: "bg-bred" },
+    { id: "even", label: t("bettingTable.even"), color: "bg-bblue" },
+    { id: "odd", label: t("bettingTable.odd"), color: "bg-bblue" },
+    { id: "green", label: t("bettingTable.green"), color: "bg-bgreen" },
+  ];
+
   const getNumberColor = (number: number) => {
     if (number === 0) return "bg-black";
 

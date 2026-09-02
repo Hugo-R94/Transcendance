@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { Conversation, Message, Friend } from "../../api/chat";
 import { useUserAvatar } from "../../api/getUserAvatar";
 import NotificationSignal from "../utils/notificationSignal";
@@ -24,6 +25,7 @@ export default function ChatWindow({
   onClose,
   onFriendClick,
 }: ChatWindowProps) {
+  const { t } = useTranslation();
   const [newMessage, setNewMessage] = useState("");
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -110,7 +112,7 @@ export default function ChatWindow({
             )}
 
             <span className="font-bold text-xs tracking-wider truncate max-w-[90px]">
-              {otherUser?.username || "Chat"}
+              {otherUser?.username || t("chatWindow.defaultLabel")}
             </span>
 
             {hasUnread && <NotificationSignal />}
@@ -164,7 +166,7 @@ export default function ChatWindow({
                 onClick={(e) => e.stopPropagation()}
                 className="text-white font-bold truncate hover:underline"
               >
-                {otherUser?.username || "Utilisateur"}
+                {otherUser?.username || t("chat.defaultUsername")}
               </Link>
             </div>
 
@@ -274,7 +276,7 @@ export default function ChatWindow({
                       ) : (
                         <span>
                           {isMine
-                            ? "M"
+                            ? t("chatWindow.myInitial")
                             : otherUser?.username
                                 ?.charAt(0)
                                 .toUpperCase()}
@@ -286,7 +288,7 @@ export default function ChatWindow({
               })
             ) : (
               <div className="flex items-center justify-center h-full text-white/50 text-sm">
-                Aucun message
+                {t("chatWindow.emptyMessages")}
               </div>
             )}
           </div>
@@ -302,7 +304,7 @@ export default function ChatWindow({
               onChange={(e) =>
                 setNewMessage(e.target.value)
               }
-              placeholder="Message..."
+              placeholder={t("chatWindow.messagePlaceholder")}
               disabled={!wsConnected}
               className="flex-1 min-w-0 px-3 py-2 rounded-xl bg-white text-black outline-none disabled:opacity-50"
             />

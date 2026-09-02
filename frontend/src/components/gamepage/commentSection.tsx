@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Comment from "./comment";
 import Pagination from "../utils/paginationController";
 import { getComments } from "../../api/comments";
@@ -6,7 +7,7 @@ import { getComments } from "../../api/comments";
 
 export interface CommentData {
   id: string;
-  userID: string; // UUID de l'auteur du commentaire
+  userID: string;
   Nickname: string;
   comment: string;
   comment_title: string;
@@ -30,14 +31,15 @@ function CommentSection({
   gameID,
   commentsPerPage = 5,
   currentUserId = "",
-  currentUsername = "Invité",
+  currentUsername,
 }: CommentSectionProps) {
+  const { t } = useTranslation();
+  const resolvedUsername = currentUsername ?? t("commentSection.guest");
   const [currentPage, setCurrentPage] = useState(1);
   const [comments, setComments] = useState<CommentData[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Normalisation du userID de l'utilisateur connecté en string (UUID)
   const normalizedCurrentUserId = String(currentUserId || "");
 
   useEffect(() => {
@@ -53,10 +55,8 @@ function CommentSection({
           (item: any, index: number) => {
             const rawId = item.ID ?? item.id ?? item.CommentID ?? item.comment_id;
 
-            // Le backend renvoie maintenant un UUID
             const commentId = String(rawId ?? "");
 
-            // Extraction de l'UUID de l'auteur
             const authorUUID = String(
               item.author?.id ??
               item.author?.ID ??
@@ -66,7 +66,7 @@ function CommentSection({
             return {
               id: commentId,
               userID: authorUUID,
-              Nickname: item.author?.username ?? "Utilisateur",
+              Nickname: item.author?.username ?? t("chat.defaultUsername"),
               comment: item.comment || "",
               comment_title: item.comment_title,
               likes: Number(item.likes ?? item.Likes ?? 0),
@@ -117,16 +117,15 @@ function CommentSection({
     <div id="comment-section" className="flex flex-col gap-4">
       {loading ? (
         <div className="text-white/60 text-center py-10">
-          Chargement des commentaires...
+          {t("commentSection.loading")}
         </div>
       ) : comments.length === 0 ? (
         <div className="text-white/60 text-center py-10">
-          Aucun commentaire pour le moment. Soyez le premier à donner votre avis !
+          {t("commentSection.empty")}
         </div>
       ) : (
         <>
           {comments.map((com, index) => {
-            // Utilisation du normalizedCurrentUserId pour la clé de localStorage
             const savedVote = localStorage.getItem(`vote_${com.id}_${normalizedCurrentUserId}`);
             const effectiveVote =
               savedVote !== null ? Number(savedVote) : (com.userVote ?? 0);
@@ -135,8 +134,8 @@ function CommentSection({
               <Comment
                 key={com.id || index}
                 commentId={com.id}
-                userId={normalizedCurrentUserId} // ID / UUID de l'utilisateur connecté
-                UUID={com.userID}                // UUID de l'auteur du commentaire
+                userId={normalizedCurrentUserId}
+                UUID={com.userID}
                 Nickname={com.Nickname}
                 CommentTitle={com.comment_title}
                 comment={com.comment}

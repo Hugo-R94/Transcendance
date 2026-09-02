@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import Pagination from "../utils/paginationController";
 import DropdownMenu from "../utils/dropdownFilter";
 import { Link } from "react-router-dom";
@@ -18,11 +19,6 @@ interface UserFriendsListProps {
   userId?: string;
   className?: string;
 }
-
-const listOptions = [
-  { label: "Amis", value: "friends" },
-  { label: "Bloqués", value: "blocked" },
-];
 
 const ITEMS_PER_PAGE = 12;
 const baseColors = ["bg-[#00509f]", "bg-[#3c9b71]", "bg-[#ed8a00]", "bg-[#fb4740]"];
@@ -52,7 +48,8 @@ function FriendCard({
   showUnblock: boolean;
   onUnblock: (id: string) => void;
 }) {
-  const nickname = friend.username || "Utilisateur";
+  const { t } = useTranslation();
+  const nickname = friend.username || t("chat.defaultUsername");
 
   return (
     <div className={`flex flex-col items-center balatro hover:z-100 justify-center p-3 rounded-2xl shadow-md shadow-black/25 ${cardColor} h-full w-full text-center gap-2 overflow-hidden hover:outline-3 hover:scale-[1.02] transition-all`}>
@@ -66,7 +63,7 @@ function FriendCard({
           onClick={() => onUnblock(friend.id)}
           className="bg-byellow w-1/2 rounded-2xl balatro h-8 hover:outline-3"
         >
-          UNBLOCK
+          {t("userFriendsList.unblock")}
         </button>
       )}
 
@@ -76,12 +73,18 @@ function FriendCard({
 }
 
 function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
+  const { t } = useTranslation();
   const [selectedList, setSelectedList] = useState("friends");
   const [friends, setFriends] = useState<FriendItem[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const listOptions = [
+    { label: t("userFriendsList.friends"), value: "friends" },
+    { label: t("userFriendsList.blocked"), value: "blocked" },
+  ];
 
   const getOtherUser = (conv: Conversation, targetId: string) => {
     if (String(conv.user1_id) === String(targetId)) return conv.user2;
@@ -106,8 +109,6 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
         return {
           id: user.id,
           username: user.username,
-          title_1: user.title_1 || "",
-          title_2: user.title_2 || "",
           profile_picture: user.profile_pic,
         };
       })
@@ -125,14 +126,14 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
 
         return {
           id: String(user.id),
-          username: user.username || "Utilisateur",
+          username: user.username || t("chat.defaultUsername"),
           title_1: user.title_1 || "",
           title_2: user.title_2 || "",
           profile_picture: user.profile_pic || user.profile_picture,
         };
       })
       .filter((user: FriendItem | null): user is FriendItem => user !== null);
-  }, []);
+  }, [t]);
 
   const fetchList = useCallback(async () => {
     setLoading(true);
@@ -152,13 +153,13 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
       setTotalPages(1);
       setError(
         selectedList === "friends"
-          ? "Impossible de charger les amis pour le moment."
-          : "Impossible de charger la liste des utilisateurs bloqués."
+          ? t("userFriendsList.friendsLoadError")
+          : t("userFriendsList.blockedLoadError")
       );
     } finally {
       setLoading(false);
     }
-  }, [selectedList, fetchFriends, fetchBlocked]);
+  }, [selectedList, fetchFriends, fetchBlocked, t]);
 
   useEffect(() => {
     fetchList();
@@ -198,8 +199,8 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
   };
 
   const emptyMessage = selectedList === "friends"
-    ? "Aucun ami trouvé"
-    : "Aucun utilisateur bloqué";
+    ? t("userFriendsList.noFriends")
+    : t("userFriendsList.noBlocked");
 
   return (
     <>
@@ -208,7 +209,7 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
         <div className="w-full h-[85%] p-3 rounded-t-2xl">
           {loading ? (
             <div className="flex h-full w-full items-center justify-center text-gray-400 font-bold">
-              Chargement...
+              {t("common.loading")}
             </div>
           ) : error ? (
             <div className="flex h-full w-full items-center justify-center text-red-400 font-bold">
@@ -265,7 +266,7 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
         <div className="w-full py-2 px-3 flex flex-col gap-2 overflow-y-auto max-h-[65vh]">
           {loading ? (
             <div className="flex h-40 w-full items-center justify-center text-gray-400 font-bold">
-              Chargement...
+              {t("common.loading")}
             </div>
           ) : error ? (
             <div className="flex h-40 w-full items-center justify-center text-red-400 font-bold">
@@ -277,7 +278,7 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
             </div>
           ) : (
             paginatedFriends.map((friend, index) => {
-              const nickname = friend.username || "Utilisateur";
+              const nickname = friend.username || t("chat.defaultUsername");
 
               return (
                 <div
@@ -305,7 +306,7 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
                       onClick={() => handleUnblock(friend.id)}
                       className="bg-byellow px-3 h-8 rounded-xl balatro hover:outline-2 shrink-0"
                     >
-                      Débloquer
+                      {t("userFriendsList.unblock")}
                     </button>
                   )}
                 </div>

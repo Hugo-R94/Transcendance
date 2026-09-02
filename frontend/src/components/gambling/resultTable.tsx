@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Player } from "../../api/gambling";
 import type { Result } from "../../api/gambling";
 
@@ -42,11 +43,9 @@ export function ResultsTable({
   playerId,
   players,
 }: ResultsTableProps) {
+  const { t } = useTranslation();
   const [sortedByAfter, setSortedByAfter] = useState(false);
 
-  /*
-   * On commence avec le classement AVANT.
-   */
   const beforeResults = useMemo(
     () =>
       [...results].sort(
@@ -55,9 +54,6 @@ export function ResultsTable({
     [results]
   );
 
-  /*
-   * Puis on passe au classement APRÈS.
-   */
   const afterResults = useMemo(
     () =>
       [...results].sort(
@@ -66,9 +62,6 @@ export function ResultsTable({
     [results]
   );
 
-  /*
-   * Après 2 secondes, on déclenche le second tri.
-   */
   useEffect(() => {
     setSortedByAfter(false);
 
@@ -79,10 +72,6 @@ export function ResultsTable({
     return () => window.clearTimeout(timer);
   }, [results]);
 
-  /*
-   * Chaque joueur garde son identité.
-   * On calcule simplement sa position avant et après.
-   */
   const positionsBefore = new Map(
     beforeResults.map((result, index) => [
       result.playerId,
@@ -100,7 +89,7 @@ export function ResultsTable({
   if (!results.length) {
     return null;
   }
-  const title = turn === 5 ? "🏆 Résultats de la partie" : "🏆 Résultats du tour";
+  const title = turn === 5 ? t("resultsTable.gameTitle") : t("resultsTable.roundTitle");
   const ROW_HEIGHT = 52;
   const ROW_GAP = 8;
   const ROW_SIZE = ROW_HEIGHT + ROW_GAP;
@@ -159,11 +148,11 @@ export function ResultsTable({
             text-white/50
           "
         >
-          <span className="text-left">Joueur</span>
-          <span>Résultat</span>
-          <span>Avant</span>
-          <span>Gain</span>
-          <span>Après</span>
+          <span className="text-left">{t("resultsTable.player")}</span>
+          <span>{t("resultsTable.result")}</span>
+          <span>{t("resultsTable.before")}</span>
+          <span>{t("resultsTable.gain")}</span>
+          <span>{t("resultsTable.after")}</span>
         </div>
 
         {/* RESULTATS */}
@@ -234,7 +223,7 @@ export function ResultsTable({
 
                   {result.playerId === playerId && (
                     <span className="h-fit w-fit text-[8px] text-white/60">
-                      (toi)
+                      {t("lobby.you")}
                     </span>
                   )}
                 </div>

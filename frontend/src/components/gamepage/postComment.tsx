@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import StarRating from "./star";
 import Notification from "../utils/notification";
 import { postComment } from "../../api/comments";
@@ -10,6 +11,7 @@ interface PostCommentProps {
 }
 
 function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
+    const { t } = useTranslation();
     const [comment, setComment] = useState("");
     const [title, setTitle] = useState("");
     const [rating, setRating] = useState(0);
@@ -48,30 +50,22 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
         }
 
         if (!gameId || gameId === 0) {
-            setNotificationMessage(
-                "Erreur : Impossible de publier, l'ID du jeu est introuvable."
-            );
+            setNotificationMessage(t("postComment.errors.missingGameId"));
             return;
         }
 
         if (!title.trim()) {
-            setNotificationMessage(
-                "Veuillez ajouter un titre avant d'envoyer votre commentaire."
-            );
+            setNotificationMessage(t("postComment.errors.missingTitle"));
             return;
         }
 
         if (!comment.trim()) {
-            setNotificationMessage(
-                "Veuillez écrire un commentaire avant d'envoyer."
-            );
+            setNotificationMessage(t("postComment.errors.missingComment"));
             return;
         }
 
         if (rating <= 0) {
-            setNotificationMessage(
-                "Veuillez donner une note avant d'envoyer votre commentaire."
-            );
+            setNotificationMessage(t("postComment.errors.missingRating"));
             return;
         }
 
@@ -89,9 +83,7 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
             setTitle("");
             setRating(0);
 
-            setNotificationMessage(
-                "Commentaire publié avec succès !"
-            );
+            setNotificationMessage(t("postComment.success"));
 
             if (onCommentPosted) {
                 onCommentPosted();
@@ -102,7 +94,7 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
             setNotificationMessage(
                 error?.response?.data?.error ||
                 error?.message ||
-                "Impossible d'envoyer le commentaire."
+                t("postComment.errors.submitFailed")
             );
         } finally {
             setIsSubmitting(false);
@@ -132,7 +124,7 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
                 </div>
 
                 <p className="font-bold">
-                    Did you like this game ?
+                    {t("postComment.prompt")}
                 </p>
             </div>
 
@@ -140,14 +132,14 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="bg-gray-200 w-[75%] h-10 mt-3 rounded-2xl text-gray-800 p-2 resize-none overflow-y-auto focus:outline-none mx-auto block"
-                placeholder="Write your title..."
+                placeholder={t("postComment.titlePlaceholder")}
             />
 
             <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 className="w-full h-50 my-3 rounded-2xl bg-gray-200 text-gray-800 p-3 resize-none overflow-y-auto focus:outline-none mx-auto block"
-                placeholder="Write your comment..."
+                placeholder={t("postComment.commentPlaceholder")}
             />
 
             <StarRating
@@ -161,7 +153,7 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
                 disabled={isSubmitting}
                 className="bg-[#00509f] w-30 h-15 mt-3 rounded-2xl balatro shadow-md shadow-black font-bold active:scale-90 hover:outline-2 hover:outline-white block mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
             >
-                {isSubmitting ? "..." : "SUBMIT"}
+                {isSubmitting ? t("postComment.submitting") : t("postComment.submit")}
             </button>
         </div>
     );

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import NotificationSignal from "../utils/notificationSignal";
 
 type Tab = "friends" | "requests";
@@ -17,6 +18,8 @@ export function ChatMenuHeader({
   isOpen,
   hasRequest,
 }: ChatMenuHeaderProps) {
+  const { t } = useTranslation();
+
   return (
     <div
       className={`flex flex-row justify-center items-center gap-x-2 transition-all duration-300 rounded-2xl shrink-0 p-1 ${
@@ -34,10 +37,9 @@ export function ChatMenuHeader({
               activeTab === "friends" ? "outline-3 outline-white" : ""
             } active:scale-90`}
           >
-            AMIS
+            {t("chatMenuHeader.friendsTab")}
           </button>
 
-          {/* Wrapper relatif pour positionner le rond */}
           <div className="relative w-1/2 h-full">
             <button
               onClick={(e) => {
@@ -48,7 +50,7 @@ export function ChatMenuHeader({
                 activeTab === "requests" ? "outline-3 outline-white" : ""
               } active:scale-90`}
             >
-              INVITATIONS
+              {t("chatMenuHeader.requestsTab")}
             </button>
 
             {hasRequest && (
@@ -79,7 +81,7 @@ export function ChatMenuHeader({
           className="w-full h-full flex flex-row items-center justify-between cursor-pointer text-white px-1"
         >
           <span className="font-bold text-xs tracking-wider balatro">
-            CHAT
+            {t("chatMenuHeader.collapsedLabel")}
           </span>
 
           <span className="transform transition-transform duration-500 inline-block rotate-180 text-xs">

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 type InviteProps = {
   color: string;
@@ -9,6 +10,7 @@ export default function InviteGame({
   color,
   roomId,
 }: InviteProps) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const text_color =
@@ -27,7 +29,7 @@ export default function InviteGame({
       className={`flex flex-col items-center gap-y-1 card w-50 h-20 rounded-2xl gap-x-2 text-xs justify-center p-3 ${color}`}
     >
       <div className="flex gap-x-1">
-        <p className="font-extrabold">JOIN ROOM :</p>
+        <p className="font-extrabold">{t("inviteGame.joinRoom")}</p>
 
         <p className={`font-extrabold ${text_color}`}>
           {roomId}
@@ -38,7 +40,7 @@ export default function InviteGame({
         onClick={handleJoin}
         className="bg-bgreen w-1/2 h-full balatro rounded-2xl shadow-black/50 shadow-md active:scale-90 active:outline-3 font-extrabold"
       >
-        JOIN
+        {t("inviteGame.join")}
       </button>
     </div>
   );

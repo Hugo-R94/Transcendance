@@ -1,15 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import Pagination from "../utils/paginationController";
 import DropdownMenu from "../utils/dropdownFilter";
-import { genres, orderOptions } from "../../pages/GameList";
+import { useGenreOptions, useOrderOptions } from "../../pages/GameList";
 import api from "../../api/api";
 import GameList from "../gameList";
-
-export const listOptions = [
-  { label: "Likes", value: "likes" },
-  { label: "Dislikes", value: "dislikes" },
-  { label: "Wishlist", value: "wishlist" },
-];
 
 export interface Game {
   appid: number;
@@ -23,6 +18,16 @@ interface UserGameListProps {
 }
 
 function UserGameList({ userId, className = "" }: UserGameListProps) {
+  const { t } = useTranslation();
+  const genres = useGenreOptions();
+  const orderOptions = useOrderOptions();
+
+  const listOptions = [
+    { label: t("userGameList.likes"), value: "likes" },
+    { label: t("userGameList.dislikes"), value: "dislikes" },
+    { label: t("userGameList.wishlist"), value: "wishlist" },
+  ];
+
   const [selectedList, setSelectedList] = useState<string>("likes");
   const [selectedGenre, setSelectedGenre] = useState<string>("");
   const [selectedOrderBy, setSelectedOrderBy] = useState<string>("");
@@ -86,11 +91,11 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
         <div className="w-full flex justify-center items-center h-[85%] overflow-visible p-2 rounded-t-2xl ">
           {loading ? (
             <div className="flex h-full w-full items-center justify-center">
-              <span className="text-gray-400">Chargement...</span>
+              <span className="text-gray-400">{t("common.loading")}</span>
             </div>
           ) : games.length === 0 ? (
             <div className="flex h-full w-full items-center justify-center">
-              <span className="text-gray-400">Aucun jeu dans cette liste</span>
+              <span className="text-gray-400">{t("userGameList.empty")}</span>
             </div>
           ) : (
             <GameList games={games} />
@@ -107,7 +112,7 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
               color="bg-bgreen"
             />
             <DropdownMenu
-              Name="Genre"
+              Name={t("gameFilters.genreLabel")}
               pos={-1}
               items={genres}
               value={selectedGenre}
@@ -115,7 +120,7 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
               color="bg-bblue"
             />
             <DropdownMenu
-              Name="Tri"
+              Name={t("gameFilters.sortLabel")}
               items={orderOptions}
               pos={-1}
               value={selectedOrderBy}
@@ -147,7 +152,7 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
             color="bg-bgreen"
           />
           <DropdownMenu
-            Name="Genre"
+            Name={t("gameFilters.genreLabel")}
             pos={-1}
             items={genres}
             value={selectedGenre}
@@ -155,7 +160,7 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
             color="bg-bblue"
           />
           <DropdownMenu
-            Name="Tri"
+            Name={t("gameFilters.sortLabel")}
             pos={-1}
             items={orderOptions}
             value={selectedOrderBy}
@@ -168,11 +173,11 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
         <div className="w-full flex justify-center items-center py-2 px-2">
           {loading ? (
             <div className="flex h-40 w-full items-center justify-center">
-              <span className="text-gray-400">Chargement...</span>
+              <span className="text-gray-400">{t("common.loading")}</span>
             </div>
           ) : games.length === 0 ? (
             <div className="flex h-40 w-full items-center justify-center">
-              <span className="text-gray-400">Aucun jeu dans cette liste</span>
+              <span className="text-gray-400">{t("userGameList.empty")}</span>
             </div>
           ) : (
             <GameList games={games} />

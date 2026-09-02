@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import ProfileMenu from "../components/profile/profilMenu";
 import UserGameList from "../components/profile/userGameList";
 import Notification from "../components/utils/notification";
@@ -19,6 +20,7 @@ export type UserProfile = {
 };
 
 export default function Profil() {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [description, setDescription] = useState<string>("");
   const [imageSrc, setImageSrc] = useState<string>("");
@@ -40,7 +42,7 @@ export default function Profil() {
         const token = localStorage.getItem("token");
 
         if (!token) {
-          setError("Non authentifié");
+          setError(t("profile.errors.notAuthenticated"));
           setLoading(false);
           return;
         }
@@ -67,7 +69,7 @@ export default function Profil() {
         setError(
           err.response?.data?.error ||
             err.message ||
-            "Une erreur est survenue"
+            t("profile.errors.generic")
         );
       } finally {
         setLoading(false);
@@ -107,11 +109,11 @@ export default function Profil() {
       const newImageUrl = URL.createObjectURL(file);
 
       setImageSrc(newImageUrl);
-      setNotification("Photo de profil mise à jour avec succès !");
+      setNotification(t("profile.success.pictureUpdated"));
     } catch (err: any) {
       alert(
         err.response?.data?.error ||
-          "Impossible de mettre à jour la photo de profil."
+          t("profile.errors.pictureUpdateFailed")
       );
     }
   };
@@ -131,11 +133,11 @@ export default function Profil() {
         });
       }
 
-      setNotification("Description sauvegardée avec succès !");
+      setNotification(t("profile.success.descriptionSaved"));
     } catch (err: any) {
       alert(
         err.response?.data?.error ||
-          "Erreur lors de la sauvegarde."
+          t("profile.errors.saveDescriptionFailed")
       );
     } finally {
       setIsSavingDesc(false);
@@ -172,7 +174,7 @@ export default function Profil() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-white font-bold">
-        Chargement du profil...
+        {t("profile.loading")}
       </div>
     );
   }
@@ -180,7 +182,7 @@ export default function Profil() {
   if (error || !profile) {
     return (
       <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">
-        {error || "Profil introuvable"}
+        {error || t("profile.notFound")}
       </div>
     );
   }
@@ -193,8 +195,6 @@ export default function Profil() {
           onClose={() => setNotification(null)}
         />
       )}
-
-      {/* ==================== DESKTOP ==================== */}
 
       <main className="hidden sm:flex sm:flex-col mx-[5%] w-[90%] pt-20 pb-4 h-screen overflow-hidden">
         <ProfileHeader
@@ -218,8 +218,6 @@ export default function Profil() {
           {renderTabContent()}
         </div>
       </main>
-
-      {/* ==================== MOBILE ==================== */}
 
       <div className="sm:hidden flex flex-col w-full min-h-screen p-2">
         <ProfileHeader

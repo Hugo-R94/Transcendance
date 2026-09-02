@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { Ticket } from "../../api/gambling";
 
 type ScratchTicketProps = {
@@ -15,6 +16,7 @@ export function ScratchTicket({
   countdown,
   scratch,
 }: ScratchTicketProps) {
+  const { t } = useTranslation();
   const isVisible = state === "scratch";
 
   const disabled =
@@ -91,11 +93,11 @@ export function ScratchTicket({
 
                 <div>
                   <h2 className="text-xl font-black text-white drop-shadow-md">
-                    TICKET MYSTÈRE
+                    {t("scratchTicket.mysteryTitle")}
                   </h2>
 
                   <p className="mt-1 text-sm text-white/80 drop-shadow">
-                    Révèle ton bonus
+                    {t("scratchTicket.revealSubtitle")}
                   </p>
                 </div>
 
@@ -117,7 +119,7 @@ export function ScratchTicket({
                     disabled:opacity-40
                   "
                 >
-                  ✨ GRATTER
+                  {t("scratchTicket.scratchButton")}
                 </button>
 
                 {countdown !== null && countdown > 0 && (
@@ -129,7 +131,7 @@ export function ScratchTicket({
             ) : (
               <div className="flex flex-col items-center gap-3 text-center">
                 <span className="text-sm font-bold uppercase tracking-widest text-white/80 drop-shadow">
-                  Ton ticket
+                  {t("scratchTicket.yourTicket")}
                 </span>
 
                 <span className="text-5xl">
@@ -137,7 +139,7 @@ export function ScratchTicket({
                 </span>
 
                 <h2 className="text-2xl font-black text-white drop-shadow-md">
-                  {ticket.type === "bonus" ? "BONUS" : "MALUS"}
+                  {ticket.type === "bonus" ? t("scratchTicket.bonus") : t("scratchTicket.malus")}
                 </h2>
 
                 <strong className="text-5xl font-black text-white drop-shadow-md">
@@ -146,7 +148,7 @@ export function ScratchTicket({
                 </strong>
 
                 <span className="mt-2 rounded-full bg-black/30 px-4 py-1 text-xs font-bold text-white/80 backdrop-blur-sm">
-                  ✓ TICKET RÉVÉLÉ
+                  {t("scratchTicket.revealed")}
                 </span>
               </div>
             )}

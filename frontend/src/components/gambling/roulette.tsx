@@ -381,23 +381,6 @@ export function Roulette({
           </div>
         </div>
       </div>
-
-      {/* MESSAGE
-          La hauteur est TOUJOURS réservée.
-          Seul le texte devient invisible.
-      */}
-      <div className="mt-5 h-5 text-sm font-bold text-white/60">
-        <span
-          className={
-            state === "spinning"
-              ? "visible"
-              : "invisible"
-          }
-        >
-          🎰 Roulette en cours
-        </span>
-      </div>
-
     </section>
   );
 }
