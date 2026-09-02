@@ -1,9 +1,9 @@
-import { useGambling } from "../../use/useGambling";
+import { useTranslation } from "react-i18next";
 
 type PhaseTimerProps = {
   state: string;
   countdown: number | null;
-  turn:	number,
+  turn: number,
 };
 
 export function PhaseTimer({
@@ -11,22 +11,24 @@ export function PhaseTimer({
   countdown,
   turn,
 }: PhaseTimerProps) {
+  const { t } = useTranslation();
+
   const getLabel = () => {
     switch (state) {
       case "betting":
-        return "PARIS";
+        return t("phaseTimer.phases.betting");
 
       case "scratch":
-        return "TICKET À GRATTER";
+        return t("phaseTimer.phases.scratch");
 
       case "spinning":
-        return "ROULETTE";
+        return t("phaseTimer.phases.spinning");
 
       case "resolving":
-        return "RÉSULTAT";
+        return t("phaseTimer.phases.resolving");
 
       case "finished":
-        return "PARTIE TERMINÉE";
+        return t("phaseTimer.phases.finished");
 
       default:
         return state;
@@ -34,59 +36,59 @@ export function PhaseTimer({
   };
 
   return (
-	<div className="flex h-fit sm:w-full w-[90%] items-center gap-4">
+    <div className="flex h-fit sm:w-full w-[90%] items-center gap-4">
 
-	{/* TIMER */}
-	<div className="flex sm:h-full h-10 flex-1 items-center justify-center rounded-2xl bg-bred p-2 card">
-		<div
-		className="flex items-center justify-center gap-2 whitespace-nowrap"
-		style={{
-			fontSize: "clamp(0.6rem, 1.2vw, 1rem)",
-		}}
-		>
-		<span className="font-semibold">
-			REMAINS:
-		</span>
+      {/* TIMER */}
+      <div className="flex sm:h-full h-10 flex-1 items-center justify-center rounded-2xl bg-bred p-2 card">
+        <div
+          className="flex items-center justify-center gap-2 whitespace-nowrap"
+          style={{
+            fontSize: "clamp(0.6rem, 1.2vw, 1rem)",
+          }}
+        >
+          <span className="font-semibold">
+            {t("phaseTimer.remains")}
+          </span>
 
-		<strong>
-			{countdown}s
-		</strong>
-		</div>
-	</div>
+          <strong>
+            {countdown}s
+          </strong>
+        </div>
+      </div>
 
-	{/* TURN */}
-	<div
-		className="flex sm:h-full h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-bgreen p-2 card whitespace-nowrap"
-		style={{
-		fontSize: "clamp(0.6rem, 1.2vw, 1rem)",
-		}}
-	>
-		<span className="font-semibold">
-		Turn:
-		</span>
+      {/* TURN */}
+      <div
+        className="flex sm:h-full h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-bgreen p-2 card whitespace-nowrap"
+        style={{
+          fontSize: "clamp(0.6rem, 1.2vw, 1rem)",
+        }}
+      >
+        <span className="font-semibold">
+          {t("phaseTimer.turn")}
+        </span>
 
-		<strong>
-		{turn}
-		</strong>
-	</div>
+        <strong>
+          {turn}
+        </strong>
+      </div>
 
-	{/* PHASE */}
-	<div
-		className="flex sm:h-full h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-bgreen p-2 card whitespace-nowrap"
-		style={{
-		fontSize: "clamp(0.55rem, 1vw, 1rem)",
-		}}
-	>
-		<span className="font-semibold">
-		Phase:
-		</span>
+      {/* PHASE */}
+      <div
+        className="flex sm:h-full h-10 flex-1 items-center justify-center gap-2 rounded-2xl bg-bgreen p-2 card whitespace-nowrap"
+        style={{
+          fontSize: "clamp(0.55rem, 1vw, 1rem)",
+        }}
+      >
+        <span className="font-semibold">
+          {t("phaseTimer.phase")}
+        </span>
 
-		<strong>
-		{getLabel()}
-		</strong>
-	</div>
+        <strong>
+          {getLabel()}
+        </strong>
+      </div>
 
-	</div>
+    </div>
 
   );
 }

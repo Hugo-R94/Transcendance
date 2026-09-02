@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import api from '../api/api';
 
 interface User {
@@ -27,6 +28,7 @@ interface Conversation {
 }
 
 export default function MinimalChat() {
+  const { t } = useTranslation();
   const [convs, setConvs] = useState<Conversation[]>([]);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [selectedConv, setSelectedConv] =
@@ -37,16 +39,7 @@ export default function MinimalChat() {
   const [wsConnected, setWsConnected] = useState(false);
 
   const wsRef = useRef<WebSocket | null>(null);
-
-  /*
-   * Permet d'éviter de créer plusieurs connexions
-   * simultanément.
-   */
   const wsConnectingRef = useRef(false);
-
-  // =========================================================
-  // 1. Profil courant
-  // =========================================================
 
   const fetchMyProfile = async () => {
     try {
@@ -62,10 +55,6 @@ export default function MinimalChat() {
       );
     }
   };
-
-  // =========================================================
-  // 2. Conversations
-  // =========================================================
 
   const fetchConversations = async () => {
     try {
@@ -101,17 +90,9 @@ export default function MinimalChat() {
     }
   };
 
-  // =========================================================
-  // 3. WebSocket
-  // =========================================================
-
   useEffect(() => {
     let ws: WebSocket | null = null;
 
-    /*
-     * Si une connexion est déjà en cours,
-     * on ne fait rien.
-     */
     if (wsConnectingRef.current) {
       return;
     }
@@ -119,19 +100,6 @@ export default function MinimalChat() {
     wsConnectingRef.current = true;
 
     const setupChatConnection = () => {
-      /*
-       * Pour le moment :
-       *
-       * JWT directement dans l'URL.
-       *
-       * DEV UNIQUEMENT.
-       *
-       * Plus tard :
-       *
-       * JWT -> endpoint HTTP -> ticket temporaire
-       * -> WebSocket avec ticket
-       */
-
       const token = localStorage.getItem('token');
 
       if (!token) {
@@ -163,10 +131,6 @@ export default function MinimalChat() {
 
       wsRef.current = ws;
 
-      // =====================================================
-      // WebSocket ouvert
-      // =====================================================
-
       ws.onopen = () => {
         console.log(
           'Connecté au WebSocket 🔌'
@@ -174,10 +138,6 @@ export default function MinimalChat() {
 
         setWsConnected(true);
       };
-
-      // =====================================================
-      // Message reçu
-      // =====================================================
 
       ws.onmessage = (event) => {
         try {
@@ -191,10 +151,6 @@ export default function MinimalChat() {
           );
 
           switch (data.type) {
-
-            // ===============================================
-            // Nouveau message
-            // ===============================================
 
             case 'message': {
               setConvs((previousConvs) =>
@@ -237,18 +193,10 @@ export default function MinimalChat() {
               break;
             }
 
-            // ===============================================
-            // Demande d'ami
-            // ===============================================
-
             case 'friend_req': {
               fetchConversations();
               break;
             }
-
-            // ===============================================
-            // Acceptation d'ami
-            // ===============================================
 
             case 'friend_accept': {
               fetchConversations();
@@ -269,10 +217,6 @@ export default function MinimalChat() {
         }
       };
 
-      // =====================================================
-      // Erreur
-      // =====================================================
-
       ws.onerror = (event) => {
         console.error(
           'Erreur WebSocket :',
@@ -281,10 +225,6 @@ export default function MinimalChat() {
 
         setWsConnected(false);
       };
-
-      // =====================================================
-      // Fermeture
-      // =====================================================
 
       ws.onclose = (event) => {
         console.log(
@@ -297,11 +237,6 @@ export default function MinimalChat() {
 
         setWsConnected(false);
 
-        /*
-         * On ne détruit la référence que si
-         * c'est bien ce WebSocket qui est actuellement
-         * enregistré.
-         */
         if (wsRef.current === ws) {
           wsRef.current = null;
         }
@@ -312,24 +247,7 @@ export default function MinimalChat() {
     fetchConversations();
     setupChatConnection();
 
-    // =====================================================
-    // Cleanup
-    // =====================================================
-
     return () => {
-      /*
-       * React StrictMode peut provoquer :
-       *
-       * useEffect
-       * cleanup
-       * useEffect
-       *
-       * en développement.
-       *
-       * Le code 1001 sur le premier WebSocket
-       * est donc normal.
-       */
-
       if (ws) {
         ws.close();
       }
@@ -341,10 +259,6 @@ export default function MinimalChat() {
       wsConnectingRef.current = false;
     };
   }, []);
-
-  // =========================================================
-  // 4. Demande d'ami
-  // =========================================================
 
   const handleSendFriendRequest = async (
     e: React.FormEvent
@@ -366,9 +280,7 @@ export default function MinimalChat() {
         }
       );
 
-      alert(
-        'Demande d’ami envoyée !'
-      );
+      alert(t('chat.alerts.friendRequestSent'));
 
       setTargetUsername('');
 
@@ -381,17 +293,11 @@ export default function MinimalChat() {
       );
 
       alert(
-        `Erreur : ${
-          err.response?.data?.error ||
-          'Impossible d’envoyer la demande'
-        }`
+        err.response?.data?.error ||
+          t('chat.alerts.friendRequestFailed')
       );
     }
   };
-
-  // =========================================================
-  // 5. ID de l'autre utilisateur
-  // =========================================================
 
   const getOtherUserId = (
     conv: Conversation
@@ -434,10 +340,6 @@ export default function MinimalChat() {
     );
   };
 
-  // =========================================================
-  // 6. Accepter une demande
-  // =========================================================
-
   const handleAcceptFriendRequest = async (
     conv: Conversation
   ) => {
@@ -446,9 +348,7 @@ export default function MinimalChat() {
         getOtherUserId(conv);
 
       if (!otherUserId) {
-        alert(
-          "Erreur : impossible de trouver l'utilisateur."
-        );
+        alert(t('chat.alerts.userNotFound'));
 
         return;
       }
@@ -461,9 +361,7 @@ export default function MinimalChat() {
         }
       );
 
-      alert(
-        'Demande d’ami acceptée !'
-      );
+      alert(t('chat.alerts.friendRequestAccepted'));
 
       await fetchConversations();
     } catch (err: any) {
@@ -474,17 +372,11 @@ export default function MinimalChat() {
       );
 
       alert(
-        `Erreur : ${
-          err.response?.data?.error ||
-          'Impossible d’accepter la demande'
-        }`
+        err.response?.data?.error ||
+          t('chat.alerts.friendAcceptFailed')
       );
     }
   };
-
-  // =========================================================
-  // 7. Envoyer un message
-  // =========================================================
 
   const handleSendMessage = (
     e: React.FormEvent
@@ -499,9 +391,7 @@ export default function MinimalChat() {
     }
 
     if (!selectedConv) {
-      alert(
-        'Sélectionnez une discussion.'
-      );
+      alert(t('chat.alerts.selectConversation'));
 
       return;
     }
@@ -510,9 +400,7 @@ export default function MinimalChat() {
       wsRef.current;
 
     if (!ws) {
-      alert(
-        'La connexion WebSocket n’existe pas.'
-      );
+      alert(t('chat.alerts.wsMissing'));
 
       return;
     }
@@ -521,9 +409,7 @@ export default function MinimalChat() {
       ws.readyState !==
       WebSocket.OPEN
     ) {
-      alert(
-        'La connexion WebSocket n’est pas active.'
-      );
+      alert(t('chat.alerts.wsNotActive'));
 
       return;
     }
@@ -546,10 +432,6 @@ export default function MinimalChat() {
 
     setNewMessage('');
   };
-
-  // =========================================================
-  // 8. Helpers
-  // =========================================================
 
   const isAccepted = (
     accepted:
@@ -601,7 +483,7 @@ export default function MinimalChat() {
       return (
         conv.user2?.username ||
         conv.user1?.username ||
-        'Utilisateur'
+        t('chat.defaultUsername')
       );
     }
 
@@ -613,35 +495,25 @@ export default function MinimalChat() {
     ) {
       return (
         conv.user2?.username ||
-        'Utilisateur'
+        t('chat.defaultUsername')
       );
     }
 
     return (
       conv.user1?.username ||
-      'Utilisateur'
+      t('chat.defaultUsername')
     );
   };
-
-  // =========================================================
-  // 9. Render
-  // =========================================================
 
   return (
     <div className="flex h-screen bg-gray-100 text-gray-800">
 
-      {/* ===================================================
-          SIDEBAR
-          =================================================== */}
-
       <div className="w-1/3 bg-white border-r flex flex-col mt-20">
-
-        {/* Ajouter un ami */}
 
         <div className="p-4 border-b">
 
           <h2 className="text-lg font-bold mb-2">
-            Ajouter un ami
+            {t('chat.addFriend')}
           </h2>
 
           <form
@@ -653,7 +525,7 @@ export default function MinimalChat() {
 
             <input
               type="text"
-              placeholder="Nom d'utilisateur"
+              placeholder={t('chat.usernamePlaceholder')}
               value={targetUsername}
               onChange={(e) =>
                 setTargetUsername(
@@ -667,14 +539,12 @@ export default function MinimalChat() {
               type="submit"
               className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
             >
-              Ajouter
+              {t('chat.addButton')}
             </button>
 
           </form>
 
         </div>
-
-        {/* Statut WebSocket */}
 
         <div className="px-4 py-2 border-b bg-gray-50">
 
@@ -690,31 +560,25 @@ export default function MinimalChat() {
 
             <span className="text-gray-500">
               {wsConnected
-                ? 'WebSocket connecté'
-                : 'WebSocket déconnecté'}
+                ? t('chat.wsConnected')
+                : t('chat.wsDisconnected')}
             </span>
 
           </div>
 
         </div>
 
-        {/* Demandes en attente */}
-
         <div className="border-b bg-gray-50 p-4">
 
           <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">
-
-            Demandes en attente (
-            {pendingRequests.length}
-            )
-
+            {t('chat.pendingRequests', { count: pendingRequests.length })}
           </h3>
 
           {pendingRequests.length ===
           0 ? (
 
             <p className="text-xs text-gray-400">
-              Aucune demande en attente.
+              {t('chat.noPendingRequests')}
             </p>
 
           ) : (
@@ -739,7 +603,7 @@ export default function MinimalChat() {
                     }
                     className="bg-green-500 text-white px-2.5 py-1 rounded text-xs hover:bg-green-600"
                   >
-                    Accepter
+                    {t('chat.accept')}
                   </button>
 
                 </div>
@@ -751,23 +615,17 @@ export default function MinimalChat() {
 
         </div>
 
-        {/* Discussions */}
-
         <div className="flex-1 overflow-y-auto">
 
           <h3 className="text-xs font-semibold text-gray-400 uppercase px-4 py-2">
-
-            Discussions (
-            {activeConvs.length}
-            )
-
+            {t('chat.discussions', { count: activeConvs.length })}
           </h3>
 
           {activeConvs.length ===
           0 ? (
 
             <p className="p-4 text-sm text-gray-500">
-              Aucune discussion active.
+              {t('chat.noActiveDiscussions')}
             </p>
 
           ) : (
@@ -807,25 +665,16 @@ export default function MinimalChat() {
 
       </div>
 
-      {/* ===================================================
-          CHAT PRINCIPAL
-          =================================================== */}
-
       <div className="flex-1 flex flex-col bg-white mt-20">
 
         {selectedConv ? (
 
           <>
 
-            {/* Header */}
-
             <div className="p-4 border-b font-bold flex items-center justify-between">
 
               <span>
-                Discussion avec{' '}
-                {getOtherUser(
-                  selectedConv
-                )}
+                {t('chat.discussionWith', { name: getOtherUser(selectedConv) })}
               </span>
 
               <span
@@ -836,15 +685,11 @@ export default function MinimalChat() {
                 }`}
               >
                 {wsConnected
-                  ? '● En ligne'
-                  : '● Hors ligne'}
+                  ? t('chat.online')
+                  : t('chat.offline')}
               </span>
 
             </div>
-
-            {/* Messages */}
-
-			{/* Messages */}
 
 			<div className="flex-1 p-4 overflow-y-auto flex flex-col-reverse gap-2">
 						
@@ -874,15 +719,12 @@ export default function MinimalChat() {
 			) : (
 
 				<p className="text-center text-gray-400 text-sm mt-4">
-				Aucun message pour le moment.
-				Dites bonjour !
+				{t('chat.noMessages')}
 				</p>
 
 			)}
 
 			</div>
-
-            {/* Envoyer un message */}
 
             <form
               onSubmit={
@@ -893,7 +735,7 @@ export default function MinimalChat() {
 
               <input
                 type="text"
-                placeholder="Écrivez votre message..."
+                placeholder={t('chat.messagePlaceholder')}
                 value={newMessage}
                 onChange={(e) =>
                   setNewMessage(
@@ -914,7 +756,7 @@ export default function MinimalChat() {
                     : 'bg-gray-400 cursor-not-allowed'
                 }`}
               >
-                Envoyer
+                {t('chat.send')}
               </button>
 
             </form>
@@ -924,7 +766,7 @@ export default function MinimalChat() {
         ) : (
 
           <div className="flex-1 flex items-center justify-center text-gray-400">
-            Sélectionnez une discussion pour commencer
+            {t('chat.selectDiscussion')}
           </div>
 
         )}

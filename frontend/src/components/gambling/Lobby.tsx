@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import { useUserAvatar } from "../../api/getUserAvatar";
 import type { Friend } from "../../api/chat";
@@ -77,6 +78,7 @@ export default function Lobby({
   invite,
   toggleReady,
 }: LobbyProps) {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const roomFromUrl = searchParams.get("room");
 
@@ -114,7 +116,7 @@ export default function Lobby({
     <div className="w-full p-6 text-white">
       <div className="mx-auto flex max-w-3xl flex-col items-center justify-center">
         <h1 className="mb-6 text-3xl font-black">
-          LOBBY
+          {t("lobby.title")}
         </h1>
 
         {error && (
@@ -127,7 +129,7 @@ export default function Lobby({
         {countdown !== null && (
           <div className="mb-4 rounded-xl bg-yellow-900 p-4 text-center">
             <div className="text-sm font-bold text-yellow-300">
-              LA PARTIE COMMENCE DANS
+              {t("lobby.startingIn")}
             </div>
 
             <div className="text-4xl font-black text-white">
@@ -145,7 +147,7 @@ export default function Lobby({
                   : "text-yellow-400"
               }
             >
-              ● {connected ? "Connecté" : "Connexion..."}
+              ● {connected ? t("lobby.connected") : t("lobby.connecting")}
             </span>
           </div>
 
@@ -153,7 +155,7 @@ export default function Lobby({
             <input
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
-              placeholder="Nom de la room"
+              placeholder={t("lobby.roomNamePlaceholder")}
               disabled={joined}
               className="flex-1 rounded-xl bg-slate-800 px-4 py-3 outline-none"
             />
@@ -163,7 +165,7 @@ export default function Lobby({
                 onClick={joinRoom}
                 className="rounded-xl bg-blue-600 px-6 py-3 font-black hover:bg-blue-500"
               >
-                REJOINDRE
+                {t("lobby.join")}
               </button>
             )}
           </div>
@@ -182,27 +184,28 @@ export default function Lobby({
                     },
                   }))}
                 >
-                  INVITE
+                  {t("lobby.invite")}
                 </DropdownMenu>
 
                 <button
                   onClick={leaveRoom}
                   className="w-1/2 rounded-2xl bg-bred p-2 shadow-md shadow-black/75 hover:z-50 hover:outline-3"
                 >
-                  LEAVE
+                  {t("lobby.leave")}
                 </button>
               </div>
 
               <div className="mb-6 flex items-center justify-between">
                 <div>
                   <h2 className="text-xl font-black">
-                    Joueurs
+                    {t("lobby.players")}
                   </h2>
 
                   <p className="text-sm text-slate-500">
-                    {players.filter((player) => player.ready).length}
-                    {" / "}
-                    {players.length} prêts
+                    {t("lobby.readyCount", {
+                      ready: players.filter((player) => player.ready).length,
+                      total: players.length,
+                    })}
                   </p>
                 </div>
 
@@ -212,14 +215,14 @@ export default function Lobby({
                     ready ? "bg-bgreen" : "bg-bblue"
                   }`}
                 >
-                  {ready ? "READY" : "NOT READY"}
+                  {ready ? t("lobby.readyToggleOn") : t("lobby.readyToggleOff")}
                 </button>
               </div>
 
               <div className="space-y-3">
                 {players.length === 0 && (
                   <div className="rounded-xl bg-slate-800 p-6 text-center text-slate-500">
-                    Aucun joueur
+                    {t("lobby.noPlayers")}
                   </div>
                 )}
 
@@ -241,7 +244,7 @@ export default function Lobby({
 
                         {player.playerId === playerId && (
                           <span className="ml-1 text-bblue">
-                            (toi)
+                            {t("lobby.you")}
                           </span>
                         )}
                       </div>
@@ -254,7 +257,7 @@ export default function Lobby({
                           : "text-white/50"
                       }`}
                     >
-                      {player.ready ? "READY" : "WAITING"}
+                      {player.ready ? t("lobby.statusReady") : t("lobby.statusWaiting")}
                     </div>
                   </div>
                 ))}

@@ -1,34 +1,36 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "../../i18n";
 import DropdownMenu from "../utils/dropdownFilter";
 import { setUserTitle } from "../../api/profilApi";
 
-
 export type TitleOption = {
-  label: string;
   value: number;
 };
 
-// La liste autorisée côté front (IDs identiques au Backend)
+// La liste des IDs autorisés côté front (identiques au Backend)
 export const TITLE_OPTIONS: TitleOption[] = [
-  { label: "Gamer", value: 1 },
-  { label: "Puant", value: 2 },
-  { label: "Hardstuck", value: 3 },
-  { label: "High", value: 4 },
-  { label: "Lucky", value: 5 },
-  { label: "Endetté", value: 6 },
-  { label: "Master", value: 7 },
-  { label: "Inter", value: 8 },
-  { label: "New", value: 9 },
-  { label: "Player", value: 10 },
+  { value: 1 },
+  { value: 2 },
+  { value: 3 },
+  { value: 4 },
+  { value: 5 },
+  { value: 6 },
+  { value: 7 },
+  { value: 8 },
+  { value: 9 },
+  { value: 10 },
 ];
 
 /**
  * Helper exporté pour convertir un ID (numérique ou string) en son libellé texte.
+ * Utilise i18n.t() directement (plutôt que useTranslation) car cette fonction
+ * est appelée depuis des composants qui n'utilisent pas le hook.
  */
 export function getTitleLabel(id: string | number): string {
   const num = Number(id);
   const found = TITLE_OPTIONS.find((opt) => opt.value === num);
-  return found ? found.label : "";
+  return found ? i18n.t(`titles.${num}`) : "";
 }
 
 interface TitleManagerProps {
@@ -44,11 +46,10 @@ function TitleManager({
   onSelectTitle1,
   onSelectTitle2,
 }: TitleManagerProps) {
-  // Conversion explicite en number pour le state local
+  const { t } = useTranslation();
   const [selectedTitle1, setSelectedTitle1] = useState<number>(Number(initialTitle1));
   const [selectedTitle2, setSelectedTitle2] = useState<number>(Number(initialTitle2));
 
-  // Synchronisation si les props sont mises à jour après un fetch API du Profil
   useEffect(() => {
     if (initialTitle1 !== undefined) setSelectedTitle1(Number(initialTitle1));
     if (initialTitle2 !== undefined) setSelectedTitle2(Number(initialTitle2));
@@ -80,9 +81,8 @@ function TitleManager({
     if (onSelectTitle2) onSelectTitle2(numericValue);
   };
 
-  // Construction des items pour le dropdown en utilisant getTitleLabel
   const formattedOptions = TITLE_OPTIONS.map((opt) => ({
-    label: getTitleLabel(opt.value),
+    label: t(`titles.${opt.value}`),
     value: opt.value.toString(),
   }));
 

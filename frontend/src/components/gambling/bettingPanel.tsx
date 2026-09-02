@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import BettingTable from "./bettingTable";
 import { Balance } from "./balance";
 import type { PlayerBet } from "../../api/gambling";
@@ -59,6 +60,7 @@ export function BettingPanel({
   placeBet,
   playerBets,
 }: BettingPanelProps) {
+  const { t } = useTranslation();
   const bettingDisabled =
     state !== "betting" || phaseCountdown === 0;
 
@@ -144,7 +146,7 @@ export function BettingPanel({
         </div>
 
         <div className="hidden w-[90%] card bg-bblue p-1 text-lg font-extrabold sm:block mb-2">
-          <p>How much do you want to bet ???</p>
+          <p>{t("bettingPanel.howMuch")}</p>
         </div>
 
         <div className="my-0.5 w-full px-2 sm:w-fit sm:px-0">
@@ -192,13 +194,13 @@ export function BettingPanel({
         </div>
 
         <div className="flex items-center justify-center gap-x-1 text-xs text-center sm:text-sm">
-          <p>Mise actuelle</p>
+          <p>{t("bettingPanel.currentBet")}</p>
 
           <p className="mx-1 text-base font-extrabold sm:mx-2 sm:text-lg">
             {betAmount}
           </p>
 
-          <span>sur</span>
+          <span>{t("bettingPanel.on")}</span>
 
           <p className="mx-1 text-base font-extrabold sm:mx-2 sm:text-lg">
             {target || "-"}
@@ -206,7 +208,7 @@ export function BettingPanel({
         </div>
 
         <p className="mt-0.5 text-[10px] text-white/50 sm:text-xs">
-          Clique sur une case pour placer ta mise
+          {t("bettingPanel.hint")}
         </p>
       </div>
     </div>

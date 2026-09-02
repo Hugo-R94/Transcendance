@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import DropdownFilter from "../utils/dropdownFilter";
 
 type ProfileMenuProps = {
@@ -6,15 +7,16 @@ type ProfileMenuProps = {
   onTabChange?: (tabValue: string) => void;
 };
 
-const MENU_OPTIONS = [
-  { label: "GAMES", value: "game", color: "bg-bblue" },
-  { label: "REVIEWS", value: "reviews", color: "bg-byellow" },
-  { label: "FRIENDS", value: "friends", color: "bg-bred" },
-  { label: "GAMBLES", value: "gambles", color: "bg-bgreen" },
-];
-
 export default function ProfileMenu({ activeTab = "profil", onTabChange }: ProfileMenuProps) {
+  const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(activeTab);
+
+  const MENU_OPTIONS = [
+    { label: t("profileMenu.games"), value: "game", color: "bg-bblue" },
+    { label: t("profileMenu.reviews"), value: "reviews", color: "bg-byellow" },
+    { label: t("profileMenu.friends"), value: "friends", color: "bg-bred" },
+    { label: t("profileMenu.gambles"), value: "gambles", color: "bg-bgreen" },
+  ];
 
   const handleSelect = (value: string) => {
     setSelectedTab(value);

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import Pagination from "../utils/paginationController";
 import Rating from "../gamepage/getRating";
 import GameCard from "../gamepage/gameCard";
@@ -29,6 +30,7 @@ interface UserReviewsProps {
 }
 
 function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
+  const { t, i18n } = useTranslation();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [gameData, setGameData] = useState<{ name: string; header_image: string } | null>(null);
 
@@ -72,7 +74,7 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
 
         if (response.data) {
           setGameData({
-            name: response.data.name || "Jeu",
+            name: response.data.name || t("userReviews.gameFallback"),
             header_image: response.data.header_image || "",
           });
         }
@@ -89,8 +91,15 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
   const colors = ["bg-[#00509f]", "bg-[#3c9b71]", "bg-[#ed8a00]", "bg-[#fb4740]"];
   const color = colors[index % colors.length];
 
-  const nickname = review.author?.username || "Utilisateur";
+  const nickname = review.author?.username || t("chat.defaultUsername");
   const authorId = review.author?.id || "";
+
+  let formattedDate = "";
+  try {
+    formattedDate = new Date(review.CreatedAt).toLocaleDateString(i18n.language);
+  } catch {
+    formattedDate = review.CreatedAt || "";
+  }
 
   return (
     <>
@@ -122,13 +131,13 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
                 </p>
 
                 <p className="text-[10px] font-semibold text-gray-300/75">
-                  Posté le {new Date(review.CreatedAt).toLocaleDateString()}
+                  {t("userReviews.postedOn", { date: formattedDate })}
                 </p>
               </div>
             </div>
 
             <div className="w-full font-extrabold text-base text-gray-200 mt-2 text-center shrink-0">
-              {review.comment_title || "Avis sans titre"}
+              {review.comment_title || t("userReviews.untitledReview")}
             </div>
 
             <div className="mt-2 text-xs bg-white/10 rounded-xl p-2.5 font-semibold whitespace-pre-wrap break-words text-gray-300 max-h-[75px] overflow-y-auto pr-1">
@@ -147,21 +156,19 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
             <GameCard
               id={review.game_id}
               name={gameData.name}
-              tag=""
               imgLink={gameData.header_image}
               className="w-full h-full shadow-lg"
             />
           ) : (
             <div className="w-full h-full bg-white/10 rounded-2xl flex items-center justify-center text-xs text-gray-400">
-              Chargement...
+              {t("common.loading")}
             </div>
           )}
         </div>
       </div>
 
-      {/* ================= MOBILE VIEW (Refondu & Épuré) ================= */}
+      {/* ================= MOBILE VIEW ================= */}
       <div className={`sm:hidden flex flex-col w-[95%] rounded-2xl p-4 shadow-md shadow-black/25 my-3 ${color} gap-3`}>
-        {/* Top : Auteur + Date */}
         <div className="flex items-center justify-between">
           <Link
             to={`/profil/${authorId}`}
@@ -185,11 +192,10 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
           </Link>
 
           <p className="text-[10px] text-gray-300/80">
-            {new Date(review.CreatedAt).toLocaleDateString()}
+            {formattedDate}
           </p>
         </div>
 
-        {/* Bloc central : Jeu + Titre & Note */}
         <div className="flex items-center gap-3 bg-black/20 p-2.5 rounded-xl">
           <div className="w-24 shrink-0 flex justify-center">
             {gameData ? (
@@ -197,7 +203,6 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
                 <GameCard
                   id={review.game_id}
                   name={gameData.name}
-                  tag=""
                   imgLink={gameData.header_image}
                   className="w-full h-auto"
                 />
@@ -209,7 +214,7 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
 
           <div className="flex flex-col flex-1 text-left overflow-hidden">
             <p className="font-extrabold text-sm text-white truncate">
-              {review.comment_title || "Avis sans titre"}
+              {review.comment_title || t("userReviews.untitledReview")}
             </p>
 
             {gameData && (
@@ -227,7 +232,6 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
           </div>
         </div>
 
-        {/* Commentaire texte */}
         <div className="text-xs bg-white/10 rounded-xl p-3 font-medium whitespace-pre-wrap break-words text-gray-200 max-h-[130px] overflow-y-auto leading-relaxed">
           {review.comment}
         </div>
@@ -237,6 +241,7 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
 }
 
 function UserReviews({ userId, className = "" }: UserReviewsProps) {
+  const { t } = useTranslation();
   const [reviews, setReviews] = useState<CommentItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -260,7 +265,7 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
       setTotalPages(response.data.total_pages || 1);
     } catch (err) {
       console.error("Erreur lors de la récupération des avis :", err);
-      setError("Impossible de charger les avis pour le moment.");
+      setError(t("userReviews.loadError"));
       setReviews([]);
     } finally {
       setLoading(false);
@@ -278,7 +283,7 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
         <div className="w-full flex flex-col items-center h-[90%] overflow-y-auto p-2 rounded-t-2xl">
           {loading ? (
             <div className="flex h-full w-full items-center justify-center text-gray-400">
-              Chargement...
+              {t("common.loading")}
             </div>
           ) : error ? (
             <div className="flex h-full w-full items-center justify-center text-red-400">
@@ -286,7 +291,7 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
             </div>
           ) : reviews.length === 0 ? (
             <div className="flex h-full w-full items-center justify-center text-gray-400">
-              Aucun avis trouvé
+              {t("userReviews.empty")}
             </div>
           ) : (
             reviews.map((review, index) => (
@@ -315,7 +320,7 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
         <div className="w-full flex flex-col items-center py-2 overflow-y-auto px-2">
           {loading ? (
             <div className="flex h-40 w-full items-center justify-center text-gray-400">
-              Chargement...
+              {t("common.loading")}
             </div>
           ) : error ? (
             <div className="flex h-40 w-full items-center justify-center text-red-400">
@@ -323,7 +328,7 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
             </div>
           ) : reviews.length === 0 ? (
             <div className="flex h-40 w-full items-center justify-center text-gray-400">
-              Aucun avis trouvé
+              {t("userReviews.empty")}
             </div>
           ) : (
             reviews.map((review, index) => (

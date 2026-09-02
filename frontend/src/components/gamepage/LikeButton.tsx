@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import api from "../../api/api";
 
 interface LikeButtonProps {
@@ -14,6 +15,7 @@ function LikeButton({
   initialDislikes = 0,
   initialState = 0,
 }: LikeButtonProps) {
+  const { t } = useTranslation();
   const [likes, setLikes] = useState<number>(initialLikes);
   const [dislikes, setDislikes] = useState<number>(initialDislikes);
   const [userState, setUserState] = useState<number>(Number(initialState));
@@ -40,7 +42,7 @@ function LikeButton({
     const token = localStorage.getItem("token") || localStorage.getItem("jwt");
 
     if (!token) {
-      alert("Vous devez être connecté pour pouvoir voter.");
+      alert(t("likeButton.mustBeLoggedIn"));
       return;
     }
 
@@ -85,7 +87,8 @@ function LikeButton({
       );
     } catch (error: any) {
       console.error("❌ Échec du vote :", error);
-      alert(`Erreur lors du vote : ${error.response?.data?.message || error.message}`);
+      alert(t("likeButton.voteError", { message: error.response?.data?.message || error.message }));
+
 
       // Restauration de l'état local en cas d'erreur API
       setUserState(prevState);

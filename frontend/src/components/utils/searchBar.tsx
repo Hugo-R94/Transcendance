@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import Research from "./research";
 
 function SearchBar() {
+  const { t } = useTranslation();
   const [search, setSearch] = useState("");
 
   return (
@@ -12,7 +14,7 @@ function SearchBar() {
         onChange={(e) => setSearch(e.target.value)}
         className="w-full p-1 h-full rounded-lg bg-[#ed8a00] pr-5 pl-2 focus:bg-[#ffaa00] focus:outline-0 shadow-xs text-gray-800 shadow-black focus:shadow-sm focus:text-shadow-current"
         type="text"
-        placeholder="Search..."
+        placeholder={t("searchBar.placeholder")}
       />
 
       <button className="absolute right-2 top-1/2 -translate-y-1/2 size-6 transition-opacity">

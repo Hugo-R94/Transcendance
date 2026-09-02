@@ -4,7 +4,7 @@ import api from "../../api/api";
 import type { ListState } from "../../api/client";
 
 import LikeGameButton from "./likeGameButton";
-import WishlistGameButton from "../wishlistGameButton";
+import WishlistGameButton from "./wishlistGameButton";
 import DislikeGameButton from "./dislikeGameButton";
 
 interface GameInteractionBarProps {

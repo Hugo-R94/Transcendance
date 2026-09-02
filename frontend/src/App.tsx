@@ -14,12 +14,13 @@ import { ProtectedRoute } from "./components/utils/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
 import MinimalChat from "./pages/minichat";
 import ChatMenu from "./components/chat/chatMenu";
+import LanguageSwitcher from "./components/utils/LanguageSwitcher";
 
 function ProtectedLayout() {
   return (
     <>
       <NavBar />
-	  <ChatMenu />
+      <ChatMenu />
       <Outlet />
     </>
   );
@@ -30,6 +31,9 @@ function App() {
     <div className="relative min-h-screen text-white">
       <ShaderBackground />
 
+      <div className="fixed top-3 right-3 z-100">
+        <LanguageSwitcher />
+      </div>
       <Routes>
         {/* --- ROUTES PUBLIQUES --- */}
         <Route path="/login" element={<Login />} />
@@ -41,11 +45,11 @@ function App() {
           <Route element={<ProtectedLayout />}>
             <Route path="/game/:appid" element={<GamePage />} />
             <Route path="/profil" element={<Profil />} />
-            <Route path="/profil/:userid" element={<UserProfil />} /> 
+            <Route path="/profil/:userid" element={<UserProfil />} />
             <Route path="/games" element={<Games />} />
             <Route path="/chat" element={<MinimalChat />} />
             <Route path="/support" element={<Support />} />
-            <Route path="/clicker" element={<Clicker />} /> 
+            <Route path="/clicker" element={<Clicker />} />
           </Route>
         </Route>
       </Routes>

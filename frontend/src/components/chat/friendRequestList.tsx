@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useUserAvatar } from "../../api/getUserAvatar";
 
 function RequestAvatar({
@@ -35,10 +36,12 @@ export default function FriendRequestList({
   onReject: (req: any) => void;
   onBlock: (req: any) => void;
 }) {
+  const { t } = useTranslation();
+
   if (!requests || requests.length === 0) {
     return (
       <div className="flex items-center justify-center h-full text-white/50 text-sm">
-        Aucune demande
+        {t("friendRequestList.noRequests")}
       </div>
     );
   }
@@ -60,9 +63,9 @@ export default function FriendRequestList({
 
           const avatarUserId = req.id;
 
-          const username = req.username || "Utilisateur";
+          const username = req.username || t("chat.defaultUsername");
           const bgColor = colors[index % colors.length];
-		  console.log("[REQUEST]", requests);		
+          console.log("[REQUEST]", requests);
           return (
             <div
               key={keyId}
@@ -80,7 +83,7 @@ export default function FriendRequestList({
                   </span>
 
                   <span className="text-white/70 text-xs">
-                    Demande d'ami
+                    {t("friendRequestList.friendRequestLabel")}
                   </span>
                 </div>
               </div>
@@ -89,7 +92,7 @@ export default function FriendRequestList({
                 <button
                   onClick={() => onAccept(req)}
                   className="bg-black/20 w-8 h-8 rounded-lg text-white font-bold flex items-center justify-center hover:bg-green-600 hover:outline-2 hover:outline-white active:scale-90 transition-all cursor-pointer balatro"
-                  title="Accepter"
+                  title={t("friendRequestList.accept")}
                 >
                   ✓
                 </button>
@@ -97,7 +100,7 @@ export default function FriendRequestList({
                 <button
                   onClick={() => onReject(req)}
                   className="bg-black/20 w-8 h-8 rounded-lg text-white font-bold flex items-center justify-center hover:bg-red-600 hover:outline-2 hover:outline-white active:scale-90 transition-all cursor-pointer balatro"
-                  title="Refuser"
+                  title={t("friendRequestList.reject")}
                 >
                   ✕
                 </button>

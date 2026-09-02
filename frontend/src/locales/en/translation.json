@@ -1,0 +1,353 @@
+{
+  "greeting": "Hello",
+  "login": {
+    "signin": "SIGNIN",
+    "submit": "login",
+    "usernamePlaceholder": "Enter your email or username...",
+    "passwordPlaceholder": "Enter your password...",
+    "logoAlt": "Logo",
+    "errors": {
+      "fillAllFields": "Please fill in all fields.",
+      "serverError": "Server error: {{status}}",
+      "invalidCredentials": "Unable to log in. Check your credentials."
+    },
+    "success": "Login successful! Redirecting..."
+  },
+  "signin": {
+    "login": "LOGIN",
+    "submit": "Sign in",
+    "logoAlt": "Logo",
+    "emailPlaceholder": "Enter your email ...",
+    "usernamePlaceholder": "Enter your username ...",
+    "passwordPlaceholder": "Enter your password ...",
+    "confirmPasswordPlaceholder": "Confirm your password ...",
+    "errors": {
+      "passwordMismatch": "Passwords do not match.",
+      "serverError": "Server error: {{status}}",
+      "registrationFailed": "An error occurred during registration."
+    },
+    "success": "Registration successful!"
+  },
+  "navbar": {
+    "gamble": "Gamble",
+    "profile": "Profil",
+    "menu": "MENU",
+    "dropdown": {
+      "home": "Home",
+      "profile": "Profil",
+      "support": "Support",
+      "logout": "Logout"
+    },
+    "logout": {
+      "success": "Logged out successfully!",
+      "forced": "Forced logout (expired session/server unavailable)",
+      "done": "Logout completed",
+      "networkError": "Network error: logged out locally."
+    }
+  },
+  "home": {
+    "welcome": "Welcome to",
+    "tagline": "The first hybrid platform to rate your video games and bet on gaming news",
+    "login": "Log in",
+    "signup": "Sign up"
+  },
+  "profile": {
+    "loading": "Loading profile...",
+    "notFound": "Profile not found",
+    "errors": {
+      "notAuthenticated": "Not authenticated",
+      "generic": "An error occurred",
+      "pictureUpdateFailed": "Unable to update profile picture.",
+      "saveDescriptionFailed": "An error occurred while saving."
+    },
+    "success": {
+      "pictureUpdated": "Profile picture updated successfully!",
+      "descriptionSaved": "Description saved successfully!"
+    }
+  },
+  "profileMenu": {
+    "games": "GAMES",
+    "reviews": "REVIEWS",
+    "friends": "FRIENDS",
+    "gambles": "GAMBLES"
+  },
+  "profileHeader": {
+    "pictureAlt": "Profile picture",
+    "aboutMe": "ABOUT ME :",
+    "save": "Save",
+    "saving": "Saving...",
+    "descriptionPlaceholder": "No description yet...",
+    "changePicture": "Change"
+  },
+  "common": {
+    "loading": "Loading..."
+  },
+  "gameFilters": {
+    "genreLabel": "Genre",
+    "sortLabel": "Sort",
+    "genres": {
+      "Action": "Action",
+      "Sport": "Sport",
+      "Adventure": "Adventure",
+      "Strategy": "Strategy",
+      "Indie": "Indie",
+      "Simulation": "Simulation",
+      "RPG": "RPG",
+      "FreeToPlay": "Free To Play",
+      "Casual": "Casual",
+      "Racing": "Racing"
+    },
+    "sort": {
+      "releaseDateAsc": "Release date ↑",
+      "releaseDateDesc": "Release date ↓",
+      "ratingAsc": "Lowest rated on Steam",
+      "ratingDesc": "Highest rated on Steam",
+      "mostPlayed": "Most played",
+      "lessPlayed": "Least played",
+      "nameAsc": "Name A → Z",
+      "nameDesc": "Name Z → A"
+    }
+  },
+  "gamesPage": {
+    "heading": "WHAT'S HOT ?",
+    "error": "Unable to load games",
+    "empty": "No games found"
+  },
+  "userGameList": {
+    "likes": "Likes",
+    "dislikes": "Dislikes",
+    "wishlist": "Wishlist",
+    "empty": "No games in this list"
+  },
+  "gamePage": {
+    "notFound": "Game not found",
+    "genericError": "An error occurred",
+    "rating": "Rating",
+    "steamLogoAlt": "Steam Logo",
+    "reviewCount": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews"
+  },
+  "chat": {
+    "addFriend": "Add a friend",
+    "usernamePlaceholder": "Username",
+    "addButton": "Add",
+    "wsConnected": "WebSocket connected",
+    "wsDisconnected": "WebSocket disconnected",
+    "pendingRequests": "Pending requests ({{count}})",
+    "noPendingRequests": "No pending requests.",
+    "accept": "Accept",
+    "discussions": "Discussions ({{count}})",
+    "noActiveDiscussions": "No active discussions.",
+    "discussionWith": "Discussion with {{name}}",
+    "online": "● Online",
+    "offline": "● Offline",
+    "noMessages": "No messages yet. Say hello!",
+    "messagePlaceholder": "Write your message...",
+    "send": "Send",
+    "selectDiscussion": "Select a discussion to begin",
+    "defaultUsername": "User",
+    "alerts": {
+      "friendRequestSent": "Friend request sent!",
+      "friendRequestFailed": "Unable to send the request",
+      "friendRequestAccepted": "Friend request accepted!",
+      "friendAcceptFailed": "Unable to accept the request",
+      "userNotFound": "Error: unable to find the user.",
+      "selectConversation": "Select a conversation.",
+      "wsMissing": "The WebSocket connection does not exist.",
+      "wsNotActive": "The WebSocket connection is not active."
+    }
+  },
+  "userProfilePage": {
+    "clicker": "CLICKER",
+    "selection": "SELECTION",
+    "loadError": "An error occurred while loading"
+  },
+  "userReviews": {
+    "gameFallback": "Game",
+    "postedOn": "Posted on {{date}}",
+    "untitledReview": "Untitled review",
+    "loadError": "Unable to load reviews right now.",
+    "empty": "No reviews found"
+  },
+  "userProfileHeader": {
+    "pictureAlt": "{{username}} profile",
+    "noDescription": "No description provided."
+  },
+  "gambleHistory": {
+    "score": "score:",
+    "rank": "rank:",
+    "gamble": "GAMBLE",
+    "history": "HISTORY",
+    "noGames": "No games played.",
+    "loadError": "Unable to retrieve history"
+  },
+  "userFriendsList": {
+    "friends": "Friends",
+    "blocked": "Blocked",
+    "unblock": "UNBLOCK",
+    "friendsLoadError": "Unable to load friends right now.",
+    "blockedLoadError": "Unable to load the blocked users list.",
+    "noFriends": "No friends found",
+    "noBlocked": "No blocked users"
+  },
+  "inviteGame": {
+    "joinRoom": "JOIN ROOM :",
+    "join": "JOIN"
+  },
+  "chatMenu": {
+    "myFriends": "My friends",
+    "friendRequests": "Friend requests"
+  },
+  "chatMenuHeader": {
+    "friendsTab": "FRIENDS",
+    "requestsTab": "INVITES",
+    "collapsedLabel": "CHAT"
+  },
+  "friendList": {
+    "noFriends": "No friends",
+    "chat": "Chat",
+    "block": "Block",
+    "delete": "Remove"
+  },
+  "friendRequestList": {
+    "noRequests": "No requests",
+    "friendRequestLabel": "Friend request",
+    "accept": "Accept",
+    "reject": "Reject"
+  },
+  "chatWindow": {
+    "defaultLabel": "Chat",
+    "emptyMessages": "No messages",
+    "messagePlaceholder": "Message...",
+    "myInitial": "M"
+  },
+  "titles": {
+    "1": "Gamer",
+    "2": "Stinky",
+    "3": "Hardstuck",
+    "4": "High",
+    "5": "Lucky",
+    "6": "In Debt",
+    "7": "Master",
+    "8": "Inter",
+    "9": "New",
+    "10": "Player"
+  },
+  "lobby": {
+    "title": "LOBBY",
+    "startingIn": "GAME STARTING IN",
+    "connected": "Connected",
+    "connecting": "Connecting...",
+    "roomNamePlaceholder": "Room name",
+    "join": "JOIN",
+    "invite": "INVITE",
+    "leave": "LEAVE",
+    "players": "Players",
+    "readyCount": "{{ready}} / {{total}} ready",
+    "readyToggleOn": "READY",
+    "readyToggleOff": "NOT READY",
+    "noPlayers": "No players",
+    "you": "(you)",
+    "statusReady": "READY",
+    "statusWaiting": "WAITING"
+  },
+  "leaderboard": {
+    "title": "LEADERBOARD",
+    "name": "name",
+    "score": "score"
+  },
+  "bettingTable": {
+    "red": "RED",
+    "even": "EVEN",
+    "odd": "ODD",
+    "green": "GREEN"
+  },
+  "bettingPanel": {
+    "howMuch": "How much do you want to bet?",
+    "currentBet": "Current bet",
+    "on": "on",
+    "hint": "Click a cell to place your bet"
+  },
+  "balance": {
+    "label": "Balance:"
+  },
+  "phaseTimer": {
+    "phases": {
+      "betting": "BETTING",
+      "scratch": "SCRATCH TICKET",
+      "spinning": "ROULETTE",
+      "resolving": "RESULT",
+      "finished": "GAME OVER"
+    },
+    "remains": "REMAINS:",
+    "turn": "Turn:",
+    "phase": "Phase:"
+  },
+  "resultsTable": {
+    "gameTitle": "🏆 Game results",
+    "roundTitle": "🏆 Round results",
+    "player": "Player",
+    "result": "Result",
+    "before": "Before",
+    "gain": "Gain",
+    "after": "After"
+  },
+  "scratchTicket": {
+    "mysteryTitle": "MYSTERY TICKET",
+    "revealSubtitle": "Reveal your bonus",
+    "scratchButton": "✨ SCRATCH",
+    "yourTicket": "Your ticket",
+    "bonus": "BONUS",
+    "malus": "MALUS",
+    "revealed": "✓ TICKET REVEALED"
+  },
+  "commentSection": {
+  "loading": "Loading comments...",
+  "empty": "No comments yet. Be the first to leave a review!",
+  "guest": "Guest"
+},
+"dislikeButton": {
+  "removeDislike": "Remove dislike",
+  "dislikeGame": "I don't like this game"
+},
+"gameDescription": {
+  "release": "Release:",
+  "developers": "Developers:",
+  "publishers": "Publishers:",
+  "genres": "Genres:"
+},
+"likeButton": {
+  "mustBeLoggedIn": "You must be logged in to vote.",
+  "voteError": "Error while voting: {{message}}"
+},
+"likeGameButton": {
+  "removeFavorite": "Remove from favorites",
+  "likeGame": "I like this game"
+},
+"postComment": {
+  "errors": {
+    "missingGameId": "Error: unable to post, the game ID is missing.",
+    "missingTitle": "Please add a title before submitting your comment.",
+    "missingComment": "Please write a comment before submitting.",
+    "missingRating": "Please give a rating before submitting your comment.",
+    "submitFailed": "Unable to send the comment."
+  },
+  "success": "Comment posted successfully!",
+  "prompt": "Did you like this game?",
+  "titlePlaceholder": "Write your title...",
+  "commentPlaceholder": "Write your comment...",
+  "submit": "SUBMIT",
+  "submitting": "..."
+},
+"wishlistButton": {
+  "remove": "Remove from wishlist",
+  "add": "Add to my wishlist"
+},
+"pagination": {
+  "previous": "Previous",
+  "next": "Next"
+},
+"searchBar": {
+  "placeholder": "Search..."
+}
+}

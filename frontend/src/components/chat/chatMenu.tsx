@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import FriendList from "./friendList";
 import FriendRequestList from "./friendRequestList";
 import Notification from "../utils/notification";
@@ -8,6 +9,7 @@ import { useChat } from "../../use/useChat";
 import NotificationSignal from "../utils/notificationSignal";
 
 export default function ChatMenu() {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(() => {
     return localStorage.getItem("chatOpen") !== "false";
   });
@@ -83,7 +85,6 @@ export default function ChatMenu() {
 
           {!isOpen && hasNotification && (
 			<NotificationSignal />
-            // <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full border-2 border-bdarkgreen z-20" />
           )}
         </div>
 
@@ -96,7 +97,7 @@ export default function ChatMenu() {
         >
           <div className="flex items-center justify-between px-2 mt-3 mb-1 shrink-0">
             <p className="text-white font-bold text-lg">
-              {activeTab === "friends" ? "Mes amis" : "Demandes d'amis"}
+              {activeTab === "friends" ? t("chatMenu.myFriends") : t("chatMenu.friendRequests")}
             </p>
 
             <p className="text-white/60 text-sm">
@@ -118,7 +119,7 @@ export default function ChatMenu() {
                 type="text"
                 value={targetUsername}
                 onChange={(e) => setTargetUsername(e.target.value)}
-                placeholder="Nom d'utilisateur..."
+                placeholder={t("chat.usernamePlaceholder")}
                 className="min-w-0 flex-1 h-10 px-3 rounded-xl bg-white/90 text-black text-sm outline-none focus:ring-2 focus:ring-white"
               />
 

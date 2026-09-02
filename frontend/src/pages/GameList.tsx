@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import GameList from "../components/gameList";
 import NavBar from "../components/utils/navBar";
 import Pagination from "../components/utils/paginationController";
@@ -19,31 +20,41 @@ interface GamesPageResponse {
   total_pages: number;
 }
 
-export const genres = [
-  { label: "Action", value: "Action" },
-  { label: "Sport", value: "Sport" },
-  { label: "Aventure", value: "Adventure" },
-  { label: "Strategie", value: "Strategy" },
-  { label: "Indie", value: "Indie" },
-  { label: "Simulation", value: "Simulation" },
-  { label: "RPG", value: "RPG" },
-  { label: "Free To Play", value: "Free To Play" },
-  { label: "Casual", value: "Casual" },
-  { label: "Racing", value: "Racing" },
-];
+export function useGenreOptions() {
+  const { t } = useTranslation();
+  return [
+    { label: t("gameFilters.genres.Action"), value: "Action" },
+    { label: t("gameFilters.genres.Sport"), value: "Sport" },
+    { label: t("gameFilters.genres.Adventure"), value: "Adventure" },
+    { label: t("gameFilters.genres.Strategy"), value: "Strategy" },
+    { label: t("gameFilters.genres.Indie"), value: "Indie" },
+    { label: t("gameFilters.genres.Simulation"), value: "Simulation" },
+    { label: t("gameFilters.genres.RPG"), value: "RPG" },
+    { label: t("gameFilters.genres.FreeToPlay"), value: "Free To Play" },
+    { label: t("gameFilters.genres.Casual"), value: "Casual" },
+    { label: t("gameFilters.genres.Racing"), value: "Racing" },
+  ];
+}
 
-export const orderOptions = [
-  { label: "Date de sortie ↑", value: "release_date_asc" },
-  { label: "Date de sortie ↓", value: "release_date_desc" },
-  { label: "Moins bien note sur steam", value: "rating_asc" },
-  { label: "Mieux note sur steam", value: "rating_desc" },
-  { label: "Plus joués", value: "most_played" },
-  { label: "Moins joués", value: "less_played" },
-  { label: "Nom A → Z", value: "name_asc" },
-  { label: "Nom Z → A", value: "name_desc" },
-];
+export function useOrderOptions() {
+  const { t } = useTranslation();
+  return [
+    { label: t("gameFilters.sort.releaseDateAsc"), value: "release_date_asc" },
+    { label: t("gameFilters.sort.releaseDateDesc"), value: "release_date_desc" },
+    { label: t("gameFilters.sort.ratingAsc"), value: "rating_asc" },
+    { label: t("gameFilters.sort.ratingDesc"), value: "rating_desc" },
+    { label: t("gameFilters.sort.mostPlayed"), value: "most_played" },
+    { label: t("gameFilters.sort.lessPlayed"), value: "less_played" },
+    { label: t("gameFilters.sort.nameAsc"), value: "name_asc" },
+    { label: t("gameFilters.sort.nameDesc"), value: "name_desc" },
+  ];
+}
 
 function Games() {
+  const { t } = useTranslation();
+  const genres = useGenreOptions();
+  const orderOptions = useOrderOptions();
+
   const [games, setGames] = useState<GameListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -86,7 +97,7 @@ function Games() {
       })
       .catch((err) => {
         console.error(err);
-        setError("Impossible de charger les jeux");
+        setError(t("gamesPage.error"));
       })
       .finally(() => {
         setLoading(false);
@@ -107,11 +118,11 @@ function Games() {
         
 		<div className="w-full flex justify-center items-center mt-3 py-2 shrink-0 gap-4 z-30 relative">
 		<p className="font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] hidden sm:block">
-			WHAT'S HOT ?
+			{t("gamesPage.heading")}
 		</p>
 
 		<DropdownMenu
-			Name="Genre"
+			Name={t("gameFilters.genreLabel")}
 			items={genres}
 			value={genre}
 			onChange={(value) => changeFilter("genre", value)}
@@ -119,7 +130,7 @@ function Games() {
 		/>
 
 		<DropdownMenu
-			Name="Tri"
+			Name={t("gameFilters.sortLabel")}
 			items={orderOptions}
 			value={orderBy}
 			onChange={(value) => changeFilter("orderBy", value)}
@@ -130,7 +141,7 @@ function Games() {
         <div className="w-full flex-1 sm:min-h-[300px] flex items-center justify-center my-2">
           {loading ? (
             <div className="flex h-40 sm:h-full w-full items-center justify-center text-gray-400">
-              Chargement...
+              {t("common.loading")}
             </div>
           ) : error ? (
             <div className="flex h-40 sm:h-full w-full items-center justify-center text-red-400">
@@ -138,7 +149,7 @@ function Games() {
             </div>
           ) : games.length === 0 ? (
             <div className="flex h-40 sm:h-full w-full items-center justify-center text-gray-400">
-              Aucun jeu trouvé
+              {t("gamesPage.empty")}
             </div>
           ) : (
             <GameList games={games} />

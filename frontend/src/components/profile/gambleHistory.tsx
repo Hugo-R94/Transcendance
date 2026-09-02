@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Pagination from "../utils/paginationController";
 import api from "../../api/api";
 
@@ -41,6 +42,7 @@ function HistoryComponent({
     time,
     final_score,
 }: HistoryComponentProps) {
+    const { t } = useTranslation();
     const scoreColor =
         final_score > 1000 ? "text-bgreen" : "text-bred";
 
@@ -51,14 +53,14 @@ function HistoryComponent({
         <div className="bg-byellow w-full h-15 shrink-0 font-extrabold md:text-2xl text-lg flex items-center border-t border-l border-8 border-black/25 rounded-2xl hover:scale-101 hover:z-50 shadow-md shadow-black/75 hover:shadow-lg">
             <div className="w-1/3 h-full flex items-center justify-center">
                 <p>
-                    score :{" "}
+                    {t("gambleHistory.score")}{" "}
                     <span className={scoreColor}>{final_score}</span>
                 </p>
             </div>
 
             <div className="w-1/3 h-full flex items-center justify-center">
                 <p>
-                    rank : <span className={rankColor}>{rank}</span>
+                    {t("gambleHistory.rank")} <span className={rankColor}>{rank}</span>
                 </p>
             </div>
 
@@ -73,6 +75,7 @@ export default function GambleHistory({
     userID,
     className = "",
 }: GambleHistoryProps) {
+    const { t } = useTranslation();
     const [history, setHistory] = useState<History[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -105,7 +108,7 @@ export default function GambleHistory({
 
             setError(
                 err.response?.data?.error ||
-                    "Impossible de récupérer l'historique"
+                    t("gambleHistory.loadError")
             );
 
             setHistory([]);
@@ -121,16 +124,14 @@ export default function GambleHistory({
 
     return (
         <div className={`flex flex-col flex-1 w-full min-h-0 ${className}`}>
-            {/* Header */}
             <div className="bg-bdarkgreen w-full h-15 shrink-0 rounded-2xl font-extrabold flex justify-center items-center gap-x-3 text-2xl text-white">
-                GAMBLE <span className="text-bred">HISTORY</span>
+                {t("gambleHistory.gamble")} <span className="text-bred">{t("gambleHistory.history")}</span>
             </div>
 
-            {/* Desktop & Mobile */}
             <div className="w-full flex-1 min-h-0 overflow-y-auto flex flex-col gap-y-2 p-3">
                 {loading ? (
                     <div className="text-white flex justify-center items-center h-full">
-                        Chargement...
+                        {t("common.loading")}
                     </div>
                 ) : error ? (
                     <div className="text-bred flex justify-center items-center h-full text-center p-4">
@@ -138,7 +139,7 @@ export default function GambleHistory({
                     </div>
                 ) : history.length === 0 ? (
                     <div className="text-white flex justify-center items-center h-full">
-                        Aucune partie jouée.
+                        {t("gambleHistory.noGames")}
                     </div>
                 ) : (
                     history.map((game, index) => (
@@ -152,7 +153,6 @@ export default function GambleHistory({
                 )}
             </div>
 
-            {/* Desktop & Mobile */}
             <div className="bg-byellow w-full h-20 shrink-0 rounded-b-2xl flex items-center justify-center px-4">
                 <Pagination
                     page={page}

@@ -1,11 +1,12 @@
 import { useState, useEffect, Fragment } from "react";
 import { useParams, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import DropdownFilter from "../components/utils/dropdownFilter";
-import UserGameList from "../components/profile/userGameList";
 import UserReviews from "../components/profile/userReviews";
+import UserGameList from "../components/profile/userGameList";
 import UserFriendsList from "../components/chat/userFriendList";
 import { UserProfileHeader } from "../components/profile/UserProfileHeader";
-import api from "../api/api"; // Utilisation de ton instance api configurée
+import api from "../api/api";
 import GambleHistory from "../components/profile/gambleHistory";
 
 type UserProfile = {
@@ -18,6 +19,7 @@ type UserProfile = {
 };
 
 export default function UserProfil() {
+  const { t } = useTranslation();
   const { userid } = useParams<{ userid: string }>();
   const currentUserId = localStorage.getItem("current_user_id") || localStorage.getItem("userID");
 
@@ -28,17 +30,17 @@ export default function UserProfil() {
   const [activeTab, setActiveTab] = useState<string>("game");
 
   const menuOptions = [
-    { label: "GAMES", value: "game" },
-    { label: "REVIEWS", value: "reviews" },
-    { label: "FRIENDS", value: "friends" },
-    { label: "CLICKER", value: "clicker" },
+    { label: t("profileMenu.games"), value: "game" },
+    { label: t("profileMenu.reviews"), value: "reviews" },
+    { label: t("profileMenu.friends"), value: "friends" },
+    { label: t("userProfilePage.clicker"), value: "clicker" },
   ];
 
   const desktopTabs = [
-    { label: "GAMES", value: "game", defaultColor: "bg-bblue" },
-    { label: "REVIEWS", value: "reviews", defaultColor: "bg-bred" },
-    { label: "FRIENDS", value: "friends", defaultColor: "bg-bgreen" },
-    { label: "CLICKER", value: "clicker", defaultColor: "bg-byellow text-bdarkgreen" },
+    { label: t("profileMenu.games"), value: "game", defaultColor: "bg-bblue" },
+    { label: t("profileMenu.reviews"), value: "reviews", defaultColor: "bg-bred" },
+    { label: t("profileMenu.friends"), value: "friends", defaultColor: "bg-bgreen" },
+    { label: t("userProfilePage.clicker"), value: "clicker", defaultColor: "bg-byellow text-bdarkgreen" },
   ];
 
   useEffect(() => {
@@ -50,7 +52,6 @@ export default function UserProfil() {
       try {
         setLoading(true);
 
-        // Requêtes parallèles pour plus de rapidité (profil + avatar via ton instance api)
         const [profileRes, avatarRes] = await Promise.all([
           api.get(`/profil/${userid}`),
           api.get(`/getPP?userId=${userid}&t=${Date.now()}`, { responseType: "blob" }).catch(() => null)
@@ -65,7 +66,7 @@ export default function UserProfil() {
           setImageSrc("https://thispersondoesnotexist.com/random-person.jpeg");
         }
       } catch (err: any) {
-        setError(err.response?.data?.error || err.message || "Erreur lors du chargement");
+        setError(err.response?.data?.error || err.message || t("userProfilePage.loadError"));
       } finally {
         setLoading(false);
       }
@@ -93,26 +94,23 @@ export default function UserProfil() {
     }
   };
 
-  // Redirection si l'utilisateur visite son propre profil via un lien externe
   if (currentUserId && userid === currentUserId) {
     return <Navigate to="/profil" replace />;
   }
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-white font-bold">Chargement du profil...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-white font-bold">{t("profile.loading")}</div>;
   }
 
   if (error || !profile) {
-    return <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">{error || "Profil introuvable"}</div>;
+    return <div className="min-h-screen flex items-center justify-center text-red-500 font-bold">{error || t("profile.notFound")}</div>;
   }
 
   return (
     <div className="relative min-h-screen flex flex-col">
-      {/* -------------------- VERSION DESKTOP -------------------- */}
       <main className="hidden sm:flex-1 sm:flex flex-col mx-[5%] w-[90%] pt-22 pb-4 h-screen max-h-screen">
         <UserProfileHeader profile={profile} imageSrc={imageSrc} />
 
-        {/* Barre d'onglets Desktop */}
         <div className="flex gap-3 my-3 h-15 rounded-2xl bg-[#334b4d] shadow-md shadow-black/75 text-white p-2 flex-shrink-0">
           {desktopTabs.map((tab, index) => {
             const isActive = activeTab === tab.value;
@@ -137,13 +135,12 @@ export default function UserProfil() {
         </div>
       </main>
 
-      {/* -------------------- VERSION MOBILE -------------------- */}
       <div className="sm:hidden flex flex-col w-full min-h-screen p-2">
         <UserProfileHeader profile={profile} imageSrc={imageSrc} />
 
         <DropdownFilter
           className="bg-bred w-[80%] mx-auto h-fit my-3 rounded-2xl shadow-black shadow-md"
-          Name="SELECTION"
+          Name={t("userProfilePage.selection")}
           color="bg-bred"
           items={menuOptions}
           value={activeTab}

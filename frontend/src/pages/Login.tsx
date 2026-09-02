@@ -1,192 +1,163 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Notification from "../components/utils/notification";
 import api from "../api/api";
 
 function Login() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+	const { t } = useTranslation();
+	const [username, setUsername] = useState("");
+	const [password, setPassword] = useState("");
+	const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+	const navigate = useNavigate();
 
-  const [notificationMessage, setNotificationMessage] =
-    useState<string | null>(null);
+	async function handleSubmit(e: React.FormEvent) {
+		e.preventDefault();
 
-  const navigate = useNavigate();
+		if (!username.trim() || !password.trim()) {
+			setNotificationMessage(t("login.errors.fillAllFields"));
+			return;
+		}
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+		const data = { username, password };
 
-    if (!username.trim() || !password.trim()) {
-      setNotificationMessage("Veuillez remplir tous les champs.");
-      return;
-    }
+		try {
+			const response = await fetch("http://localhost:8080/login", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(data),
+			});
 
-    const data = {
-      username,
-      password,
-    };
+			const result = await response.json();
 
-    try {
-      /*
-       * =========================
-       * LOGIN
-       * =========================
-       */
+			if (!response.ok) {
+				throw new Error(
+					result.error || t("login.errors.serverError", { status: response.status })
+				);
+			}
 
-      const response = await fetch("http://localhost:8080/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+			/*
+			 * =========================
+			 * SESSION
+			 * =========================
+			 */
 
-      const result = await response.json();
+			localStorage.setItem(
+				"token",
+				result.token
+			);
+			localStorage.setItem("refresh_token", result.refresh_token);
+			localStorage.setItem(
+				"token_expiration",
+				String(
+					Date.now() +
+					result.expires_in * 1000
+				)
+			);
 
-      if (!response.ok) {
-        throw new Error(
-          result.error ||
-            `Erreur serveur : ${response.status}`
-        );
-      }
+			localStorage.setItem(
+				"userID",
+				String(result.user_ID)
+			);
 
-      /*
-       * =========================
-       * SESSION
-       * =========================
-       */
+			localStorage.setItem(
+				"chatOpen",
+				"false"
+			);
 
-      localStorage.setItem(
-        "token",
-        result.token
-      );
-	  localStorage.setItem("refresh_token", result.refresh_token);
-      localStorage.setItem(
-        "token_expiration",
-        String(
-          Date.now() +
-          result.expires_in * 1000
-        )
-      );
+			console.log(
+				"USER ID STOCKÉ =",
+				localStorage.getItem("userID")
+			);
 
-      localStorage.setItem(
-        "userID",
-        String(result.user_ID)
-      );
+			/*
+			 * =========================
+			 * PHOTO DE PROFIL
+			 * =========================
+			 *
+			 * On récupère le blob depuis l'API
+			 * puis on le transforme en Data URL.
+			 *
+			 * IMPORTANT :
+			 * On ne fait PAS URL.createObjectURL()
+			 * ici car le blob: URL peut devenir
+			 * inutilisable après un changement de contexte.
+			 */
 
-      localStorage.setItem(
-        "chatOpen",
-        "false"
-      );
+			try {
+				const ppRes = await api.get(
+					`/getPP?userID=${result.user_ID}`,
+					{
+						responseType: "blob",
+					}
+				);
 
-      console.log(
-        "USER ID STOCKÉ =",
-        localStorage.getItem("userID")
-      );
+				const reader = new FileReader();
 
-      /*
-       * =========================
-       * PHOTO DE PROFIL
-       * =========================
-       *
-       * On récupère le blob depuis l'API
-       * puis on le transforme en Data URL.
-       *
-       * IMPORTANT :
-       * On ne fait PAS URL.createObjectURL()
-       * ici car le blob: URL peut devenir
-       * inutilisable après un changement de contexte.
-       */
+				reader.onloadend = () => {
+					if (
+						typeof reader.result === "string"
+					) {
+						localStorage.setItem(
+							"userPP",
+							reader.result
+						);
 
-      try {
-        const ppRes = await api.get(
-          `/getPP?userID=${result.user_ID}`,
-          {
-            responseType: "blob",
-          }
-        );
+						console.log(
+							"PHOTO STOCKÉE DANS userPP"
+						);
+					}
+				};
 
-        const reader = new FileReader();
+				reader.readAsDataURL(ppRes.data);
 
-        reader.onloadend = () => {
-          if (
-            typeof reader.result === "string"
-          ) {
-            localStorage.setItem(
-              "userPP",
-              reader.result
-            );
+			} catch (ppErr) {
+				console.error(
+					"Erreur lors de la récupération de la photo de profil :",
+					ppErr
+				);
 
-            console.log(
-              "PHOTO STOCKÉE DANS userPP"
-            );
-          }
-        };
+				/*
+				 * Si aucune photo n'est disponible,
+				 * on supprime une éventuelle ancienne photo.
+				 */
+				localStorage.removeItem("userPP");
+			}
 
-        reader.readAsDataURL(ppRes.data);
+			/*
+			 * =========================
+			 * NOTIFICATION
+			 * =========================
+			 */
 
-      } catch (ppErr) {
-        console.error(
-          "Erreur lors de la récupération de la photo de profil :",
-          ppErr
-        );
+			setNotificationMessage(t("login.success"));
 
-        /*
-         * Si aucune photo n'est disponible,
-         * on supprime une éventuelle ancienne photo.
-         */
-        localStorage.removeItem("userPP");
-      }
+			setUsername("");
+			setPassword("");
 
-      /*
-       * =========================
-       * NOTIFICATION
-       * =========================
-       */
+			setTimeout(() => {
+				navigate("/games");
+			}, 1000);
+		} catch (error: any) {
+			console.error("Login error:", error);
+			setNotificationMessage(error.message || t("login.errors.invalidCredentials"));
+		}
+	}
 
-      setNotificationMessage(
-        "Connexion réussie ! Redirection..."
-      );
+	return (
+		<div className="relative min-h-screen">
 
-      setUsername("");
-      setPassword("");
+			{notificationMessage && (
+				<Notification
+					message={notificationMessage}
+					onClose={() =>
+						setNotificationMessage(null)
+					}
+				/>
+			)}
 
-      /*
-       * =========================
-       * REDIRECTION
-       * =========================
-       */
-
-      setTimeout(() => {
-        navigate("/games");
-      }, 1000);
-
-    } catch (error: any) {
-      console.error(
-        "Login error:",
-        error
-      );
-
-      setNotificationMessage(
-        error.message ||
-          "Impossible de se connecter. Vérifiez vos identifiants."
-      );
-    }
-  }
-
-  return (
-    <div className="relative min-h-screen">
-
-      {notificationMessage && (
-        <Notification
-          message={notificationMessage}
-          onClose={() =>
-            setNotificationMessage(null)
-          }
-        />
-      )}
-
-      <div
-        className="
+			<div
+				className="
           absolute
           inset-0
           m-auto
@@ -194,11 +165,11 @@ function Login() {
           w-70
           bg-white
         "
-      >
+			>
 
-        <div
-          id="card"
-          className="
+				<div
+					id="card"
+					className="
             absolute
             h-100
             w-70
@@ -210,11 +181,11 @@ function Login() {
             transition-all
             duration-300
           "
-        />
+				/>
 
-        <form
-          onSubmit={handleSubmit}
-          className="
+				<form
+					onSubmit={handleSubmit}
+					className="
             absolute
             flex
             h-100
@@ -230,13 +201,13 @@ function Login() {
             transition
             focus:shadow-2xl
           "
-        >
+				>
 
-          {/* SIGN IN */}
+					{/* SIGN IN */}
 
-          <Link
-            to="/signin"
-            className="
+					<Link
+						to="/signin"
+						className="
               balatro
               z-15
               flex
@@ -256,32 +227,30 @@ function Login() {
               hover:scale-105
               active:scale-90
             "
-          >
-            SIGNIN
-          </Link>
+					>{t("login.signin")}</Link>
 
 
-          {/* LOGO */}
+					{/* LOGO */}
 
-          <img
-            src="https://cdn2.steamgriddb.com/logo/2553761c31ac33576b6030cf1a70a08b.png"
-            className="
+					<img
+						src="https://cdn2.steamgriddb.com/logo/2553761c31ac33576b6030cf1a70a08b.png"
+						className="
               z-15
               mt-5
               scale-70
             "
-            alt="Logo"
-          />
+						alt={t("login.logoAlt")}
+					/>
 
 
-          {/* USERNAME */}
+					{/* USERNAME */}
 
-          <input
-            onChange={(e) =>
-              setUsername(e.target.value)
-            }
-            value={username}
-            className="
+					<input
+						onChange={(e) =>
+							setUsername(e.target.value)
+						}
+						value={username}
+						className="
               balatro
               z-15
               mb-5
@@ -300,46 +269,44 @@ function Login() {
               focus:bg-[#ffaa00]
               active:scale-90
             "
-            placeholder="Enter your email or username..."
-          />
+						placeholder={t("login.usernamePlaceholder")} />
 
 
-          {/* PASSWORD */}
+					{/* PASSWORD */}
 
-          <input
-            onChange={(e) =>
-              setPassword(e.target.value)
-            }
-            value={password}
-            type="password"
-            className="
-              balatro
-              z-15
-              mb-5
-              h-15
-              w-full
-              rounded-2xl
-              bg-[#fb4740]
-              p-2
-              text-gray-700
-              shadow-md
-              shadow-black
-              outline-0
-              hover:outline-2
-              hover:outline-white
-              focus:scale-105
-              focus:bg-[#ff3830]
-              active:scale-90
+					<input
+						onChange={(e) =>
+							setPassword(e.target.value)
+						}
+						value={password}
+						type="password"
+						className="
+						balatro
+						z-15
+						mb-5
+						h-15
+						w-full
+						rounded-2xl
+						bg-[#fb4740]
+						p-2
+						text-gray-700
+						shadow-md
+						shadow-black
+						outline-0
+						hover:outline-2
+						hover:outline-white
+						focus:scale-105
+						focus:bg-[#ff3830]
+						active:scale-90
             "
-            placeholder="Enter your password..."
-          />
+						placeholder={t("login.passwordPlaceholder")} />
 
 
-          {/* LOGIN */}
+					{/* LOGIN */}
 
-          <button
-            type="submit"
-            className="
+					<button
+						type="submit"
+						className="
               balatro
               mx-auto
               h-15
@@ -356,14 +323,12 @@ function Login() {
               active:scale-90
               transition
             "
-          >
-            login
-          </button>
+					>{t("login.submit")}</button>
 
-        </form>
-      </div>
-    </div>
-  );
+				</form>
+			</div>
+		</div>
+	);
 }
 
 export default Login;

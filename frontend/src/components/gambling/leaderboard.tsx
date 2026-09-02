@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 import api from "../../api/api";
 import { useUserAvatar } from "../../api/getUserAvatar";
@@ -56,6 +57,7 @@ function ScoreCard({
 }
 
 export default function Leaderboard() {
+    const { t } = useTranslation();
     const [leaderboard, setLeaderboard] = useState<Player[]>([]);
 
     useEffect(() => {
@@ -91,16 +93,16 @@ export default function Leaderboard() {
         <div className="flex flex-col gap-y-3 w-full h-full">
             <div className="h-1/20 flex flex-col justify-center">
                 <div className="w-full h-2/3 font-extrabold">
-                    LEADERBOARD
+                    {t("leaderboard.title")}
                 </div>
 
                 <div className="flex w-full h-1/3 px-5 text-sm text-white/50">
                     <p className="flex-1 text-center translate-x-5">
-                        name
+                        {t("leaderboard.name")}
                     </p>
 
                     <p className="text-right">
-                        score
+                        {t("leaderboard.score")}
                     </p>
                 </div>
             </div>

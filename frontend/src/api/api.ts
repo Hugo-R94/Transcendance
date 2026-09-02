@@ -1,4 +1,5 @@
 import axios from "axios";
+import i18n from "../i18n";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -12,6 +13,7 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
+  config.headers["Accept-Language"] = i18n.language;
   return config;
 });
 
@@ -22,14 +24,14 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       console.warn("Token invalide ou expiré détecté par le serveur.");
-      
+
 
       localStorage.removeItem("token");
       localStorage.removeItem("token_expiration");
-      
+
       window.location.href = "/login";
     }
-    
+
     return Promise.reject(error);
   }
 );
