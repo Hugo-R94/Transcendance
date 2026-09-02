@@ -76,9 +76,7 @@ function LikeButton({
 
     try {
       // 3. Envoi au serveur en passant le Token dans les Headers (Bearer Authorization)
-      await api.post(
-        `/game/comment/${commentId}/vote`,
-        { vote: newVote },
+      await api.post(`/game/comment/${commentId}/vote`,{ vote: newVote },
         {
           headers: {
             Authorization: `Bearer ${token}`,

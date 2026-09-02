@@ -2,6 +2,8 @@ import NavBar from "../components/utils/navBar";
 import SupportContact from "../components/supportContact";
 
 function support() {
+
+
   return (
     <div className="relative min-h-screen items-center justify-center">
       <NavBar />
