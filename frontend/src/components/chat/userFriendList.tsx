@@ -74,17 +74,18 @@ function FriendCard({
 
 function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
   const { t } = useTranslation();
+
+  const listOptions = [
+    { label: t("userFriendsList.friends"), value: "friends" },
+    { label: t("userFriendsList.blocked"), value: "blocked" },
+  ];
+
   const [selectedList, setSelectedList] = useState("friends");
   const [friends, setFriends] = useState<FriendItem[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  const listOptions = [
-    { label: t("userFriendsList.friends"), value: "friends" },
-    { label: t("userFriendsList.blocked"), value: "blocked" },
-  ];
 
   const getOtherUser = (conv: Conversation, targetId: string) => {
     if (String(conv.user1_id) === String(targetId)) return conv.user2;
@@ -127,8 +128,6 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
         return {
           id: String(user.id),
           username: user.username || t("chat.defaultUsername"),
-          title_1: user.title_1 || "",
-          title_2: user.title_2 || "",
           profile_picture: user.profile_pic || user.profile_picture,
         };
       })

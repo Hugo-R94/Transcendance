@@ -14,7 +14,6 @@ import ShaderBackground from "./components/utils/shaderBG";
 import NavBar from "./components/utils/navBar";
 import { ProtectedRoute } from "./components/utils/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
-import MinimalChat from "./pages/minichat";
 import ChatMenu from "./components/chat/chatMenu";
 import LanguageSwitcher from "./components/utils/LanguageSwitcher";
 
@@ -59,7 +58,6 @@ function App() {
             <Route path="/profil" element={<Profil />} />
             <Route path="/profil/:userid" element={<UserProfil />} />
             <Route path="/games" element={<Games />} />
-            <Route path="/chat" element={<MinimalChat />} />
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} />
           </Route>

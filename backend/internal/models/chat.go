@@ -106,4 +106,6 @@ const (
 	MessageTypeRead			 = "read"
 	MessageTypeChatNotification = "chat_notification"
 	MessageTypeGameInvit	 = "game_invit"
+	MessageIsTyping			 = "is_typing"
+
 )

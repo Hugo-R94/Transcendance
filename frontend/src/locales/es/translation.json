@@ -209,12 +209,14 @@
     "accept": "Aceptar",
     "reject": "Rechazar"
   },
-  "chatWindow": {
-    "defaultLabel": "Chat",
-    "emptyMessages": "Aucun message",
-    "messagePlaceholder": "Message...",
-    "myInitial": "M"
-  },
+"chatWindow": {
+  "defaultLabel": "Chat",
+  "emptyMessages": "Ningún mensaje",
+  "messagePlaceholder": "Mensaje...",
+  "myInitial": "Y",
+  "typing": "escribiendo...",
+  "read": "Leído"
+},
   "titles": {
     "1": "Gamer",
     "2": "Apestoso",

@@ -26,10 +26,15 @@ export default function ChatMenu() {
     openConvIds,
     setOpenConvIds,
     wsConnected,
+	setReadConversations,
+	markAsUnread,
     wsRef,
+    sendIsTyping,
+	readConversations,
     targetUsername,
     setTargetUsername,
     notification,
+    typingConversations,
     setNotification,
     friends,
     requests,
@@ -43,38 +48,56 @@ export default function ChatMenu() {
   } = useChat();
 
   const hasRequest = requests.length > 0;
-  const hasNotification = hasRequest || unreadUserIds.length > 0;
+  const hasNotification =
+    hasRequest || unreadUserIds.length > 0;
 
   return (
-    <div className="fixed bottom-4 end-4 hidden sm:flex flex-row items-end gap-3 z-[9999]">
+    <div
+      className="
+        fixed z-[9999] top-20 start-0 end-0 bottom-0 p-2 
+        sm:top-auto sm:start-auto sm:end-4 sm:bottom-4 sm:p-0
+		flex flex-row items-end justify-end gap-3 " >
+
       {isOpen && (
         <ChatWindowContainer
           openConvIds={openConvIds}
+		  setReadConversations={markAsUnread}
+		  readConversations={readConversations}
+          typingConversations={typingConversations}
+          sendIsTyping={sendIsTyping}
           convs={convs}
           currentUserId={currentUserId}
           ws={wsRef.current}
           wsConnected={wsConnected}
-		  unreadUserIds={unreadUserIds}
+          unreadUserIds={unreadUserIds}
           onFriendClick={handleFriendClick}
           onCloseConv={(convId) =>
             setOpenConvIds((prev) =>
-              prev.filter((id) => String(id) !== String(convId))
+              prev.filter(
+                (id) =>
+                  String(id) !== String(convId)
+              )
             )
           }
         />
       )}
 
       <div
-        className={`bg-bdarkgreen rounded-2xl shadow-lg shadow-black p-2 overflow-hidden flex flex-col transition-all duration-300 ease-in-out origin-bottom-right ${
-          isOpen
-            ? "w-80 h-[30rem] scale-100 opacity-100 translate-y-0"
-            : "w-40 h-11 scale-95 opacity-90 translate-y-1 cursor-pointer hover:opacity-100 flex justify-center items-center p-1"
-        }`}
+        className={`bg-bdarkgreen rounded-2xl shadow-lg
+          shadow-black overflow-hidden flex flex-col transition-all
+          duration-300 ease-in-out origin-bottom-right 
+          ${isOpen? `w-full h-full sm:w-80 sm:h-[30rem]`
+              : `w-40 h-11 scale-95 opacity-90 translate-y-1 cursor-pointer  hover:opacity-100
+                justify-center items-center p-1  sm:w-40 sm:h-11 `}
+          ${isOpen ? "p-2" : ""}`}
         onClick={() => {
-          if (!isOpen) setIsOpen(true);
+          if (!isOpen) {
+            setIsOpen(true);
+          }
         }}
       >
-        <div className="flex">
+
+        <div className="flex shrink-0">
           <ChatMenuHeader
             activeTab={activeTab}
             setActiveTab={setActiveTab}
@@ -84,20 +107,20 @@ export default function ChatMenu() {
           />
 
           {!isOpen && hasNotification && (
-			<NotificationSignal />
+            <NotificationSignal />
           )}
         </div>
 
         <div
-          className={`flex flex-col flex-1 min-h-0 transition-opacity duration-500 ${
-            isOpen
-              ? "opacity-150 delay-100"
-              : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <div className="flex items-center justify-between px-2 mt-3 mb-1 shrink-0">
+          className={`flex flex-col flex-1 min-h-0 transition-opacity duration-500
+            ${isOpen ? "opacity-100 delay-100" : "opacity-0 pointer-events-none"}`}>
+
+          <div
+            className=" flex items-center justify-between px-2 mt-3 mb-1 shrink-0">
             <p className="text-white font-bold text-lg">
-              {activeTab === "friends" ? t("chatMenu.myFriends") : t("chatMenu.friendRequests")}
+              {activeTab === "friends"
+                ? t("chatMenu.myFriends")
+                : t("chatMenu.friendRequests")}
             </p>
 
             <p className="text-white/60 text-sm">
@@ -107,39 +130,51 @@ export default function ChatMenu() {
             </p>
           </div>
 
+          {/* AJOUTER UN AMI */}
+
           {activeTab === "requests" && (
             <form
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendFriendRequest();
               }}
-              className="flex gap-1 mb-2 shrink-0"
-            >
+              className="flex gap-1 mb-2 shrink-0 ">
               <input
                 type="text"
                 value={targetUsername}
-                onChange={(e) => setTargetUsername(e.target.value)}
+                onChange={(e) =>
+                  setTargetUsername(
+                    e.target.value
+                  )
+                }
                 placeholder={t("chat.usernamePlaceholder")}
-                className="min-w-0 flex-1 h-10 px-3 rounded-xl bg-white/90 text-black text-sm outline-none focus:ring-2 focus:ring-white"
-              />
+                className="min-w-0 flex-1 h-10  px-3 rounded-xl  bg-white/90  text-black text-sm outline-none
+                  focus:ring-2 focus:ring-white"/>
 
               <button
                 type="submit"
-                className="bg-bblue px-3 h-10 rounded-xl text-white font-bold balatro hover:outline-2 hover:outline-white active:scale-90"
-              >
+                className="bg-bblue px-3 h-10 rounded-xl text-white font-bold
+                  balatro hover:outline-2 hover:outline-white  active:scale-90">
                 +
               </button>
             </form>
           )}
 
-          <div className="flex-1 bg-white/20 rounded-2xl p-1 overflow-y-auto min-h-0">
+          <div
+            className="flex-1 bg-white/20 rounded-2xl p-1 overflow-y-auto  min-h-0">
             {activeTab === "friends" ? (
               <FriendList
                 friends={friends}
-                onFriendClick={handleFriendClick}
-                onUnfriend={handleUnfriend}
+                onFriendClick={
+                  handleFriendClick
+                }
+                onUnfriend={
+                  handleUnfriend
+                }
                 onBlock={handleBlock}
-                unreadUserIds={unreadUserIds}
+                unreadUserIds={
+                  unreadUserIds
+                }
               />
             ) : (
               <FriendRequestList
@@ -158,7 +193,9 @@ export default function ChatMenu() {
       {notification && (
         <Notification
           message={notification}
-          onClose={() => setNotification(null)}
+          onClose={() =>
+            setNotification(null)
+          }
         />
       )}
     </div>

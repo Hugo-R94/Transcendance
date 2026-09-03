@@ -113,7 +113,7 @@ export default function FriendList({
                 </button>
 
                 {hasUnread && (
-                  <div className="absolute bottom-1 right-1 z-20 pointer-events-none">
+                  <div className="absolute bottom-1 end-1 z-20 pointer-events-none">
                     <NotificationSignal />
                   </div>
                 )}

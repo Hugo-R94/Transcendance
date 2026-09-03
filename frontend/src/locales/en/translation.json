@@ -215,12 +215,14 @@
     "accept": "Accept",
     "reject": "Reject"
   },
-  "chatWindow": {
-    "defaultLabel": "Chat",
-    "emptyMessages": "No messages",
-    "messagePlaceholder": "Message...",
-    "myInitial": "M"
-  },
+"chatWindow": {
+  "defaultLabel": "Chat",
+  "emptyMessages": "No messages",
+  "messagePlaceholder": "Message...",
+  "myInitial": "M",
+  "typing": "typing...",
+  "read": "Read"
+},
   "titles": {
     "1": "Gamer",
     "2": "Stinky",

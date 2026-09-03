@@ -215,12 +215,14 @@
 		"accept": "قبول",
 		"reject": "رفض"
 	},
-	"chatWindow": {
-		"defaultLabel": "دردشة",
-		"emptyMessages": "لا توجد رسائل",
-		"messagePlaceholder": "رسالة...",
-		"myInitial": "أ"
-	},
+"chatWindow": {
+  "defaultLabel": "دردشة",
+  "emptyMessages": "لا توجد رسائل",
+  "messagePlaceholder": "رسالة...",
+  "myInitial": "أ",
+  "typing": "يكتب الآن...",
+  "read": "تمت القراءة"
+},
 	"titles": {
 		"1": "لاعب",
 		"2": "كريه الرائحة",

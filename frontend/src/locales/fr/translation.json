@@ -215,12 +215,14 @@
     "accept": "Accepter",
     "reject": "Refuser"
   },
-  "chatWindow": {
-    "defaultLabel": "Chat",
-    "emptyMessages": "Aucun message",
-    "messagePlaceholder": "Message...",
-    "myInitial": "M"
-  },
+"chatWindow": {
+  "defaultLabel": "Chat",
+  "emptyMessages": "Aucun message",
+  "messagePlaceholder": "Message...",
+  "myInitial": "M",
+  "typing": "en train d'écrire...",
+  "read": "Lu"
+},
   "titles": {
     "1": "Gamer",
     "2": "Puant",
