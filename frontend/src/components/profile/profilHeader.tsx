@@ -33,7 +33,7 @@ export function ProfileHeader({
           ===================================================== */}
 
       <div className="hidden sm:flex mt-3 w-full gap-3 h-32 lg:h-36 p-2 flex-shrink-0 min-w-0">
-        <div className="relative bg-gray-400 h-full aspect-square rounded-full ml-5 shadow-md shadow-black overflow-hidden outline-3 outline-white group cursor-pointer bg-byellow flex-shrink-0">
+        <div className="relative bg-gray-400 h-full aspect-square rounded-full ms-5 shadow-md shadow-black overflow-hidden outline-3 outline-white group cursor-pointer bg-byellow flex-shrink-0">
           <img
             className="w-full h-full object-cover group-hover:blur-sm transition-all duration-200"
             src={imageSrc}
@@ -65,7 +65,7 @@ export function ProfileHeader({
           </label>
         </div>
 
-        <div className="flex flex-col justify-center flex-shrink-0 p-1 text-left min-w-0">
+        <div className="flex flex-col justify-center flex-shrink-0 p-1 text-start min-w-0">
           <p className="font-bold text-md text-gray-300 whitespace-nowrap">
             {profile.username}
           </p>

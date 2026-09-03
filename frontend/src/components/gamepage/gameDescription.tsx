@@ -17,10 +17,10 @@ function GameDescription({ name, genres, className, description, developers, pub
 
   return (
     <div className="h-fit mt-15 sm:mt-0 rounded-xl flex flex-col backdrop-blur-md">
-      <div className="w-full h-fit rounded-2xl p-5 text-left bg-black/40">
+      <div className="w-full h-fit rounded-2xl p-5 text-start bg-black/40">
         <p className="text-3xl top-0 left-0 font-bold">{name}</p>
         <div className="text-sm">
-          <p className="font-bold text-sm opacity-70 mt-0">{t("gameDescription.release")}<span className=" ml-2 text-sm font-light">{releaseDate}</span></p>
+          <p className="font-bold text-sm opacity-70 mt-0">{t("gameDescription.release")}<span className=" ms-2 text-sm font-light">{releaseDate}</span></p>
         </div>
         <div className="w-full h-5 flex gap-x-2 text-sm opacity-60 items-center">
           <p className="font-bold ">{t("gameDescription.developers")} </p>

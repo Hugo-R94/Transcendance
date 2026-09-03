@@ -243,7 +243,7 @@ export default function Lobby({
                         {player.username}
 
                         {player.playerId === playerId && (
-                          <span className="ml-1 text-bblue">
+                          <span className="ms-1 text-bblue">
                             {t("lobby.you")}
                           </span>
                         )}

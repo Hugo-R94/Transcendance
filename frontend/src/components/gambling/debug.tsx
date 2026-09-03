@@ -15,7 +15,7 @@ export default function JsonDebugger({
     return (
       <button
         onClick={() => setShow(true)}
-        className="fixed bottom-5 right-5 z-[9999] rounded-xl border border-slate-700
+        className="fixed bottom-5 end-5 z-[9999] rounded-xl border border-slate-700
           bg-slate-900 px-4 py-3 text-sm font-black text-white shadow-2xl hover:bg-slate-800"      >
         WebSocket JSON
       </button>
@@ -23,7 +23,7 @@ export default function JsonDebugger({
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-[9999]">
+    <div className="fixed bottom-5 end-5 z-[9999]">
 		
       <div className="flex h-[420px] w-[400px] flex-col overflow-hidden rounded-2xl border
           border-slate-700 bg-slate-950 shadow-2xl">

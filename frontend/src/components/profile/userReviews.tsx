@@ -125,7 +125,7 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
                 )}
               </Link>
 
-              <div className="flex flex-col text-left">
+              <div className="flex flex-col text-start">
                 <p className="font-bold text-gray-300 text-sm">
                   {nickname}
                 </p>
@@ -140,7 +140,7 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
               {review.comment_title || t("userReviews.untitledReview")}
             </div>
 
-            <div className="mt-2 text-xs bg-white/10 rounded-xl p-2.5 font-semibold whitespace-pre-wrap break-words text-gray-300 max-h-[75px] overflow-y-auto pr-1">
+            <div className="mt-2 text-xs bg-white/10 rounded-xl p-2.5 font-semibold whitespace-pre-wrap break-words text-gray-300 max-h-[75px] overflow-y-auto pe-1">
               {review.comment}
             </div>
           </div>
@@ -151,7 +151,7 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
           </div>
         </div>
 
-        <div className="w-[170px] h-[95%] flex items-center justify-center shrink-0 ml-3">
+        <div className="w-[170px] h-[95%] flex items-center justify-center shrink-0 ms-3">
           {gameData ? (
             <GameCard
               id={review.game_id}
@@ -212,7 +212,7 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
             )}
           </div>
 
-          <div className="flex flex-col flex-1 text-left overflow-hidden">
+          <div className="flex flex-col flex-1 text-start overflow-hidden">
             <p className="font-extrabold text-sm text-white truncate">
               {review.comment_title || t("userReviews.untitledReview")}
             </p>

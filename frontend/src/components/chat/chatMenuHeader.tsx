@@ -54,7 +54,7 @@ export function ChatMenuHeader({
             </button>
 
             {hasRequest && (
-				<div className="absolute right-1 top-1">
+				<div className="absolute end-1 top-1">
 				<NotificationSignal />
 				</div>
             )}

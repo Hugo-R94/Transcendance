@@ -17,7 +17,7 @@ function SearchCard({ appid, name, header, index }: Game) {
 	<a href={`http://localhost:5173/game/${appid}`}>
     <div className={`flex ${color} w-full h-15 rounded-2xl p-1 transition overflow-x-auto hover:scale-105 shadow-sm shadow-black hover:outline-3`}>
 
-      <div className="bg-gray-600 h-full aspect-square rounded-2xl mr-1 overflow-hidden">
+      <div className="bg-gray-600 h-full aspect-square rounded-2xl me-1 overflow-hidden">
         <img
           className="h-full w-full object-cover rounded-2xl object-cover"
           src={header}
@@ -26,7 +26,7 @@ function SearchCard({ appid, name, header, index }: Game) {
       </div>
 
       <div className="relative bg-black/40 w-full h-full rounded-2xl p-2 text-gray-300 flex justify-center items-center">
-        <p className="ml-2 font-bold text-sm">
+        <p className="ms-2 font-bold text-sm">
           {name}
         </p>
 

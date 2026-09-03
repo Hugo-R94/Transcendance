@@ -5,6 +5,7 @@ const LANGUAGES = [
   { code: "en", label: "EN" },
   { code: "fr", label: "FR" },
   { code: "es", label: "ES" },
+  { code: "ar", label: "AR" },
 ];
 
 function LanguageSwitcher() {

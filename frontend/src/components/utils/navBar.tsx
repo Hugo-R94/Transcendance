@@ -69,7 +69,7 @@ function NavBar() {
 			<ButtonLink
 				link="http://localhost:5173/games"
 				color="bg-[#00509f]"
-				className="m-auto font-extrabold lg:text-xl md:text-sm sm:text-sm text-xs transition mr-5"
+				className="m-auto font-extrabold lg:text-xl md:text-sm sm:text-sm text-xs transition me-5"
 			>
 				<p>
 					<span className="text-white">Click</span>
@@ -124,13 +124,13 @@ function NavBar() {
 						d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
 					/>
 				</svg>
-				<p className="mr-5 my-auto text-white text-xl sm:inline hidden font-bold">
+				<p className="me-5 my-auto text-white text-xl sm:inline hidden font-bold">
 					{t("navbar.profile")}
 				</p>
 			</ButtonLink>
 
 			<DropdownMenu
-				className="rounded-2xl ml-3 shadow-black/50 shadow-md sm:w-[10%] w-20 flex items-center justify-center h-full"
+				className="rounded-2xl ms-3 shadow-black/50 shadow-md sm:w-[10%] w-20 flex items-center justify-center h-full"
 				color="bg-bred"
 				items={[
 					{ label: t("navbar.dropdown.home"), href: "/games" },

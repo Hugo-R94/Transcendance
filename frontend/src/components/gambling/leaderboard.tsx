@@ -49,7 +49,7 @@ function ScoreCard({
                 {player.username}
             </p>
 
-            <p className="hidden md:block w-16 text-right">
+            <p className="hidden md:block w-16 text-end">
                 {player.final_score}
             </p>
         </div>
@@ -101,7 +101,7 @@ export default function Leaderboard() {
                         {t("leaderboard.name")}
                     </p>
 
-                    <p className="text-right">
+                    <p className="text-end">
                         {t("leaderboard.score")}
                     </p>
                 </div>

@@ -302,52 +302,52 @@
     "revealed": "✓ TICKET REVEALED"
   },
   "commentSection": {
-  "loading": "Loading comments...",
-  "empty": "No comments yet. Be the first to leave a review!",
-  "guest": "Guest"
-},
-"dislikeButton": {
-  "removeDislike": "Remove dislike",
-  "dislikeGame": "I don't like this game"
-},
-"gameDescription": {
-  "release": "Release:",
-  "developers": "Developers:",
-  "publishers": "Publishers:",
-  "genres": "Genres:"
-},
-"likeButton": {
-  "mustBeLoggedIn": "You must be logged in to vote.",
-  "voteError": "Error while voting: {{message}}"
-},
-"likeGameButton": {
-  "removeFavorite": "Remove from favorites",
-  "likeGame": "I like this game"
-},
-"postComment": {
-  "errors": {
-    "missingGameId": "Error: unable to post, the game ID is missing.",
-    "missingTitle": "Please add a title before submitting your comment.",
-    "missingComment": "Please write a comment before submitting.",
-    "missingRating": "Please give a rating before submitting your comment.",
-    "submitFailed": "Unable to send the comment."
+    "loading": "Loading comments...",
+    "empty": "No comments yet. Be the first to leave a review!",
+    "guest": "Guest"
   },
-  "success": "Comment posted successfully!",
-  "prompt": "Did you like this game?",
-  "titlePlaceholder": "Write your title...",
-  "commentPlaceholder": "Write your comment...",
-  "submit": "SUBMIT",
-  "submitting": "..."
-},
-"wishlistButton": {
-  "remove": "Remove from wishlist",
-  "add": "Add to my wishlist"
-},
-"pagination": {
-  "previous": "Previous",
-  "next": "Next"
-},
-"searchBar": {
-  "placeholder": "Search..."
-}
+  "dislikeButton": {
+    "removeDislike": "Remove dislike",
+    "dislikeGame": "I don't like this game"
+  },
+  "gameDescription": {
+    "release": "Release:",
+    "developers": "Developers:",
+    "publishers": "Publishers:",
+    "genres": "Genres:"
+  },
+  "likeButton": {
+    "mustBeLoggedIn": "You must be logged in to vote.",
+    "voteError": "Error while voting: {{message}}"
+  },
+  "likeGameButton": {
+    "removeFavorite": "Remove from favorites",
+    "likeGame": "I like this game"
+  },
+  "postComment": {
+    "errors": {
+      "missingGameId": "Error: unable to post, the game ID is missing.",
+      "missingTitle": "Please add a title before submitting your comment.",
+      "missingComment": "Please write a comment before submitting.",
+      "missingRating": "Please give a rating before submitting your comment.",
+      "submitFailed": "Unable to send the comment."
+    },
+    "success": "Comment posted successfully!",
+    "prompt": "Did you like this game?",
+    "titlePlaceholder": "Write your title...",
+    "commentPlaceholder": "Write your comment...",
+    "submit": "SUBMIT",
+    "submitting": "..."
+  },
+  "wishlistButton": {
+    "remove": "Remove from wishlist",
+    "add": "Add to my wishlist"
+  },
+  "pagination": {
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "searchBar": {
+    "placeholder": "Search..."
+  }
 }

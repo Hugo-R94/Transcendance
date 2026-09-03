@@ -46,7 +46,7 @@ export default function ChatMenu() {
   const hasNotification = hasRequest || unreadUserIds.length > 0;
 
   return (
-    <div className="fixed bottom-4 right-4 hidden sm:flex flex-row items-end gap-3 z-[9999]">
+    <div className="fixed bottom-4 end-4 hidden sm:flex flex-row items-end gap-3 z-[9999]">
       {isOpen && (
         <ChatWindowContainer
           openConvIds={openConvIds}

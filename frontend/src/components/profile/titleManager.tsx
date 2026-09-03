@@ -97,7 +97,7 @@ function TitleManager({
       />
 
       <DropdownMenu
-        className="ml-2 w-1/2 text-xs"
+        className="ms-2 w-1/2 text-xs"
         items={formattedOptions}
         value={selectedTitle2.toString()}
         onChange={handleTitle2Change}

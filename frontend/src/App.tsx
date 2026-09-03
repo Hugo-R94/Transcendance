@@ -1,4 +1,6 @@
 // App.tsx
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Routes, Route, Outlet } from "react-router-dom";
 import Home from "./pages/Home";
 import Games from "./pages/GameList";
@@ -26,12 +28,22 @@ function ProtectedLayout() {
   );
 }
 
+const RTL_LANGUAGES = ["ar"];
+
 function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.dir = RTL_LANGUAGES.includes(i18n.language)
+      ? "rtl"
+      : "ltr";
+  }, [i18n.language]);
+
   return (
     <div className="relative min-h-screen text-white">
       <ShaderBackground />
 
-      <div className="fixed top-3 right-3 z-100">
+      <div className="fixed top-3 end-3 z-100">
         <LanguageSwitcher />
       </div>
       <Routes>
