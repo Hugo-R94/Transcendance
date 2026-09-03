@@ -16,7 +16,20 @@ export function useChat() {
     const [targetUsername, setTargetUsername] = useState("");
     const [notification, setNotification] = useState<string | null>(null);
     const [unreadUserIds, setUnreadUserIds] = useState<string[]>([]);
+	const [typingConversations, setTypingConversations] = useState<string[]>([]);
+	const [readConversations, setReadConversations] = useState<string[]>([]);
+	
+	const sendIsTyping = (conversationId: string) => {
+		console.log("[CHAT] Sending is_typing", conversationId);
 
+		return sendWebSocketMessage(
+			conversationId,
+			"is_typing",
+			""
+		);
+	};
+
+	
     const wsRef = useRef<WebSocket | null>(null);
 
     const showNotification = (message: string) => {
@@ -215,13 +228,74 @@ export function useChat() {
                         showNotification(
                             "Quelqu'un vous a bloquer."
                         );
-                    } else if (data.type === "game_invit") {
-                        fetchConversations();
+                    }else if (data.type === "message") {
+						setConvs((prev) =>
+							prev.map((conv) =>
+								String(conv.id) !==
+								String(data.conversation_id)
+									? conv
+									: {
+										...conv,
+										messages: [
+											data,
+											...(conv.messages || []),
+										],
+									}
+							)
+						);
 
-                        showNotification(
-                            `Invitation pour rejoindre la room ${data.text}`
-                        );
-                    } else if (
+						setReadConversations((prev) =>
+							prev.filter(
+								(id) => String(id) !== String(data.conversation_id)
+							)
+						);
+
+						fetchConversations();
+					}
+					else if (
+						data.type === "read" &&
+						String(data.sender_id) !== String(localStorage.getItem("userID"))
+					) {
+						const conversationId = String(data.conversation_id);
+						// showNotification(`conversation ${data.conversation_id} a ete lu.`);
+						console.log(
+							`[CHAT] Conversation ${conversationId} : message lu par ${data.sender_id}`
+						);
+
+						setReadConversations((prev) => {
+							if (prev.includes(conversationId)) {
+								return prev;
+							}
+
+							return [...prev, conversationId];
+						});
+					}
+
+					else if (data.type === "is_typing") {
+						const senderId = String(data.sender_id);
+						const myUserId = String(localStorage.getItem("userID"));
+						const conversationId = String(data.conversation_id);
+						console.log("senderID = %s | my id = %s", senderId, myUserId);
+						if (senderId === myUserId) {
+							return;
+						}
+
+						setTypingConversations((prev) => {
+							if (prev.includes(conversationId)) {
+								return prev;
+							}	
+
+							return [...prev, conversationId];
+						});
+
+						window.setTimeout(() => {
+							setTypingConversations((prev) =>
+								prev.filter((id) => id !== conversationId)
+							);
+						}, 2000);
+					}
+
+					else if (
                         data.type === "chat_notification" &&
                         String(data.sender_id) !==
                             String(localStorage.getItem("userID"))
@@ -366,6 +440,13 @@ export function useChat() {
     const markAsRead = (conversationId: string) => {
         return sendWebSocketMessage(conversationId, "read");
     };
+	const markAsUnread = (conversationId: string) => {
+		setReadConversations((prev) =>
+			prev.filter(
+				(id) => String(id) !== String(conversationId)
+			)
+		);
+	};
 
     const handleFriendClick = async (friend: Friend) => {
         setUnreadUserIds((prev) =>
@@ -394,7 +475,11 @@ export function useChat() {
                 String(conversation.id),
             ]);
         }
-
+		
+		// setReadConversations((prev) =>
+		// 	prev.filter((id) => id !== String(conversation.id))
+		// );
+		
         const myUserId = localStorage.getItem("userID");
 
         const isUser1 =
@@ -554,6 +639,7 @@ export function useChat() {
         setIsOpen,
         currentUserId,
         convs,
+		sendIsTyping,
         openConvIds,
         setOpenConvIds,
         wsConnected,
@@ -569,8 +655,12 @@ export function useChat() {
         handleFriendClick,
         invite,
         handleSendFriendRequest,
+		readConversations,
+		setReadConversations,
         handleAccept,
+		markAsUnread,
         handleReject,
+		typingConversations,
         handleBlock,
         handleUnfriend,
     };

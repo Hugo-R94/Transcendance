@@ -4,10 +4,13 @@ import (
 	"encoding/json"
 	"log"
 	"time"
-
+	"fmt"
+	"errors"
+	
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
+	"gorm.io/gorm"
 )
 
 type Client struct {
@@ -25,16 +28,18 @@ func validType(typeMsg string) bool {
 		typeMsg == models.MessageTypeFriendAccept ||
 		typeMsg == models.MessageTypeUnfriend ||
 		typeMsg == models.MessageTypeGameInvit ||
+		typeMsg == models.MessageIsTyping ||
 		typeMsg == models.MessageTypeRead {
 		return true
 	}
 
 	return false
 }
+
 func (h *Hub) MarkAsRead(
 	userID uuid.UUID,
 	conversationID uuid.UUID,
-) {
+) (bool, error) {
 	now := time.Now()
 
 	var conv models.Conversation
@@ -43,7 +48,7 @@ func (h *Hub) MarkAsRead(
 		Where("id = ?", conversationID).
 		First(&conv).Error; err != nil {
 		log.Printf("[ERROR] Couldn't fetch conversation: %v", err)
-		return
+		return false, err
 	}
 
 	updates := map[string]interface{}{}
@@ -56,12 +61,15 @@ func (h *Hub) MarkAsRead(
 		updates["last_read_at_user2"] = now
 
 	default:
-		log.Printf(
-			"[ERROR] User %v isn't in conversation %v",
+		err := fmt.Errorf(
+			"user %v isn't in conversation %v",
 			userID,
 			conversationID,
 		)
-		return
+
+		log.Printf("[ERROR] %v", err)
+
+		return false, err
 	}
 
 	if err := h.DB.
@@ -69,15 +77,35 @@ func (h *Hub) MarkAsRead(
 		Where("id = ?", conversationID).
 		Updates(updates).Error; err != nil {
 		log.Printf("[ERROR] Couldn't update last read: %v", err)
-		return
+		return false, err
 	}
 
-	log.Printf(
-		"[CHAT] User %v read conversation %v",
-		userID,
-		conversationID,
-	)
+	var lastMessage models.Message
+
+	if err := h.DB.
+		Where("conversation_id = ?", conversationID).
+		Order("created_at DESC").
+		First(&lastMessage).Error; err != nil {
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+
+		log.Printf(
+			"[ERROR] Couldn't fetch last message: %v",
+			err,
+		)
+
+		return false, err
+	}
+
+	if lastMessage.SenderID == userID {
+		return false, nil
+	}
+
+	return true, nil
 }
+
 
 func (c *Client) readPump() {
 	defer func() {
@@ -118,9 +146,20 @@ func (c *Client) readPump() {
 		}
 
 		if msg.Type == models.MessageTypeRead {
-			c.Hub.MarkAsRead(c.ID, convID)
-			continue
+			shouldBroadcast, err := c.Hub.MarkAsRead(c.ID, convID)
+			if err != nil {
+				log.Printf(
+					"[ERROR] MarkAsRead failed: %v",
+					err,
+				)
+				continue
+			}
+
+			if !shouldBroadcast {
+				continue
+			}
 		}
+
 
 		newMsg := models.Message{
 			ConversationID: convID,

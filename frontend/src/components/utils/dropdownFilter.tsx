@@ -118,7 +118,7 @@ function DropdownMenu({
           ) : (
             /* Bouton classique avec texte et flèche */
             <>
-              <span className="font-bold text-white truncate mr-2">
+              <span className="font-bold text-white truncate me-2">
                 {selectedItem?.label ?? Name ?? items[0]?.label}
               </span>
               <span
@@ -137,8 +137,8 @@ function DropdownMenu({
       <div
         className={`
           /* Positionnement Mobile First */
-          fixed left-4 right-4 top-1/2 -translate-y-1/2
-          sm:absolute sm:left-auto sm:right-0 sm:translate-y-0
+          fixed start-4 end-4 top-1/2 -translate-y-1/2
+          sm:absolute sm:start-auto sm:end-0 sm:translate-y-0
           sm:w-64
           ${positionClasses}
 

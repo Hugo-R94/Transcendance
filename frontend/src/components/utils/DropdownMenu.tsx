@@ -75,11 +75,11 @@ function DropdownMenu({
       {/* Menu déroulant */}
       {menuOpen && (
         <div
-          className={`flex flex-col gap-y-2 absolute right-0 top-[110%] sm:w-75 w-[500%] mt-2 rounded-xl overflow-visible shadow-lg p-3 bg-bdarkgreen z-50 shadow-md shadow-black/75 ${menuClassName}`}
+          className={`flex flex-col gap-y-2 absolute end-0 top-[110%] sm:w-75 w-[500%] mt-2 rounded-xl overflow-visible shadow-lg p-3 bg-bdarkgreen z-50 shadow-md shadow-black/75 ${menuClassName}`}
         >
           {items.map((item, index) => {
             const itemStyles = `
-              block w-full text-left px-4 py-3 text-white font-bold transition
+              block w-full text-start px-4 py-3 text-white font-bold transition
               hover:brightness-110 shadow-black/75 shadow-md rounded-2xl
               hover:outline-3 hover:outline-white balatro cursor-pointer 
               ${colors[index % colors.length]}

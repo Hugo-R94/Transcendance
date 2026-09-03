@@ -1,0 +1,355 @@
+{
+	"greeting": "مرحبا",
+	"login": {
+		"signin": "إنشاء حساب",
+		"submit": "تسجيل الدخول",
+		"usernamePlaceholder": "أدخل بريدك الإلكتروني أو اسم المستخدم...",
+		"passwordPlaceholder": "أدخل كلمة المرور...",
+		"logoAlt": "الشعار",
+		"errors": {
+			"fillAllFields": "يرجى ملء جميع الحقول.",
+			"serverError": "خطأ في الخادم: {{status}}",
+			"invalidCredentials": "تعذر تسجيل الدخول. تحقق من بياناتك."
+		},
+		"success": "تم تسجيل الدخول بنجاح! جارٍ إعادة التوجيه..."
+	},
+	"signin": {
+		"login": "تسجيل الدخول",
+		"submit": "إنشاء حساب",
+		"logoAlt": "الشعار",
+		"emailPlaceholder": "أدخل بريدك الإلكتروني...",
+		"usernamePlaceholder": "أدخل اسم المستخدم...",
+		"passwordPlaceholder": "أدخل كلمة المرور...",
+		"confirmPasswordPlaceholder": "أكد كلمة المرور...",
+		"errors": {
+			"passwordMismatch": "كلمتا المرور غير متطابقتين.",
+			"serverError": "خطأ في الخادم: {{status}}",
+			"registrationFailed": "حدث خطأ أثناء التسجيل."
+		},
+		"success": "تم التسجيل بنجاح!"
+	},
+	"navbar": {
+		"gamble": "المراهنة",
+		"profile": "الملف الشخصي",
+		"menu": "القائمة",
+		"dropdown": {
+			"home": "الرئيسية",
+			"profile": "الملف الشخصي",
+			"support": "الدعم",
+			"logout": "تسجيل الخروج"
+		},
+		"logout": {
+			"success": "تم تسجيل الخروج بنجاح!",
+			"forced": "تم تسجيل الخروج قسرًا (انتهت الجلسة أو الخادم غير متاح)",
+			"done": "تم تسجيل الخروج",
+			"networkError": "خطأ في الشبكة: تم تسجيل الخروج محليًا."
+		}
+	},
+	"home": {
+		"welcome": "مرحبًا بك في",
+		"tagline": "المنصة الهجينة الأولى لتقييم ألعاب الفيديو والمراهنة على أخبار الألعاب",
+		"login": "تسجيل الدخول",
+		"signup": "إنشاء حساب"
+	},
+	"profile": {
+		"loading": "جارٍ تحميل الملف الشخصي...",
+		"notFound": "الملف الشخصي غير موجود",
+		"errors": {
+			"notAuthenticated": "غير مصادق عليه",
+			"generic": "حدث خطأ",
+			"pictureUpdateFailed": "تعذر تحديث صورة الملف الشخصي.",
+			"saveDescriptionFailed": "حدث خطأ أثناء الحفظ."
+		},
+		"success": {
+			"pictureUpdated": "تم تحديث صورة الملف الشخصي بنجاح!",
+			"descriptionSaved": "تم حفظ الوصف بنجاح!"
+		}
+	},
+	"profileMenu": {
+		"games": "الألعاب",
+		"reviews": "التقييمات",
+		"friends": "الأصدقاء",
+		"gambles": "المراهنات"
+	},
+	"profileHeader": {
+		"pictureAlt": "صورة الملف الشخصي",
+		"aboutMe": "نبذة عني:",
+		"save": "حفظ",
+		"saving": "جارٍ الحفظ...",
+		"descriptionPlaceholder": "لا يوجد وصف بعد...",
+		"changePicture": "تغيير"
+	},
+	"common": {
+		"loading": "جارٍ التحميل..."
+	},
+	"gameFilters": {
+		"genreLabel": "النوع",
+		"sortLabel": "ترتيب",
+		"genres": {
+			"Action": "أكشن",
+			"Sport": "رياضة",
+			"Adventure": "مغامرة",
+			"Strategy": "استراتيجية",
+			"Indie": "إندي",
+			"Simulation": "محاكاة",
+			"RPG": "لعب أدوار",
+			"FreeToPlay": "مجاني للعب",
+			"Casual": "كاجوال",
+			"Racing": "سباق"
+		},
+		"sort": {
+			"releaseDateAsc": "تاريخ الإصدار ↑",
+			"releaseDateDesc": "تاريخ الإصدار ↓",
+			"ratingAsc": "الأقل تقييمًا على Steam",
+			"ratingDesc": "الأعلى تقييمًا على Steam",
+			"mostPlayed": "الأكثر لعبًا",
+			"lessPlayed": "الأقل لعبًا",
+			"nameAsc": "الاسم أ ← ي",
+			"nameDesc": "الاسم ي ← أ"
+		}
+	},
+	"gamesPage": {
+		"heading": "ما الرائج؟",
+		"error": "تعذر تحميل الألعاب",
+		"empty": "لم يتم العثور على ألعاب"
+	},
+	"userGameList": {
+		"likes": "الإعجابات",
+		"dislikes": "عدم الإعجاب",
+		"wishlist": "قائمة الأمنيات",
+		"empty": "لا توجد ألعاب في هذه القائمة"
+	},
+	"gamePage": {
+		"notFound": "اللعبة غير موجودة",
+		"genericError": "حدث خطأ",
+		"rating": "التقييم",
+		"steamLogoAlt": "شعار Steam",
+		"reviewCount": "{{count}} تقييم",
+		"reviewCount_other": "{{count}} تقييمات"
+	},
+	"chat": {
+		"addFriend": "إضافة صديق",
+		"usernamePlaceholder": "اسم المستخدم",
+		"addButton": "إضافة",
+		"wsConnected": "تم الاتصال بالخادم",
+		"wsDisconnected": "انقطع الاتصال بالخادم",
+		"pendingRequests": "طلبات معلقة ({{count}})",
+		"noPendingRequests": "لا توجد طلبات معلقة.",
+		"accept": "قبول",
+		"discussions": "المحادثات ({{count}})",
+		"noActiveDiscussions": "لا توجد محادثات نشطة.",
+		"discussionWith": "محادثة مع {{name}}",
+		"online": "● متصل",
+		"offline": "● غير متصل",
+		"noMessages": "لا توجد رسائل بعد. قل مرحبًا!",
+		"messagePlaceholder": "اكتب رسالتك...",
+		"send": "إرسال",
+		"selectDiscussion": "اختر محادثة للبدء",
+		"defaultUsername": "مستخدم",
+		"alerts": {
+			"friendRequestSent": "تم إرسال طلب الصداقة!",
+			"friendRequestFailed": "تعذر إرسال الطلب",
+			"friendRequestAccepted": "تم قبول طلب الصداقة!",
+			"friendAcceptFailed": "تعذر قبول الطلب",
+			"userNotFound": "خطأ: تعذر العثور على المستخدم.",
+			"selectConversation": "اختر محادثة.",
+			"wsMissing": "اتصال WebSocket غير موجود.",
+			"wsNotActive": "اتصال WebSocket غير نشط."
+		}
+	},
+	"userProfilePage": {
+		"clicker": "النقر",
+		"selection": "التحديد",
+		"loadError": "حدث خطأ أثناء التحميل"
+	},
+	"userReviews": {
+		"gameFallback": "لعبة",
+		"postedOn": "نُشر في {{date}}",
+		"untitledReview": "تقييم بدون عنوان",
+		"loadError": "تعذر تحميل التقييمات حاليًا.",
+		"empty": "لم يتم العثور على تقييمات"
+	},
+	"userProfileHeader": {
+		"pictureAlt": "الملف الشخصي لـ {{username}}",
+		"noDescription": "لا يوجد وصف."
+	},
+	"gambleHistory": {
+		"score": "النتيجة:",
+		"rank": "الترتيب:",
+		"gamble": "المراهنة",
+		"history": "السجل",
+		"noGames": "لم يتم لعب أي مباراة.",
+		"loadError": "تعذر استرجاع السجل"
+	},
+	"userFriendsList": {
+		"friends": "الأصدقاء",
+		"blocked": "المحظورون",
+		"unblock": "إلغاء الحظر",
+		"friendsLoadError": "تعذر تحميل الأصدقاء حاليًا.",
+		"blockedLoadError": "تعذر تحميل قائمة المستخدمين المحظورين.",
+		"noFriends": "لم يتم العثور على أصدقاء",
+		"noBlocked": "لا يوجد مستخدمون محظورون"
+	},
+	"inviteGame": {
+		"joinRoom": "انضم إلى الغرفة:",
+		"join": "انضمام"
+	},
+	"chatMenu": {
+		"myFriends": "أصدقائي",
+		"friendRequests": "طلبات الصداقة"
+	},
+	"chatMenuHeader": {
+		"friendsTab": "الأصدقاء",
+		"requestsTab": "الدعوات",
+		"collapsedLabel": "الدردشة"
+	},
+	"friendList": {
+		"noFriends": "لا يوجد أصدقاء",
+		"chat": "دردشة",
+		"block": "حظر",
+		"delete": "إزالة"
+	},
+	"friendRequestList": {
+		"noRequests": "لا توجد طلبات",
+		"friendRequestLabel": "طلب صداقة",
+		"accept": "قبول",
+		"reject": "رفض"
+	},
+"chatWindow": {
+  "defaultLabel": "دردشة",
+  "emptyMessages": "لا توجد رسائل",
+  "messagePlaceholder": "رسالة...",
+  "myInitial": "أ",
+  "typing": "يكتب الآن...",
+  "read": "تمت القراءة"
+},
+	"titles": {
+		"1": "لاعب",
+		"2": "كريه الرائحة",
+		"3": "عالق",
+		"4": "منتشٍ",
+		"5": "محظوظ",
+		"6": "مدين",
+		"7": "محترف",
+		"8": "متوسط",
+		"9": "جديد",
+		"10": "لاعب"
+	},
+	"lobby": {
+		"title": "غرفة الانتظار",
+		"startingIn": "تبدأ اللعبة خلال",
+		"connected": "متصل",
+		"connecting": "جارٍ الاتصال...",
+		"roomNamePlaceholder": "اسم الغرفة",
+		"join": "انضمام",
+		"invite": "دعوة",
+		"leave": "مغادرة",
+		"players": "اللاعبون",
+		"readyCount": "{{ready}} / {{total}} جاهزون",
+		"readyToggleOn": "جاهز",
+		"readyToggleOff": "غير جاهز",
+		"noPlayers": "لا يوجد لاعبون",
+		"you": "(أنت)",
+		"statusReady": "جاهز",
+		"statusWaiting": "في الانتظار"
+	},
+	"leaderboard": {
+		"title": "لوحة المتصدرين",
+		"name": "الاسم",
+		"score": "النتيجة"
+	},
+	"bettingTable": {
+		"red": "أحمر",
+		"even": "زوجي",
+		"odd": "فردي",
+		"green": "أخضر"
+	},
+	"bettingPanel": {
+		"howMuch": "كم تريد أن تراهن؟",
+		"currentBet": "الرهان الحالي",
+		"on": "على",
+		"hint": "انقر على خانة لوضع رهانك"
+	},
+	"balance": {
+		"label": "الرصيد:"
+	},
+	"phaseTimer": {
+		"phases": {
+			"betting": "الرهان",
+			"scratch": "بطاقة الحك",
+			"spinning": "الروليت",
+			"resolving": "النتيجة",
+			"finished": "انتهت اللعبة"
+		},
+		"remains": "المتبقي:",
+		"turn": "الجولة:",
+		"phase": "المرحلة:"
+	},
+	"resultsTable": {
+		"gameTitle": "🏆 نتائج المباراة",
+		"roundTitle": "🏆 نتائج الجولة",
+		"player": "اللاعب",
+		"result": "النتيجة",
+		"before": "قبل",
+		"gain": "الربح",
+		"after": "بعد"
+	},
+	"scratchTicket": {
+		"mysteryTitle": "بطاقة غامضة",
+		"revealSubtitle": "اكشف عن مكافأتك",
+		"scratchButton": "✨ احكّ",
+		"yourTicket": "بطاقتك",
+		"bonus": "مكافأة",
+		"malus": "خصم",
+		"revealed": "✓ تم كشف البطاقة"
+	},
+	"commentSection": {
+		"loading": "جارٍ تحميل التعليقات...",
+		"empty": "لا توجد تعليقات بعد. كن أول من يترك تقييمًا!",
+		"guest": "زائر"
+	},
+	"dislikeButton": {
+		"removeDislike": "إلغاء عدم الإعجاب",
+		"dislikeGame": "لا يعجبني هذا اللعبة"
+	},
+	"gameDescription": {
+		"release": "الإصدار:",
+		"developers": "المطورون:",
+		"publishers": "الناشرون:",
+		"genres": "الأنواع:"
+	},
+	"likeButton": {
+		"mustBeLoggedIn": "يجب تسجيل الدخول للتصويت.",
+		"voteError": "خطأ أثناء التصويت: {{message}}"
+	},
+	"likeGameButton": {
+		"removeFavorite": "إزالة من المفضلة",
+		"likeGame": "يعجبني هذا اللعبة"
+	},
+	"postComment": {
+		"errors": {
+			"missingGameId": "خطأ: تعذر النشر، معرف اللعبة مفقود.",
+			"missingTitle": "يرجى إضافة عنوان قبل إرسال تعليقك.",
+			"missingComment": "يرجى كتابة تعليق قبل الإرسال.",
+			"missingRating": "يرجى إعطاء تقييم قبل إرسال تعليقك.",
+			"submitFailed": "تعذر إرسال التعليق."
+		},
+		"success": "تم نشر التعليق بنجاح!",
+		"prompt": "هل أعجبتك هذه اللعبة؟",
+		"titlePlaceholder": "اكتب عنوانك...",
+		"commentPlaceholder": "اكتب تعليقك...",
+		"submit": "إرسال",
+		"submitting": "..."
+	},
+	"wishlistButton": {
+		"remove": "إزالة من قائمة الأمنيات",
+		"add": "إضافة إلى قائمة أمنياتي"
+	},
+	"pagination": {
+		"previous": "السابق",
+		"next": "التالي"
+	},
+	"searchBar": {
+		"placeholder": "بحث..."
+	}
+}

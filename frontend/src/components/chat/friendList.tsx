@@ -104,7 +104,7 @@ export default function FriendList({
                 </div>
               </div>
 
-              <div className="relative shrink-0 mr-2">
+              <div className="relative shrink-0 me-2">
                 <button
                   onClick={() => onFriendClick(friend)}
                   className="bg-black/20 px-3 py-1.5 rounded-lg text-white balatro hover:outline-2 active:scale-90 text-xs font-bold hover:bg-white/20 transition-colors cursor-pointer"
@@ -113,7 +113,7 @@ export default function FriendList({
                 </button>
 
                 {hasUnread && (
-                  <div className="absolute bottom-1 right-1 z-20 pointer-events-none">
+                  <div className="absolute bottom-1 end-1 z-20 pointer-events-none">
                     <NotificationSignal />
                   </div>
                 )}
@@ -126,7 +126,7 @@ export default function FriendList({
                 ]}
                 color="bg-black/20"
                 className="h-full flex items-center"
-                menuClassName="sm:w-44 sm:right-0"
+                menuClassName="sm:w-44 sm:end-0"
                 pos={index >= friends.length - 2 ? 1 : -1}
                 isIconOnly={true}
                 onChange={(value) =>

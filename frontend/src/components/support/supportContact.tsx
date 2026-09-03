@@ -1,6 +1,6 @@
 import {useState} from "react";
-import api from "../api/api";
-import Notification from "./utils/notification";
+import api from "../../api/api";
+import Notification from "../utils/notification";
 
 
 function supportContact(){

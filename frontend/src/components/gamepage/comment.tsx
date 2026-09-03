@@ -111,8 +111,8 @@ function Comment({
         )}
         </Link>
         <div>
-          <p className="font-bold text-left text-gray-300">{Nickname}</p>
-          <p className="text-xs text-left font-semibold text-gray-300/75">
+          <p className="font-bold text-start text-gray-300">{Nickname}</p>
+          <p className="text-xs text-start font-semibold text-gray-300/75">
             {label1} {label2}
           </p>
         </div>

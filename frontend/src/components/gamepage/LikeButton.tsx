@@ -107,7 +107,7 @@ function LikeButton({
         type="button"
         disabled={isPending}
         onClick={() => handleVote(1)}
-        className={`flex justify-center shadow-md shadow-black/50 hover:shadow-lg balatro hover:-translate-x-3 hover:outline-2 active:scale-90 items-center gap-2 bg-black/30 w-1/2 h-full p-1 mr-1 rounded-l-2xl transition-all ${
+        className={`flex justify-center shadow-md shadow-black/50 hover:shadow-lg balatro hover:-translate-x-3 hover:outline-2 active:scale-90 items-center gap-2 bg-black/30 w-1/2 h-full p-1 me-1 rounded-l-2xl transition-all ${
           userState === 1 ? "bg-green-600/40 border-2 border-green-400" : ""
         }`}
       >

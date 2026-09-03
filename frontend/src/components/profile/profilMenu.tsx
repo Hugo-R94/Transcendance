@@ -42,7 +42,7 @@ export default function ProfileMenu({ activeTab = "profil", onTabChange }: Profi
                 {option.label}
               </button>
               {index < MENU_OPTIONS.length - 1 && (
-                <div className="w-px h-full bg-white/10 ml-3" />
+                <div className="w-px h-full bg-white/10 ms-3" />
               )}
             </div>
           );

@@ -3,6 +3,7 @@ package chat
 import (
 	"context"
 	"log"
+	"fmt"
 	"time"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
@@ -97,13 +98,40 @@ func (h *Hub) Run(ctx context.Context) {
 
 			bm.Message.SenderID = bm.Client.ID
 			bm.Message.Time = time.Now()
+			
+			if bm.Message.Type == models.MessageTypeChat ||
+				bm.Message.Type == models.MessageTypeGameInvit {
 
-			if err := h.DB.Transaction(func(tx *gorm.DB) error {
-				return tx.Create(&bm.Message).Error
-			}); err != nil {
-				log.Printf("[ERROR] Failed to save message: %v", err)
-				continue
+				if err := h.DB.Transaction(func(tx *gorm.DB) error {
+					if err := tx.Create(&bm.Message).Error; err != nil {
+						return err
+					}
+
+					if bm.Message.Type == models.MessageTypeChat {
+						if err := tx.Model(&models.Conversation{}).
+							Where("id = ?", conv.ID).
+							Updates(map[string]interface{}{
+								"last_message_id": bm.Message.ID,
+								"last_message_at": bm.Message.Time,
+							}).Error; err != nil {
+							return err
+						}
+					}
+
+					return nil
+				}); err != nil {
+					log.Printf("[ERROR] Failed to save message: %v", err)
+					continue
+				}
+
+				if bm.Message.Type == models.MessageTypeChat || bm.Message.Type == models.MessageTypeGameInvit {
+					conv.LastMessageID = bm.Message.ID
+					conv.LastMessageAt = &bm.Message.Time
+					fmt.Printf("maj du last message : last message id = %v  |  at = %v\n", bm.Message.ID, &bm.Message.Time)
+				}
 			}
+
+
 
 			h.BroadcastToRecipient(bm, conv)
 		}
@@ -135,7 +163,9 @@ func (h *Hub) BroadcastToRecipient(
 			delete(h.Clients, client)
 		}
 	}
-
+	if bm.Message.Type == models.MessageIsTyping || bm.Message.Type == models.MessageTypeRead {
+		return
+	}
 	var lastRead *time.Time
 
 	if recipientID == conv.User1ID {
@@ -181,4 +211,3 @@ func (h *Hub) sendToTarget(targetID uuid.UUID, msg models.Message) {
 		}
 	}
 }
-

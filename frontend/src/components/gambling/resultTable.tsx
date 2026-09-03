@@ -148,7 +148,7 @@ export function ResultsTable({
             text-white/50
           "
         >
-          <span className="text-left">{t("resultsTable.player")}</span>
+          <span className="text-start">{t("resultsTable.player")}</span>
           <span>{t("resultsTable.result")}</span>
           <span>{t("resultsTable.before")}</span>
           <span>{t("resultsTable.gain")}</span>

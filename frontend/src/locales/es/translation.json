@@ -209,12 +209,14 @@
     "accept": "Aceptar",
     "reject": "Rechazar"
   },
-  "chatWindow": {
-    "defaultLabel": "Chat",
-    "emptyMessages": "Aucun message",
-    "messagePlaceholder": "Message...",
-    "myInitial": "M"
-  },
+"chatWindow": {
+  "defaultLabel": "Chat",
+  "emptyMessages": "Ningún mensaje",
+  "messagePlaceholder": "Mensaje...",
+  "myInitial": "Y",
+  "typing": "escribiendo...",
+  "read": "Leído"
+},
   "titles": {
     "1": "Gamer",
     "2": "Apestoso",
@@ -296,52 +298,58 @@
     "revealed": "✓ TICKET REVELADO"
   },
   "commentSection": {
-  "loading": "Cargando comentarios...",
-  "empty": "Aún no hay comentarios. ¡Sé el primero en dejar una reseña!",
-  "guest": "Invitado"
-},
-"dislikeButton": {
-  "removeDislike": "Quitar dislike",
-  "dislikeGame": "No me gusta este juego"
-},
-"gameDescription": {
-  "release": "Lanzamiento:",
-  "developers": "Desarrolladores:",
-  "publishers": "Editores:",
-  "genres": "Géneros:"
-},
-"likeButton": {
-  "mustBeLoggedIn": "Debes iniciar sesión para poder votar.",
-  "voteError": "Error al votar: {{message}}"
-},
-"likeGameButton": {
-  "removeFavorite": "Quitar de favoritos",
-  "likeGame": "Me gusta este juego"
-},
-"postComment": {
-  "errors": {
-    "missingGameId": "Error: no se pudo publicar, no se encuentra el ID del juego.",
-    "missingTitle": "Añade un título antes de enviar tu comentario.",
-    "missingComment": "Escribe un comentario antes de enviar.",
-    "missingRating": "Da una puntuación antes de enviar tu comentario.",
-    "submitFailed": "No se pudo enviar el comentario."
+    "loading": "Cargando comentarios...",
+    "empty": "Aún no hay comentarios. ¡Sé el primero en dejar una reseña!",
+    "guest": "Invitado"
   },
-  "success": "¡Comentario publicado con éxito!",
-  "prompt": "¿Te ha gustado este juego?",
-  "titlePlaceholder": "Escribe tu título...",
-  "commentPlaceholder": "Escribe tu comentario...",
-  "submit": "ENVIAR",
-  "submitting": "..."
-},
-"wishlistButton": {
-  "remove": "Quitar de la lista de deseos",
-  "add": "Añadir a mi lista de deseos"
-},
-"pagination": {
-  "previous": "Anterior",
-  "next": "Siguiente"
-},
-"searchBar": {
-  "placeholder": "Buscar..."
-}
+  "dislikeButton": {
+    "removeDislike": "Quitar dislike",
+    "dislikeGame": "No me gusta este juego"
+  },
+  "gameDescription": {
+    "release": "Lanzamiento:",
+    "developers": "Desarrolladores:",
+    "publishers": "Editores:",
+    "genres": "Géneros:"
+  },
+  "likeButton": {
+    "mustBeLoggedIn": "Debes iniciar sesión para poder votar.",
+    "voteError": "Error al votar: {{message}}"
+  },
+  "likeGameButton": {
+    "removeFavorite": "Quitar de favoritos",
+    "likeGame": "Me gusta este juego"
+  },
+  "postComment": {
+    "errors": {
+      "missingGameId": "Error: no se pudo publicar, no se encuentra el ID del juego.",
+      "missingTitle": "Añade un título antes de enviar tu comentario.",
+      "missingComment": "Escribe un comentario antes de enviar.",
+      "missingRating": "Da una puntuación antes de enviar tu comentario.",
+      "submitFailed": "No se pudo enviar el comentario."
+    },
+    "success": "¡Comentario publicado con éxito!",
+    "prompt": "¿Te ha gustado este juego?",
+    "titlePlaceholder": "Escribe tu título...",
+    "commentPlaceholder": "Escribe tu comentario...",
+    "submit": "ENVIAR",
+    "submitting": "..."
+  },
+  "wishlistButton": {
+    "remove": "Quitar de la lista de deseos",
+    "add": "Añadir a mi lista de deseos"
+  },
+  "pagination": {
+    "previous": "Anterior",
+    "next": "Siguiente"
+  },
+  "searchBar": {
+    "placeholder": "Buscar..."
+  },
+  "home": {
+    "welcome": "Bienvenido a",
+    "tagline": "La primera plataforma híbrida para valorar tus videojuegos y apostar en noticias del sector.",
+    "login": "Acceso",
+    "signup": "Inscribirse"
+  }
 }
