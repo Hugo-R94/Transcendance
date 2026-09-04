@@ -443,7 +443,7 @@ func (h *GameHandler) VoteComment(c *gin.Context) {
 		result := tx.Where(
 			"user_id = ? AND comment_id = ?",
 			userID, commentID,
-		).FirstOrCreate(&existing)
+		).First(&existing)
 
 		oldVote := 0
 		if result.Error == nil {
