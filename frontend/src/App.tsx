@@ -51,6 +51,7 @@ function App() {
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} />
             <Route path="/quest" element={<Quest />} />
+            <Route path="/terms" element={<TermsOfServices />} />
           </Route>
         </Route>
       </Routes>

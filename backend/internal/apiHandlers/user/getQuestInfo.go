@@ -87,7 +87,8 @@ func updateQuest(db *gorm.DB, user *models.User) error {
 
     user.Quest = models.Quest{
         ExpireAt:         now.Add(24 * time.Hour),
-        QuestType:        rand.Intn(2),
+        QuestType:        1,
+        // QuestType:        rand.Intn(2),
         QuestRequirement: rand.Intn(3) + 1,
         QuestCount:       0,
         IsFinished:       false,
@@ -165,7 +166,9 @@ func ExecQuest(db *gorm.DB, user *models.User, tryquest string, hub *chat.Hub) (
 			},
 		}
 	}
-
+	if completed{
+		return true, nil
+	}
 	log.Printf(
 		"[QUEST] sauvegardée: count=%d/%d level=%d finished=%v",
 		user.QuestCount,
@@ -174,7 +177,7 @@ func ExecQuest(db *gorm.DB, user *models.User, tryquest string, hub *chat.Hub) (
 		user.IsFinished,
 	)
 
-	return true, nil
+	return false, nil
 }
 
 
