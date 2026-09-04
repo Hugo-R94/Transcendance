@@ -34,8 +34,11 @@
     "menu": "MENU",
     "dropdown": {
       "home": "Home",
-      "profile": "Profil",
+      "profile": "Profile",
       "support": "Support",
+	  	"clicker": "Play",
+	"quest": "quest",
+	  "terms": "Terms of Service and Privacy Policy",
       "logout": "Logout"
     },
     "logout": {
@@ -351,5 +354,95 @@
   },
   "searchBar": {
     "placeholder": "Search..."
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "object": {
+      "title": "1. Purpose",
+      "description": "Clickbet is a video game platform that allows users to view information about games, play online, publish reviews and comments, interact with other users, and manage their game list."
+    },
+    "account": {
+      "title": "2. User Account",
+      "description": "Some features require the creation of an account. Users are responsible for the security of their credentials and for actions performed through their account. Each user may delete their account at any time using the available account management features."
+    },
+    "behavior": {
+      "title": "3. Behavior and Interactions",
+      "description": "Users may publish reviews and comments, use the chat, and add other users to their friends list. Insulting, hateful, discriminatory, threatening, malicious, or spam-like content is not allowed. Users may also block other users."
+    },
+    "content": {
+      "title": "4. User Content",
+      "description": "Users remain responsible for the reviews, comments, and messages they publish. They agree not to use the platform to distribute illegal or malicious content or content that infringes on the rights of others. Content that does not comply with these rules may be removed."
+    },
+    "gaming": {
+      "title": "5. Online Gaming and Fair Play",
+      "description": "Gaming features are intended for entertainment purposes. The use of bots, cheats, exploits, scripts, or any other method used to cheat or manipulate scores and rankings is prohibited."
+    },
+    "moderation": {
+      "title": "6. Moderation",
+      "description": "To maintain a respectful environment, content that violates these terms may be removed and the accounts concerned may be temporarily suspended or permanently blocked in cases of abusive or repeated behavior."
+    },
+    "intellectualProperty": {
+      "title": "7. Intellectual Property",
+      "description": "The code and original elements of Clickbet are developed as part of the project. Names, logos, images, covers, and information relating to games remain the property of their respective owners. Game-related information is notably provided through the Steam API."
+    },
+    "availability": {
+      "title": "8. Service Availability",
+      "description": "Clickbet is an educational project. The service may be temporarily unavailable due to maintenance, technical issues, or platform changes."
+    },
+    "modifications": {
+      "title": "9. Changes to the Terms",
+      "description": "These terms may be modified when the operation or features of Clickbet evolve. The version displayed on this page is the version currently in effect."
+    }
+  },
+
+  "privacy": {
+    "title": "Privacy Policy",
+    "collection": {
+      "title": "1. Stored Data",
+      "description": "Clickbet only stores the data necessary for the operation of the platform. This includes the username, email address, hashed password, avatar, profile title, reviews, comments, likes, game history and scores, game lists (like, dislike and wishlist), as well as friends and blocked-user lists."
+    },
+    "messages": {
+      "title": "2. Messages and Chat",
+      "description": "Messages sent through the chat are stored in the database to enable the messaging functionality and preserve conversations between users."
+    },
+    "usage": {
+      "title": "3. Use of Data",
+      "description": "Data is only used to provide Clickbet's features, including authentication, profile management, reviews and comments, social interactions, game lists, game history, scores, rankings, and messaging."
+    },
+    "authentication": {
+      "title": "4. Authentication",
+      "description": "Passwords are not stored in plain text and are saved in hashed form. The application also uses authentication tokens stored locally in the browser to maintain the user's session."
+    },
+    "localStorage": {
+      "title": "5. Local Storage",
+      "description": "The application uses the browser's local storage (localStorage) to retain certain information necessary for the session and interface, including authentication tokens and some profile information."
+    },
+    "external": {
+      "title": "6. Data from External Services",
+      "description": "Clickbet uses the Steam API to retrieve information about video games, including their names, descriptions, and images. This information is provided by an external service and remains subject to the rights and terms applicable to their respective owners."
+    },
+    "sharing": {
+      "title": "7. Data Sharing",
+      "description": "User data is not sold or used for advertising purposes. It is used solely as part of the operation of the platform."
+    },
+    "deletion": {
+      "title": "8. Account and Data Deletion",
+      "description": "Each user may delete their account. Deleting an account results in the deletion of the data associated with it, in accordance with the operation of the platform."
+    },
+    "modifications": {
+      "title": "9. Changes to the Policy",
+      "description": "This policy may be updated if Clickbet's features or operation evolve. The version displayed on this page corresponds to the version currently in effect."
+    }
+  },"Quest":{
+    "dailyQuestTitle": "Your daily quest",
+    "dailyQuest1":"Published a review on a game",
+    "dailyQuestPending": "Pending",
+    "dailyQuestCompleted": "Completed",
+    "leaderboard": "LEADERBOARD",
+    "level":      "Level"
+  },"questTitle":{
+    "0": "Post reviews to level up!",
+    "1": "Play roulette to gain a level!"
   }
+  
 }

@@ -78,7 +78,7 @@ function DropdownMenu({
         >
           {items.map((item, index) => {
             const itemStyles = `
-              block w-full text-start px-4 py-3 text-white font-bold transition
+              block w-full text-center px-4 py-3 text-white font-bold transition
               hover:brightness-110 shadow-black/75 shadow-md rounded-2xl
               hover:outline-3 hover:outline-white balatro cursor-pointer 
               ${colors[index % colors.length]}

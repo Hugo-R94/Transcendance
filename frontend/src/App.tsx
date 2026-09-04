@@ -16,8 +16,8 @@ import { ProtectedRoute } from "./components/utils/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
 import ChatMenu from "./components/chat/chatMenu";
 import LanguageSwitcher from "./components/utils/LanguageSwitcher";
-import Quest from "../pages/Quest.tsx"
-import terms from "../pages/Terms.tsx"
+import Quest from "./pages/Quest.tsx";
+import TermsOfServices from "./pages/Terms.tsx";
 
 function ProtectedLayout() {
   return (
