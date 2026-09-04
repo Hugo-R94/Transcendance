@@ -17,6 +17,7 @@ type UserProfileResponse struct {
 	Title1      string `json:"title_1"`
 	Title2      string `json:"title_2"`
 	ProfilePic string `json:"profile_pic"`
+	Level		int		`json:"level"`
 }
 
 // Liste officielle des titres autorisés côté Backend
@@ -39,7 +40,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 
 
 	err := db.Model(&models.User{}).
-		Select("username", "description", "title1", "title2", "ProfilePic").
+		Select("username", "description", "title1", "title2", "ProfilePic", "Level").
 		Where("id = ? AND deleted_at IS NULL", userID).
 		First(&user).Error
 
@@ -52,7 +53,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 		log.Printf("titre mal setup\n")
 		t1 = "9"
 	}
-
+	log.Printf("level of user : %d", user.Level)
 	t2 := user.Title2
 	if t2 == "" {
 		t2 = "10"
@@ -64,6 +65,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 		Title1:      t1,
 		Title2:      t2,
 		ProfilePic: user.ProfilePic,
+		Level:		user.Level,
 	}, nil
 }
 
@@ -178,7 +180,10 @@ func GetMyProfileHandler(db *gorm.DB) gin.HandlerFunc {
 
 func GetUserInfo(publicGroup *gin.RouterGroup, protectedGroup *gin.RouterGroup, db *gorm.DB) {
 	protectedGroup.GET("/profil/:id", GetUserProfileByIDHandler(db))
+	protectedGroup.GET("/quest", GetMyQuest(db))
+	protectedGroup.GET("/questLeaderboard", GetLevelLeaderboard(db))
 	protectedGroup.GET("/profil", GetMyProfileHandler(db))
 	protectedGroup.POST("/profil/title", UpdateUserTitleHandler(db))
 
 }
+

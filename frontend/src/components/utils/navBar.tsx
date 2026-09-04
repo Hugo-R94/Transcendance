@@ -130,13 +130,14 @@ function NavBar() {
 			</ButtonLink>
 
 			<DropdownMenu
-				className="rounded-2xl ml-3 shadow-black/50 shadow-md sm:w-[10%] w-20 flex items-center justify-center h-full"
+				className="rounded-2xl ml-3 shadow-black/50 shadow-md sm:w-[10%] w-20 flex items-center justify-center text-center h-full"
 				color="bg-bred"
 				items={[
 					{ label: t("navbar.dropdown.home"), href: "/games" },
 					{ label: t("navbar.dropdown.profile"), href: "/profil" },
 					{ label: t("navbar.dropdown.support"), href: "/support" },
-					{ label: t("navbar.dropdown.logout"), onClick: handleLogout },
+					{ label: t("navbar.dropdown.quest"), href: "/quest"},
+					{ label: t("navbar.dropdown.logout"), onClick: handleLogout }
 				]}
 			>
 				<svg

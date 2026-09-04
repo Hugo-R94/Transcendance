@@ -38,6 +38,7 @@ func (h *UserHandler) register(c *gin.Context) {
 			ProfilePic: "avatars/avatar_default.png",
 			Title1:		"9",
 			Title2: 	"10",
+			Level:		0,
 		}
 		return tx.Create(&newUser).Error
 	})

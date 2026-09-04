@@ -36,7 +36,8 @@
       "home": "Home",
       "profile": "Profil",
       "support": "Support",
-      "logout": "Logout"
+      "logout": "Logout",
+      "quest": "Daily Quest"
     },
     "logout": {
       "success": "Logged out successfully!",
@@ -64,6 +65,14 @@
       "pictureUpdated": "Profile picture updated successfully!",
       "descriptionSaved": "Description saved successfully!"
     }
+  },
+  "Quest":{
+    "dailyQuestTitle": "Your daily quest",
+    "dailyQuest1":"Published a review on a game",
+    "dailyQuestPending": "Pending",
+    "dailyQuestCompleted": "Completed",
+    "leaderboard": "LEADERBOARD",
+    "level":      "Level"
   },
   "profileMenu": {
     "games": "GAMES",
@@ -220,8 +229,12 @@
     "emptyMessages": "No messages",
     "messagePlaceholder": "Message...",
     "myInitial": "M"
-  },
-  "titles": {
+  }
+  ,"questTitle":{
+    "0": "Post reviews to level up!",
+    "1": "Play roulette to gain a level!"
+  }
+  ,"titles": {
     "1": "Gamer",
     "2": "Stinky",
     "3": "Hardstuck",

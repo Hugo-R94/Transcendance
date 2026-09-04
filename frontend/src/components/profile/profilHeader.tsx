@@ -25,7 +25,7 @@ export function ProfileHeader({
   onImageChange,
 }: ProfileHeaderProps) {
   const { t } = useTranslation();
-
+  const leveluser = profile.level ? profile.level : "unknown";
   return (
     <>
       {/* =====================================================
@@ -66,9 +66,12 @@ export function ProfileHeader({
         </div>
 
         <div className="flex flex-col justify-center flex-shrink-0 p-1 text-left min-w-0">
+          <div className="h-full w-fit flex items-center gap-x-2">
           <p className="font-bold text-md text-gray-300 whitespace-nowrap">
             {profile.username}
           </p>
+          <p className="font-bold text-xs text-gray-300/75 whitespace-nowrap">LVL.{profile.level}</p>
+          </div>
 
           <TitleManager
             initialTitle1={profile.title_1}

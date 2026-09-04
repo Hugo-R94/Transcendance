@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+
 type (
 	User struct {
 		ID               uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
@@ -26,6 +27,8 @@ type (
 		CreatedAt        time.Time      `json:"-"`
 		UpdatedAt        time.Time      `json:"-"`
 		DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
+		Level			 int			`gorm:"type:int" json:"level"`
+		Quest							`gorm:"embedded" json:"quest"`
 	}
 
 	RegisterRequest struct {
@@ -39,6 +42,7 @@ type (
 		Description string ` json:"description"`
 		Title1      string `json:"title_1"`
 		Title2      string `json:"title_2"`
+		Level		int	   `json:"level"`
 	}
 
 	LoginRequest struct {
@@ -62,5 +66,21 @@ type (
 	TokenClaims struct {
 		ID string `json:"id"`
 		jwt.RegisteredClaims
+	}
+
+	Quest struct{
+		ExpireAt 			time.Time	`json:"expire_at"`
+		QuestType 			int			`json:"quest_type"`
+		QuestRequirement 	int			`json:"quest_requirement"`
+		QuestCount 			int			`json:"quest_count"`
+		IsFinished 			bool		`json:"is_finished"`
+		IsCollected 		bool		`json:"is_collected"`
+	}
+
+	LeaderboardLevelResponse struct{
+		UserID				uuid.UUID 	`json:"user_id"`
+		Username			string		`json:"username"`
+		ProfilePic			string		`json:"profile_picture"`
+		Level				int			`json:"level"`
 	}
 )

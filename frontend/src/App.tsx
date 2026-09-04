@@ -15,7 +15,7 @@ import UserProfil from "./pages/userProfilID";
 import MinimalChat from "./pages/minichat";
 import ChatMenu from "./components/chat/chatMenu";
 import LanguageSwitcher from "./components/utils/LanguageSwitcher";
-
+import Quest from "./pages/quest";
 function ProtectedLayout() {
   return (
     <>
@@ -50,6 +50,7 @@ function App() {
             <Route path="/chat" element={<MinimalChat />} />
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} />
+            <Route path="/quest" element={<Quest />} />
           </Route>
         </Route>
       </Routes>

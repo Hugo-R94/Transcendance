@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
+	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
 	"github.com/google/uuid"
 )
 
@@ -864,6 +865,19 @@ func (r *Room) RunGame() {
 			// ==================================================
 			// GAME FINISHED
 			// ==================================================
+			for _, player := range r.Players {
+				var u models.User
+
+				if err := r.Manager.DB.First(&u, "id = ?", player.ID).Error; err != nil {
+					log.Printf("erreur récupération user %s: %v", player.ID, err)
+					continue
+				}
+
+				if err := user.ExecQuest(r.Manager.DB, &u, "gambleQuest"); err != nil {
+					log.Printf("erreur quête user %s: %v", player.ID, err)
+				}
+			}
+
 
 			r.Hub.BroadcastJSON(
 				GameFinishedMessage{

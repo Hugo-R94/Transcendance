@@ -9,7 +9,9 @@ import (
 	"html"
 	"log"
 	"net/http"
-	"regexp"
+	"errors"
+	"regexp"	
+	"gorm.io/gorm/clause"
 	"strconv"
 	"strings"
 	"time"
@@ -402,87 +404,122 @@ func (h *GameHandler) optHandler(c *gin.Context) {
 }
 
 func (h *GameHandler) VoteComment(c *gin.Context) {
-	commentIDString := c.Param("id")
-	commentID, err := uuid.Parse(commentIDString)
+	commentID, err := uuid.Parse(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid comment id",
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid comment id"})
+		return
+	}
+
+	idRaw, exists := c.Get("id")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Utilisateur non authentifié"})
+		return
+	}
+
+	userID, ok := idRaw.(uuid.UUID)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Identifiant utilisateur invalide"})
+		return
+	}
+
+	var input struct {
+		Vote int `json:"vote"`
+	}
+
+	if err := c.ShouldBindJSON(&input); err != nil || input.Vote < -1 || input.Vote > 1 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid vote"})
+		return
+	}
+
+	err = h.db.Transaction(func(tx *gorm.DB) error {
+		var comment models.Comment
+
+		if err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).
+			First(&comment, "id = ?", commentID).Error; err != nil {
+			return err
+		}
+
+		var existing models.CommentVote
+		result := tx.Where(
+			"user_id = ? AND comment_id = ?",
+			userID, commentID,
+		).FirstOrCreate(&existing)
+
+		oldVote := 0
+		if result.Error == nil {
+			oldVote = existing.Vote
+		} else if result.Error != gorm.ErrRecordNotFound {
+			return result.Error
+		}
+
+		// Toggle : même vote => suppression
+		newVote := input.Vote
+		if oldVote == input.Vote {
+			newVote = 0
+		}
+
+		// Supprime ou crée/modifie le vote
+		switch {
+		case oldVote != 0 && newVote == 0:
+			if err := tx.Delete(&existing).Error; err != nil {
+				return err
+			}
+
+		case oldVote == 0 && newVote != 0:
+			if err := tx.Create(&models.CommentVote{
+				UserID:    userID,
+				CommentID: commentID,
+				Vote:      newVote,
+			}).Error; err != nil {
+				return err
+			}
+
+		case oldVote != 0 && newVote != 0:
+			if err := tx.Model(&existing).Update("vote", newVote).Error; err != nil {
+				return err
+			}
+		}
+
+		// Mise à jour des compteurs
+		if oldVote != newVote {
+			updates := map[string]interface{}{
+				"likes":    gorm.Expr("likes + ?", likeDelta(newVote)-likeDelta(oldVote)),
+				"dislikes": gorm.Expr("dislikes + ?", likeDelta(-newVote)-likeDelta(-oldVote)),
+			}
+
+			if err := tx.Model(&comment).Updates(updates).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Printf("[ERROR] VoteComment: %v", err)
+
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Comment not found"})
+			return
+		}
+
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Unable to process vote",
 		})
 		return
 	}
 
-	var vote models.CommentVote
-	if err := c.ShouldBindJSON(&vote); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
-		return
-	}
-
-	var existing models.CommentVote
-	result := h.db.Where("user_id = ? AND comment_id = ?", vote.UserID, commentID).First(&existing)
-
-	// --- 1. L'utilisateur a DÉJÀ un vote enregistré ---
-	if result.Error == nil {
-
-		// Cas A : Reclic sur le même vote OU demande explicite d'annulation (vote == 0)
-		if existing.Vote == vote.Vote || vote.Vote == 0 {
-			h.db.Delete(&existing)
-
-			if existing.Vote == 1 {
-				h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-					UpdateColumn("likes", gorm.Expr("GREATEST(0, likes - 1)"))
-			} else if existing.Vote == -1 {
-				h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-					UpdateColumn("dislikes", gorm.Expr("GREATEST(0, dislikes - 1)"))
-			}
-
-			c.JSON(http.StatusOK, gin.H{"message": "vote removed"})
-			return
-		}
-
-		// Cas B : Changement de vote (ex: Like -> Dislike ou Dislike -> Like)
-		if vote.Vote == 1 {
-			// De Dislike (-1) à Like (1)
-			h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-				Updates(map[string]interface{}{
-					"likes":    gorm.Expr("likes + 1"),
-					"dislikes": gorm.Expr("GREATEST(0, dislikes - 1)"),
-				})
-		} else if vote.Vote == -1 {
-			// De Like (1) à Dislike (-1)
-			h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-				Updates(map[string]interface{}{
-					"likes":    gorm.Expr("GREATEST(0, likes - 1)"),
-					"dislikes": gorm.Expr("dislikes + 1"),
-				})
-		}
-
-		existing.Vote = vote.Vote
-		h.db.Save(&existing)
-
-		c.JSON(http.StatusOK, gin.H{"message": "vote changed"})
-		return
-	}
-
-	// --- 2. NOUVEAU VOTE ---
-	if vote.Vote == 0 {
-		c.JSON(http.StatusOK, gin.H{"message": "no action"})
-		return
-	}
-
-	vote.CommentID = commentID
-
-	h.db.Create(&vote)
-
-	if vote.Vote == 1 {
-		h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-			UpdateColumn("likes", gorm.Expr("likes + 1"))
-	} else if vote.Vote == -1 {
-		h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-			UpdateColumn("dislikes", gorm.Expr("dislikes + 1"))
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "vote added"})
+	c.JSON(http.StatusOK, gin.H{"message": "vote updated"})
 }
+
+func likeDelta(vote int) int {
+	if vote == 1 {
+		return 1
+	}
+	return 0
+}
+
+
 
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
 	h := &GameHandler{db: db}

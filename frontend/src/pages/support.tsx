@@ -1,4 +1,3 @@
-import NavBar from "../components/utils/navBar";
 import SupportContact from "../components/support/supportContact";
 
 function support() {
@@ -6,10 +5,10 @@ function support() {
 
   return (
     <div className="relative min-h-screen items-center justify-center">
-      {/* <div className="sm:w-1/2 w-[90%] sm:h-125 h-150 mx-auto mt-35">
+      <div className="sm:w-1/2 w-[90%] sm:h-125 h-150 mx-auto mt-35">
           <SupportContact />
-        </div> */}
-        <div className="flex flex-col h-100 w-100 bg-bdarkgreen mt-50 mx-auto rounded-2xl card overflow-hidden p-2 gap-y-2">
+        </div>
+        {/* <div className="flex flex-col h-100 w-100 bg-bdarkgreen mt-50 mx-auto rounded-2xl card overflow-hidden p-2 gap-y-2">
           <div className="flex h-[10%] w-full text-center items-center justify-center">
             <h className="font-extrabold text-2xl">Ask us a question.</h>
           </div>
@@ -24,7 +23,7 @@ function support() {
 
           </div>
 
-        </div>
+        </div> */}
     </div>
   );
 }

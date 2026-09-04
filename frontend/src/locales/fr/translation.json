@@ -36,7 +36,8 @@
       "home": "Accueil",
       "profile": "Profil",
       "support": "Support",
-      "logout": "Déconnexion"
+      "logout": "Déconnexion",
+      "quest": "Quête journalière"
     },
     "logout": {
       "success": "Déconnexion réussie !",
@@ -64,6 +65,14 @@
       "pictureUpdated": "Photo de profil mise à jour avec succès !",
       "descriptionSaved": "Description sauvegardée avec succès !"
     }
+  },
+  "Quest":{
+    "dailyQuestTitle": "Votre quête journalière",
+    "dailyQuest1":"Publie un commentaire sur un jeu",
+    "dailyQuestPending": "En attente",
+    "dailyQuestCompleted": "Accomplis",
+    "leaderboard": "CLASSEMENT",
+    "level":      "Niveau"
   },
   "profileMenu": {
     "games": "JEUX",
@@ -220,8 +229,12 @@
     "emptyMessages": "Aucun message",
     "messagePlaceholder": "Message...",
     "myInitial": "M"
-  },
-  "titles": {
+  }
+  ,"questTitle":{
+    "0": "publie des reviews pour gagner un niveau !",
+    "1": "Joue a la roulette pour gagner un niveau !"
+  }
+  ,"titles": {
     "1": "Gamer",
     "2": "Puant",
     "3": "Hardstuck",

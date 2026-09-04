@@ -87,7 +87,6 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 	} else {
 		responseMessage = "Commentaire mis à jour avec succès !"
 	}
-
 	c.JSON(http.StatusOK, gin.H{
 		"message": responseMessage,
 		"comment": comment,

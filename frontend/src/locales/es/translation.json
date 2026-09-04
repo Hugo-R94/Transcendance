@@ -36,7 +36,8 @@
       "home": "Inicio",
       "profile": "Perfil",
       "support": "Soporte",
-      "logout": "Cerrar sesión"
+      "logout": "Cerrar sesión",
+      "quest": "misión diaria"
     },
     "logout": {
       "success": "¡Cierre de sesión exitoso!",
@@ -58,6 +59,14 @@
       "pictureUpdated": "¡Foto de perfil actualizada con éxito!",
       "descriptionSaved": "¡Descripción guardada con éxito!"
     }
+  },
+  "Quest":{
+    "dailyQuestTitle": "Tu misión diaria",
+    "dailyQuest1":"Publica un comentario sobre un juego",
+    "dailyQuestPending": "Pendiente",
+    "dailyQuestCompleted": "Terminado",
+    "leaderboard": "TABLA DE CLASIFICACIÓN",
+    "level":      "Nivel"
   },
   "profileMenu": {
     "games": "JUEGOS",
@@ -214,6 +223,10 @@
     "emptyMessages": "Aucun message",
     "messagePlaceholder": "Message...",
     "myInitial": "M"
+  },
+  "questTitle":{
+    "0": "¡Publica reseñas para subir de nivel!",
+    "1": "¡Juega a la ruleta para ganar un nivel!"
   },
   "titles": {
     "1": "Gamer",
