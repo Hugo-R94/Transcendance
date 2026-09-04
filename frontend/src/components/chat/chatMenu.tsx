@@ -56,7 +56,7 @@ export default function ChatMenu() {
       className="
         fixed z-[9999] top-20 start-0 end-0 bottom-0 p-2 
         sm:top-auto sm:start-auto sm:end-4 sm:bottom-4 sm:p-0
-		flex flex-row items-end justify-end gap-3 " >
+		flex flex-row items-end justify-end gap-3 pointer-events-none" >
 
       {isOpen && (
         <ChatWindowContainer

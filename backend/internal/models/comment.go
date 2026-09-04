@@ -17,6 +17,7 @@ type (
 		Dislikes     int            `gorm:"type:int; default:0" json:"dislikes"`
 		AuthorID     uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_author_game;constraint:onDelete:CASCADE" json:"-"`
 		GameID       uint64         `gorm:"type:bigint; uniqueIndex:idx_author_game" json:"game_id"`
+		Votes        []CommentVote  `gorm:"foreignKey:CommentID" json:"-"`
 		Author       User           `gorm:"foreignKey:AuthorID;references:ID" json:"author"`
 		Game         Game           `gorm:"foreignKey:GameID;references:AppID" json:"-"`
 		CreatedAt    time.Time      `json:"-"`
@@ -30,5 +31,8 @@ type (
 		CommentTitle string  `json:"comment_title" binding:"required"`
 		Rating       float64 `json:"rating" binding:"required"`
 	}
-)
 
+	CommentDeleteRequest struct {
+		GameID uint64 `json:"game_id" binding:"required"`
+	}
+)
