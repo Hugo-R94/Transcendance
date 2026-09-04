@@ -6,6 +6,7 @@ import (
 	"log"
 	"fmt"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
+	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -96,7 +97,7 @@ func updateQuest(db *gorm.DB, user *models.User) error {
     return db.Save(user).Error
 }
 
-func ExecQuest(db *gorm.DB, user *models.User, tryquest string) error {
+func ExecQuest(db *gorm.DB, user *models.User, tryquest string, hub *chat.Hub) (bool, error) {
 	log.Printf(
 		"[QUEST] user=%s type=%d quest=%s count=%d/%d finished=%v",
 		user.ID,
@@ -108,7 +109,7 @@ func ExecQuest(db *gorm.DB, user *models.User, tryquest string) error {
 	)
 
 	if user.QuestType < 0 || user.QuestType >= len(QuestTypes) {
-		return fmt.Errorf("invalid quest type: %d", user.QuestType)
+		return false, fmt.Errorf("invalid quest type: %d", user.QuestType)
 	}
 
 	if tryquest != QuestTypes[user.QuestType] {
@@ -117,19 +118,52 @@ func ExecQuest(db *gorm.DB, user *models.User, tryquest string) error {
 			QuestTypes[user.QuestType],
 			tryquest,
 		)
+		return false, nil
+	}
+
+	var completed bool
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var lockedUser models.User
+
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").
+			First(&lockedUser, user.ID).Error; err != nil {
+			return fmt.Errorf("failed to lock user: %w", err)
+		}
+
+		lockedUser.QuestCount++
+
+		if lockedUser.QuestCount == lockedUser.QuestRequirement {
+			lockedUser.Level++
+			lockedUser.IsFinished = true
+			completed = true
+
+			log.Printf("[QUEST] user %s completed quest", lockedUser.ID)
+		}
+
+		if err := tx.Save(&lockedUser).Error; err != nil {
+			return fmt.Errorf("failed to save quest progress: %w", err)
+		}
+
+		*user = lockedUser
+
 		return nil
+	})
+
+	if err != nil {
+		return false, err
 	}
 
-	user.QuestCount++
-
-	if user.QuestCount >= user.QuestRequirement {
-		user.Level++
-		user.IsFinished = true
-		log.Printf("[QUEST] user %s completed quest", user.ID)
-	}
-
-	if err := db.Save(user).Error; err != nil {
-		return fmt.Errorf("failed to save quest progress: %w", err)
+	if completed && hub != nil {
+		hub.Notify <- chat.Notification{
+			TargetID: user.ID,
+			Message: models.Message{
+				SenderID: user.ID,
+				Text:     "quest_completed",
+				Time:     time.Now(),
+				Type:     "quest_completed",
+			},
+		}
 	}
 
 	log.Printf(
@@ -140,8 +174,9 @@ func ExecQuest(db *gorm.DB, user *models.User, tryquest string) error {
 		user.IsFinished,
 	)
 
-	return nil
+	return true, nil
 }
+
 
 
 func GetLevelLeaderboard(db *gorm.DB) gin.HandlerFunc {

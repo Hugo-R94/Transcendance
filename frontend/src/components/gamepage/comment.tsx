@@ -88,6 +88,7 @@ function Comment({
   const label2 = getTitleLabel(title2);
   const color = colors[commentRowNb % colors.length];
   const userLink = `http://localhost:8080/profil/${userId}`;
+  
   return (
     <div className={`w-full rounded-2xl p-4 shadow-md shadow-black/20 my-3 ${color}`}>
       {/* HEADER */}

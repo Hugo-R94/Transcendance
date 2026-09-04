@@ -51,6 +51,7 @@ export function useGambling() {
     const [currentBet, setCurrentBet] = useState<Bet | null>(null);
     const [hasBet, setHasBet] = useState(false);
     const [playerBets, setPlayerBets] = useState<PlayerBet[]>([]);
+    const [notification, setNotification] = useState<string | null>(null);
 
     const [ticket, setTicket] = useState<Ticket | null>(null);
 
@@ -62,6 +63,13 @@ export function useGambling() {
 
     const [error, setError] = useState("");
     const [jsonLogs, setJsonLogs] = useState<JsonLog[]>([]);
+	
+
+
+    const showNotification = (message: string, timeoffset?: number) => {
+        setNotification(null);
+        window.setTimeout(() => setNotification(message), timeoffset);
+    };
 
     const stopPhaseCountdown = () => {
         if (phaseCountdownIntervalRef.current) {
@@ -588,10 +596,15 @@ export function useGambling() {
 
                 break;
             }
-
+			case "quest_completed": {
+				if(data.user_id === localStorage.getItem("userID")){
+					console.log("quest completed\n");
+					showNotification("quest completed");
+				}
+				break;
+			}
             case "game_finished": {
                 stopPhaseCountdown();
-
                 setGameStarted(false);
                 setReady(false);
                 setState("finished");
@@ -1082,6 +1095,9 @@ export function useGambling() {
 
         currentBet,
         hasBet,
+		
+		notification,
+		setNotification,
 
         placeBet,
 

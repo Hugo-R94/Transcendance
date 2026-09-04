@@ -19,9 +19,9 @@ export function useChat() {
 
     const wsRef = useRef<WebSocket | null>(null);
 
-    const showNotification = (message: string) => {
+    const showNotification = (message: string, timeoffset?: number) => {
         setNotification(null);
-        window.setTimeout(() => setNotification(message), 10);
+        window.setTimeout(() => setNotification(message), timeoffset);
     };
 
     const fetchMyProfile = async () => {
@@ -202,7 +202,9 @@ export function useChat() {
                     } else if (data.type === "friend_req") {
                         fetchConversations();
                         showNotification("Nouvelle demande d'ami !");
-                    } else if (data.type === "friend_accept") {
+                    }else if (data.type === "quest_completed"){
+						showNotification("felicitation quest completed youre so good!", 3000)
+					} else if (data.type === "friend_accept") {
                         fetchConversations();
                         showNotification("Demande d'ami acceptée !");
                     } else if (data.type === "friend_remove") {

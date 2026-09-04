@@ -143,6 +143,7 @@ export default function Quest(){
                 <div className="bg-byellow w-full h-15 rounded-2xl flex justify-center items-center ">
                     <p className="text-2xl font-extrabold">{t("Quest.leaderboard")}</p>
                 </div>
+				
                 <div className="bg-bdarkgreen flex flex-col h-[90%] w-full rounded-2xl p-3 gap-y-2">
 
                     {/* TOP 3 */}

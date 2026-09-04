@@ -872,12 +872,18 @@ func (r *Room) RunGame() {
 					log.Printf("erreur récupération user %s: %v", player.ID, err)
 					continue
 				}
-
-				if err := user.ExecQuest(r.Manager.DB, &u, "gambleQuest"); err != nil {
+				if res, err := user.ExecQuest(r.Manager.DB, &u, "gambleQuest", nil); err != nil {
 					log.Printf("erreur quête user %s: %v", player.ID, err)
+				} else if res == true {
+					r.Hub.BroadcastJSON(
+						QuestCompletedMessage{
+							Type:     "quest_completed",
+							UserID: 	u.ID.String(),
+						},
+					)
 				}
 			}
-
+				
 
 			r.Hub.BroadcastJSON(
 				GameFinishedMessage{
@@ -908,6 +914,7 @@ func (r *Room) RunGame() {
 		time.Sleep(1 * time.Second)
 	}
 }
+
 func (r *Room) ResetGame() {
 	r.mu.Lock()
 	defer r.mu.Unlock()

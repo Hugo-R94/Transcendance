@@ -2,6 +2,7 @@ package comment
 
 import (
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
+	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
@@ -14,16 +15,9 @@ import (
 
 type CommentHandler struct {
 	db *gorm.DB
+	hub *chat.Hub
 }
 
-func CommentRoutes(router *gin.RouterGroup, db *gorm.DB) {
-	h := &CommentHandler{
-		db: db,
-	}
-
-	router.POST("/post", h.commentPost)
-	router.GET("/:gameID/comments", h.commentGet)
-}
 
 // POST /comment/post
 func (h *CommentHandler) commentPost(c *gin.Context) {
@@ -71,6 +65,7 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 		}
 		return nil
 	})
+	
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -91,8 +86,7 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 		})
 		return
 	}
-
-	if err := user.ExecQuest(h.db, &currentUser, "commentQuest"); err != nil {
+	if _, err := user.ExecQuest(h.db, &currentUser, "commentQuest", h.hub); err != nil {
 		log.Printf("[ERROR] CommentQuest: %v", err)
 	}
 
@@ -149,4 +143,14 @@ func (h *CommentHandler) commentGet(c *gin.Context) {
 		"comments": comments,
 		"total":    total,
 	})
+}
+
+func CommentRoutes(router *gin.RouterGroup, db *gorm.DB, hub *chat.Hub) {
+	h := &CommentHandler{
+		db: db,
+		hub: hub,
+	}
+
+	router.POST("/post", h.commentPost)
+	router.GET("/:gameID/comments", h.commentGet)
 }
