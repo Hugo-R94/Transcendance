@@ -4,6 +4,8 @@ import (
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/Hugo-R94/Transcendance/backend/internal/chat"
+		"github.com/Hugo-R94/Transcendance/backend/internal/apiHandlers/user"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"log"
@@ -13,11 +15,13 @@ import (
 
 type CommentHandler struct {
 	db *gorm.DB
+	hub *chat.Hub
 }
 
-func CommentRoutes(router *gin.RouterGroup, db *gorm.DB) {
+func CommentRoutes(router *gin.RouterGroup, db *gorm.DB, hub *chat.Hub) {
 	h := &CommentHandler{
 		db: db,
+		hub: hub,
 	}
 
 	router.POST("/post", h.commentPost)
@@ -82,6 +86,19 @@ func (h *CommentHandler) commentPost(c *gin.Context) {
 		"message": responseMessage,
 		"comment": comment,
 	})
+
+	var currentUser models.User
+
+	if err := h.db.First(&currentUser, "id = ?", id).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Utilisateur introuvable",
+		})
+		return
+	}
+	if _, err := user.ExecQuest(h.db, &currentUser, "commentQuest", h.hub); err != nil {
+		log.Printf("[ERROR] CommentQuest: %v", err)
+	}
+
 }
 
 func atoi(value string) int {

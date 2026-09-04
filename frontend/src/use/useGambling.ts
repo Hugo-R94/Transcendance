@@ -30,7 +30,7 @@ export function useGambling() {
     const [playerId, setPlayerId] = useState("");
     const [playerNumber, setPlayerNumber] = useState(0);
     const [username, setUsername] = useState("");
-
+    const [notification, setNotification] = useState<string | null>(null);
     const [players, setPlayers] = useState<Player[]>([]);
     const [ready, setReady] = useState(false);
     const [countdown, setCountdown] = useState<number | null>(null);
@@ -73,6 +73,11 @@ export function useGambling() {
         }
 
         setPhaseCountdown(null);
+    };
+
+    const showNotification = (message: string, timeoffset?: number) => {
+        setNotification(null);
+        window.setTimeout(() => setNotification(message), timeoffset);
     };
 
     const startPhaseCountdown = (seconds: number) => {
@@ -199,6 +204,14 @@ export function useGambling() {
 
                 break;
             }
+
+            case "quest_completed": {
+				if(data.user_id === localStorage.getItem("userID")){
+					console.log("quest completed\n");
+					showNotification("quest completed");
+				}
+				break;
+			}
 
             case "room_state": {
                 if (
@@ -1089,6 +1102,9 @@ export function useGambling() {
 
         ticket,
         scratch,
+
+	    notification,
+		setNotification,
 
         winningNumber,
 

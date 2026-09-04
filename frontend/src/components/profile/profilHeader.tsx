@@ -111,10 +111,12 @@ export function ProfileHeader({
 
         <div className="flex flex-col justify-center flex-shrink-0 p-1 text-start min-w-0 overflow-visible">
           <div className="w-full h-10 flex items-end gap-x-3 overflow-visible">
-            <p className="font-bold text-md text-gray-300 whitespace-nowrap">
-              {profile.username}
-            </p>
-
+          <div className="h-full w-fit flex items-center gap-x-2">
+              <p className="font-bold text-md text-gray-300 whitespace-nowrap">
+                {profile.username}
+              </p>
+              <p className="font-bold text-xs text-gray-300/75 whitespace-nowrap">LVL.{profile.level}</p>
+          </div>
             <button
               type="button"
               onClick={handleDeleteProfile}

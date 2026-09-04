@@ -19,7 +19,6 @@ const colors = [
   "bg-bred",
   "bg-bgreen",
   "bg-byellow",
-  "bg-bdarkgreen",
 ];
 
 function DropdownMenu({

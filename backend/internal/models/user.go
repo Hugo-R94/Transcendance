@@ -23,6 +23,8 @@ type (
 		LikedGames       []Game         `gorm:"many2many:user_liked_games;" json:"liked_games,omitempty"`
 		DislikedGames    []Game         `gorm:"many2many:user_disliked_games;" json:"disliked_games,omitempty"`
 		WishlistedGames  []Game         `gorm:"many2many:user_wishlisted_games;" json:"wishlisted_games,omitempty"`
+		Level			 int			`gorm:"type:int" json:"level"`
+		Quest							`gorm:"embedded" json:"quest"`
 		CreatedAt        time.Time      `json:"-"`
 		UpdatedAt        time.Time      `json:"-"`
 		DeletedAt        gorm.DeletedAt `gorm:"index" json:"-"`
@@ -32,6 +34,7 @@ type (
 		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 		Email    string `json:"email" binding:"required,email"`
 		Password string `json:"password" binding:"required,min=8,max=60"`
+		Level		int	   `json:"level"`
 	}
 
 	UserProfileResponse struct {
@@ -62,5 +65,21 @@ type (
 	TokenClaims struct {
 		ID string `json:"id"`
 		jwt.RegisteredClaims
+	}
+
+	Quest struct{
+		ExpireAt 			time.Time	`json:"expire_at"`
+		QuestType 			int			`json:"quest_type"`
+		QuestRequirement 	int			`json:"quest_requirement"`
+		QuestCount 			int			`json:"quest_count"`
+		IsFinished 			bool		`json:"is_finished"`
+		IsCollected 		bool		`json:"is_collected"`
+	}
+
+	LeaderboardLevelResponse struct{
+		UserID				uuid.UUID 	`json:"user_id"`
+		Username			string		`json:"username"`
+		ProfilePic			string		`json:"profile_picture"`
+		Level				int			`json:"level"`
 	}
 )

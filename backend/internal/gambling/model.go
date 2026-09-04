@@ -21,6 +21,14 @@ const (
 	ScratchDuration = 10 * time.Second
 	SpinningDuration = 4 * time.Second
 	ResultDuration = 6 * time.Second 
+	//FastMode
+	// MinPlayers      = 2
+	// MaxTurns        = 5
+	// GameStartDelay  = 1 * time.Second /2
+	// BettingDuration = 1 * time.Second /2
+	// ScratchDuration = 1 * time.Second /2
+	// SpinningDuration = 1 * time.Second /2
+	// ResultDuration = 1 * time.Second  /2
 )
 
 // ============================================================
@@ -288,6 +296,11 @@ type PlayerResult struct {
 	BalanceBefore int    `json:"balanceBefore"`
 	Gain          int    `json:"gain"`
 	BalanceAfter  int    `json:"balanceAfter"`
+}
+
+type QuestCompletedMessage struct{
+	Type     string `json:"type"`
+	UserID 	 string `json:"user_id,omitempty"`
 }
 
 type GameFinishedMessage struct {

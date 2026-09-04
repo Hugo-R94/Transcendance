@@ -180,5 +180,6 @@ func GetUserInfo(publicGroup *gin.RouterGroup, protectedGroup *gin.RouterGroup, 
 	protectedGroup.GET("/profil/:id", GetUserProfileByIDHandler(db))
 	protectedGroup.GET("/profil", GetMyProfileHandler(db))
 	protectedGroup.POST("/profil/title", UpdateUserTitleHandler(db))
-
+	protectedGroup.GET("/quest", GetMyQuest(db))
+	protectedGroup.GET("/questLeaderboard", GetLevelLeaderboard(db))
 }

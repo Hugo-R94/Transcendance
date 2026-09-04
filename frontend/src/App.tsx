@@ -16,6 +16,8 @@ import { ProtectedRoute } from "./components/utils/ProtectedRoute";
 import UserProfil from "./pages/userProfilID";
 import ChatMenu from "./components/chat/chatMenu";
 import LanguageSwitcher from "./components/utils/LanguageSwitcher";
+import Quest from "../pages/Quest.tsx"
+import terms from "../pages/Terms.tsx"
 
 function ProtectedLayout() {
   return (
@@ -58,6 +60,8 @@ function App() {
             <Route path="/profil" element={<Profil />} />
             <Route path="/profil/:userid" element={<UserProfil />} />
             <Route path="/games" element={<Games />} />
+            <Route path="/quest" element={<Quest />} />
+            <Route path="/terms" element={<TermsOfServices />} />
             <Route path="/support" element={<Support />} />
             <Route path="/clicker" element={<Clicker />} />
           </Route>

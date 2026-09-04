@@ -55,7 +55,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	gameGroup := v1.Group("/game")
 	chatGroup := router.Group("/chat")
 	commentGroup := v1.Group("/comments")
-	comment.CommentRoutes(commentGroup, db)
+	comment.CommentRoutes(commentGroup, db, hub)
 	comment.DeleteComment(commentGroup, db)
 	support.PostSupport(supportGroup, db)
 	game.GetGameInfo(gameGroup, db)
