@@ -9,3 +9,4 @@ docker/.env_pgadmin
 docker/certificates
 docker/.DB_data
 backend/uploads
+*node_modules
