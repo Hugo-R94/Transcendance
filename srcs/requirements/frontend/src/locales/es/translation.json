@@ -36,9 +36,9 @@
       "home": "Inicio",
       "profile": "Perfil",
       "support": "Soporte",
-	  	"clicker": "Jugar",
-	  "quest": "misión",
-	  "terms": "Términos del servicio y Política de privacidad",
+      "clicker": "Jugar",
+      "quest": "misión",
+      "terms": "Términos del servicio y Política de privacidad",
       "logout": "Cerrar sesión"
     },
     "logout": {
@@ -212,14 +212,14 @@
     "accept": "Aceptar",
     "reject": "Rechazar"
   },
-"chatWindow": {
-  "defaultLabel": "Chat",
-  "emptyMessages": "Ningún mensaje",
-  "messagePlaceholder": "Mensaje...",
-  "myInitial": "Y",
-  "typing": "escribiendo...",
-  "read": "Leído"
-},
+  "chatWindow": {
+    "defaultLabel": "Chat",
+    "emptyMessages": "Ningún mensaje",
+    "messagePlaceholder": "Mensaje...",
+    "myInitial": "Y",
+    "typing": "escribiendo...",
+    "read": "Leído"
+  },
   "titles": {
     "1": "Gamer",
     "2": "Apestoso",
@@ -231,20 +231,21 @@
     "8": "Inter",
     "9": "New",
     "10": "Player"
-  },"Quest": {
-  "dailyQuestTitle": "Tu misión diaria",
-  "dailyQuest1": "Publicar una reseña sobre un juego",
-  "dailyQuestPending": "Pendiente",
-  "dailyQuestCompleted": "Completada",
-  "leaderboard": "CLASIFICACIÓN",
-  "level": "Nivel",
-  "claim": "RECLAMAR RECOMPENSA",
-  "alreadyClaimed": "YA RECLAMADO"  
-},
-"questTitle": {
-  "0": "¡Publica reseñas para subir de nivel!",
-  "1": "¡Juega a la ruleta para subir de nivel!"
-},
+  },
+  "Quest": {
+    "dailyQuestTitle": "Tu misión diaria",
+    "dailyQuest1": "Publicar una reseña sobre un juego",
+    "dailyQuestPending": "Pendiente",
+    "dailyQuestCompleted": "Completada",
+    "leaderboard": "CLASIFICACIÓN",
+    "level": "Nivel",
+    "claim": "RECLAMAR RECOMPENSA",
+    "alreadyClaimed": "YA RECLAMADO"
+  },
+  "questTitle": {
+    "0": "¡Publica reseñas para subir de nivel!",
+    "1": "¡Juega a la ruleta para subir de nivel!"
+  },
   "lobby": {
     "title": "SALA",
     "startingIn": "LA PARTIDA COMIENZA EN",
@@ -407,7 +408,6 @@
       "description": "Estos términos pueden modificarse cuando evolucionen el funcionamiento o las características de Clickbet. La versión mostrada en esta página es la versión actualmente aplicable."
     }
   },
-
   "privacy": {
     "title": "Política de Privacidad",
     "collection": {
@@ -446,5 +446,112 @@
       "title": "9. Modificación de la Política",
       "description": "Esta política puede actualizarse si las funciones o el funcionamiento de Clickbet evolucionan. La versión mostrada en esta página corresponde a la versión actualmente aplicable."
     }
+  },
+  "chatNotifications": {
+    "conversationNotFound": "Conversación no encontrada.",
+    "enterUsername": "Introduce un nombre de usuario.",
+    "invitationSent": "¡Invitación enviada!",
+    "unknownUser": "Usuario desconocido.",
+    "genericError": "Error.",
+    "newFriendRequest": "¡Nueva solicitud de amistad!",
+    "friendRequestAccepted": "¡Solicitud de amistad aceptada!",
+    "friendRemovedYou": "Alguien te ha eliminado de su lista de amigos.",
+    "someoneBlockedYou": "Alguien te ha bloqueado.",
+    "gameInviteReceived": "Invitación para unirte a la sala {{room}}",
+    "nowFriends": "¡{{username}} ahora es tu amigo!",
+    "friendRequestRejected": "¡{{username}} rechazó tu solicitud de amistad!",
+    "friendRemoved": "{{username}} eliminado de tus amigos.",
+    "userBlocked": "{{username}} ha sido bloqueado.",
+    "blockFailed": "No se pudo bloquear a este usuario.",
+    "questCompleted": "🎉 ¡Misión completada! ¡Bien hecho!"
+  },
+  "supportContact": {
+    "heading": "¿QUÉ PODEMOS HACER POR TI?",
+    "commentPlaceholder": "Describe tu problema...",
+    "emptyMessage": "Escribe un mensaje antes de enviar.",
+    "complaintReceived": "Tu mensaje ha sido recibido.",
+    "serverError": "Error del servidor. Inténtalo de nuevo."
+  },
+  "backendErrors": {
+    "alreadySentFriendRequest": "Ya has enviado una solicitud de amistad.",
+    "invalidAppId": "ID de aplicación no válido.",
+    "noTitleProvided": "No se proporcionó ningún título.",
+    "blocked": "Bloqueado.",
+    "cantBlockYourself": "No puedes bloquearte a ti mismo.",
+    "cantFriendYourself": "No puedes enviarte una solicitud de amistad a ti mismo.",
+    "cantUnblockYourself": "No puedes desbloquearte a ti mismo.",
+    "commentNotFound": "Comentario no encontrado.",
+    "couldNotCheckBlock": "No se pudo verificar el estado de bloqueo.",
+    "couldNotDeleteComment": "No se pudo eliminar el comentario.",
+    "couldNotFindBlockedUsers": "No se pudieron encontrar los usuarios bloqueados.",
+    "couldNotFindComment": "No se pudo encontrar el comentario.",
+    "couldNotFindConversations": "No se pudieron encontrar las conversaciones.",
+    "couldNotSaveFile": "No se pudo guardar el archivo.",
+    "couldNotSaveVote": "No se pudo guardar el voto.",
+    "couldNotUnblock": "No se pudo desbloquear.",
+    "couldNotUnfriendUser": "No se pudo eliminar a este usuario de tus amigos.",
+    "couldNotCheckTokenValidity": "No se pudo verificar la validez del token.",
+    "couldNotCountMatchHistory": "No se pudo contar el historial de partidas.",
+    "couldNotFindLeaderboard": "No se pudo encontrar la clasificación.",
+    "couldNotFindMatchHistory": "No se pudo encontrar el historial de partidas.",
+    "couldNotSaveComment": "No se pudo guardar el comentario.",
+    "emailOrUsernameTaken": "El correo o el nombre de usuario ya está registrado.",
+    "errorUpdatingTitles": "Error al actualizar los títulos.",
+    "errorFetchingComments": "Error al obtener los comentarios.",
+    "errorFetchingGames": "Error al obtener los juegos.",
+    "errorCountingComments": "Error al contar los comentarios.",
+    "errorCountingGames": "Error al contar los juegos.",
+    "serverErrorGeneric": "Error del servidor.",
+    "failedAcceptRejectFriendRequest": "Error al aceptar/rechazar la solicitud de amistad.",
+    "failedBlockUser": "Error al bloquear a este usuario.",
+    "failedCreateUser": "Error al crear el usuario.",
+    "failedGenerateToken": "Error al generar el token.",
+    "failedLogout": "Error al cerrar sesión.",
+    "failedSaveToken": "Error al guardar el token.",
+    "failedSendFriendRequest": "Error al enviar la solicitud de amistad.",
+    "failedUpdateDescription": "Error al actualizar la descripción.",
+    "fileTooLarge": "Archivo demasiado grande.",
+    "invalidUserIdParamFormat": "Formato de parámetro de ID de usuario no válido.",
+    "unknownUserIdFormat": "Formato de ID de usuario desconocido.",
+    "invalidUserIdFormat": "Formato de ID de usuario no válido.",
+    "invalidUserIdFormatInToken": "Formato de ID de usuario no válido en el token.",
+    "friendRequestAlreadyAccepted": "La solicitud de amistad ya fue aceptada.",
+    "friendRequestNotFound": "Solicitud de amistad no encontrada.",
+    "couldNotUpdateQuest": "No se pudo actualizar la misión.",
+    "invalidJsonBody": "Cuerpo de la solicitud no válido.",
+    "invalidToken": "Token no válido.",
+    "invalidCommentId": "ID de comentario no válido.",
+    "invalidCredential": "Credenciales no válidas.",
+    "invalidFileType": "Tipo de archivo no válido.",
+    "invalidTokenUserId": "ID de usuario no válido en el token.",
+    "invalidUserId": "ID de usuario no válido.",
+    "invalidUserIdQueryParam": "Parámetro de consulta de ID de usuario no válido.",
+    "gameNotFound": "Juego no encontrado.",
+    "appIdMustBeInteger": "El appID debe ser un entero válido.",
+    "listParamRequired": "El parámetro 'list' es obligatorio (likes, dislikes, wishlist).",
+    "appIdAndListRequired": "Los parámetros 'appID' y 'list' son obligatorios.",
+    "loginFailed": "Error de inicio de sesión.",
+    "missingFile": "Falta el archivo.",
+    "missingToken": "Falta el token.",
+    "noProfilePictureFound": "No se encontró foto de perfil.",
+    "unauthorized": "No autorizado.",
+    "notFriendWithUser": "No eres amigo de este usuario.",
+    "userAlreadyBlocked": "Este usuario ya está bloqueado.",
+    "title1Invalid": "El título 1 no es válido o no está autorizado.",
+    "title2Invalid": "El título 2 no es válido o no está autorizado.",
+    "invalidListType": "Tipo de lista no válido. Valores aceptados: 'likes', 'dislikes', 'wishlist'.",
+    "invalidUuid": "UUID no válido.",
+    "userIdMissing": "Falta el ID de usuario.",
+    "userNotAuthenticated": "Usuario no autenticado.",
+    "userNotBlocked": "Usuario no bloqueado.",
+    "userNotFound": "Usuario no encontrado.",
+    "invalidOrUnauthenticatedUser": "Usuario no válido o no autenticado.",
+    "voteMustBeOneOrMinusOne": "El voto debe ser 1 o -1.",
+    "invalidRequestFormat": "Formato de solicitud no válido.",
+    "invalidBody": "Cuerpo de la solicitud no válido.",
+    "invalidUserIdInContext": "ID de usuario no válido en el contexto.",
+    "missingSearchQuery": "Falta la consulta de búsqueda.",
+    "somethingWentWrong": "Algo salió mal.",
+    "userIdMissingFromContext": "Falta el ID de usuario en el contexto."
   }
 }

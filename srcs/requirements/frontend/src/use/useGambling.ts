@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import api from "../api/api";
 
 import {
@@ -11,11 +12,13 @@ import {
    	type PlayerBet,
 } from "../api/gambling";
 export function useGambling() {
+    const { t } = useTranslation();
     const socketRef = useRef<WebSocket | null>(null);
 
 
     const playerIdRef = useRef("");
     const playerNumberRef = useRef(0);
+
 
     const logIdRef = useRef(0);
 
@@ -208,7 +211,7 @@ export function useGambling() {
             case "quest_completed": {
 				if(data.user_id === localStorage.getItem("userID")){
 					console.log("quest completed\n");
-					showNotification("quest completed");
+					showNotification(t("chatNotifications.questCompleted"));
 				}
 				break;
 			}

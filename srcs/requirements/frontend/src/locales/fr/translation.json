@@ -36,9 +36,9 @@
       "home": "Accueil",
       "profile": "Profil",
       "support": "Support",
-	  "clicker": "Jouer",
-	  "quest": "quête",
-	  "terms": "CGU et Politique de confidentialité",
+      "clicker": "Jouer",
+      "quest": "quête",
+      "terms": "CGU et Politique de confidentialité",
       "logout": "Déconnexion"
     },
     "logout": {
@@ -218,28 +218,28 @@
     "accept": "Accepter",
     "reject": "Refuser"
   },
-"chatWindow": {
-  "defaultLabel": "Chat",
-  "emptyMessages": "Aucun message",
-  "messagePlaceholder": "Message...",
-  "myInitial": "M",
-  "typing": "en train d'écrire...",
-  "read": "Lu"
-},
-"Quest": {
-  "dailyQuestTitle": "Votre quête quotidienne",
-  "dailyQuest1": "Publier un avis sur un jeu",
-  "dailyQuestPending": "En attente",
-  "dailyQuestCompleted": "Terminée",
-  "leaderboard": "CLASSEMENT",
-  "level": "Niveau",
-  "claim": "RECUPERER SA RECOMPENSE",
-  "alreadyClaimed": "DEJA RECUPEREE"
-},
-"questTitle": {
-  "0": "Publiez des avis pour monter de niveau !",
-  "1": "Jouez à la roulette pour gagner un niveau !"
-},
+  "chatWindow": {
+    "defaultLabel": "Chat",
+    "emptyMessages": "Aucun message",
+    "messagePlaceholder": "Message...",
+    "myInitial": "M",
+    "typing": "en train d'écrire...",
+    "read": "Lu"
+  },
+  "Quest": {
+    "dailyQuestTitle": "Votre quête quotidienne",
+    "dailyQuest1": "Publier un avis sur un jeu",
+    "dailyQuestPending": "En attente",
+    "dailyQuestCompleted": "Terminée",
+    "leaderboard": "CLASSEMENT",
+    "level": "Niveau",
+    "claim": "RECUPERER SA RECOMPENSE",
+    "alreadyClaimed": "DEJA RECUPEREE"
+  },
+  "questTitle": {
+    "0": "Publiez des avis pour monter de niveau !",
+    "1": "Jouez à la roulette pour gagner un niveau !"
+  },
   "titles": {
     "1": "Gamer",
     "2": "Puant",
@@ -321,54 +321,54 @@
     "revealed": "✓ TICKET RÉVÉLÉ"
   },
   "commentSection": {
-  "loading": "Chargement des commentaires...",
-  "empty": "Aucun commentaire pour le moment. Soyez le premier à donner votre avis !",
-  "guest": "Invité"
-},
-"dislikeButton": {
-  "removeDislike": "Retirer des dislikes",
-  "dislikeGame": "J'aime pas ce jeu"
-},
-"gameDescription": {
-  "release": "Sortie :",
-  "developers": "Développeurs :",
-  "publishers": "Éditeurs :",
-  "genres": "Genres :"
-},
-"likeButton": {
-  "mustBeLoggedIn": "Vous devez être connecté pour pouvoir voter.",
-  "voteError": "Erreur lors du vote : {{message}}"
-},
-"likeGameButton": {
-  "removeFavorite": "Retirer des favoris",
-  "likeGame": "J'aime ce jeu"
-},
-"postComment": {
-  "errors": {
-    "missingGameId": "Erreur : Impossible de publier, l'ID du jeu est introuvable.",
-    "missingTitle": "Veuillez ajouter un titre avant d'envoyer votre commentaire.",
-    "missingComment": "Veuillez écrire un commentaire avant d'envoyer.",
-    "missingRating": "Veuillez donner une note avant d'envoyer votre commentaire.",
-    "submitFailed": "Impossible d'envoyer le commentaire."
+    "loading": "Chargement des commentaires...",
+    "empty": "Aucun commentaire pour le moment. Soyez le premier à donner votre avis !",
+    "guest": "Invité"
   },
-  "success": "Commentaire publié avec succès !",
-  "prompt": "As-tu aimé ce jeu ?",
-  "titlePlaceholder": "Écris ton titre...",
-  "commentPlaceholder": "Écris ton commentaire...",
-  "submit": "ENVOYER",
-  "submitting": "..."
-},
-"wishlistButton": {
-  "remove": "Retirer de la wishlist",
-  "add": "Ajouter à ma wishlist"
-},
-"pagination": {
-  "previous": "Précédent",
-  "next": "Suivant"
-},
-"searchBar": {
-  "placeholder": "Rechercher..."
-},
+  "dislikeButton": {
+    "removeDislike": "Retirer des dislikes",
+    "dislikeGame": "J'aime pas ce jeu"
+  },
+  "gameDescription": {
+    "release": "Sortie :",
+    "developers": "Développeurs :",
+    "publishers": "Éditeurs :",
+    "genres": "Genres :"
+  },
+  "likeButton": {
+    "mustBeLoggedIn": "Vous devez être connecté pour pouvoir voter.",
+    "voteError": "Erreur lors du vote : {{message}}"
+  },
+  "likeGameButton": {
+    "removeFavorite": "Retirer des favoris",
+    "likeGame": "J'aime ce jeu"
+  },
+  "postComment": {
+    "errors": {
+      "missingGameId": "Erreur : Impossible de publier, l'ID du jeu est introuvable.",
+      "missingTitle": "Veuillez ajouter un titre avant d'envoyer votre commentaire.",
+      "missingComment": "Veuillez écrire un commentaire avant d'envoyer.",
+      "missingRating": "Veuillez donner une note avant d'envoyer votre commentaire.",
+      "submitFailed": "Impossible d'envoyer le commentaire."
+    },
+    "success": "Commentaire publié avec succès !",
+    "prompt": "As-tu aimé ce jeu ?",
+    "titlePlaceholder": "Écris ton titre...",
+    "commentPlaceholder": "Écris ton commentaire...",
+    "submit": "ENVOYER",
+    "submitting": "..."
+  },
+  "wishlistButton": {
+    "remove": "Retirer de la wishlist",
+    "add": "Ajouter à ma wishlist"
+  },
+  "pagination": {
+    "previous": "Précédent",
+    "next": "Suivant"
+  },
+  "searchBar": {
+    "placeholder": "Rechercher..."
+  },
   "terms": {
     "title": "Conditions d'Utilisation",
     "object": {
@@ -408,7 +408,6 @@
       "description": "Ces conditions peuvent être modifiées lorsque le fonctionnement ou les fonctionnalités de Clickbet évoluent. La version affichée sur cette page est la version actuellement applicable."
     }
   },
-
   "privacy": {
     "title": "Politique de Confidentialité",
     "collection": {
@@ -447,5 +446,112 @@
       "title": "9. Modification de la Politique",
       "description": "Cette politique peut être mise à jour si les fonctionnalités ou le fonctionnement de Clickbet évoluent. La version affichée sur cette page correspond à la version actuellement applicable."
     }
+  },
+  "chatNotifications": {
+    "conversationNotFound": "Conversation introuvable.",
+    "enterUsername": "Entrez un nom d'utilisateur.",
+    "invitationSent": "Invitation envoyée !",
+    "unknownUser": "Utilisateur inconnu.",
+    "genericError": "Erreur.",
+    "newFriendRequest": "Nouvelle demande d'ami !",
+    "friendRequestAccepted": "Demande d'ami acceptée !",
+    "friendRemovedYou": "Quelqu'un vous a retiré de sa liste d'amis.",
+    "someoneBlockedYou": "Quelqu'un vous a bloqué.",
+    "gameInviteReceived": "Invitation pour rejoindre la room {{room}}",
+    "nowFriends": "{{username}} est maintenant votre ami !",
+    "friendRequestRejected": "{{username}} a refusé votre demande d'ami !",
+    "friendRemoved": "{{username}} supprimé de vos amis.",
+    "userBlocked": "{{username}} a été bloqué.",
+    "blockFailed": "Impossible de bloquer cet utilisateur.",
+    "questCompleted": "🎉 Quête terminée ! Bien joué !"
+  },
+  "supportContact": {
+    "heading": "QUE POUVONS-NOUS FAIRE POUR VOUS ?",
+    "commentPlaceholder": "Décrivez votre problème...",
+    "emptyMessage": "Veuillez écrire un message avant d'envoyer.",
+    "complaintReceived": "Votre réclamation a bien été reçue.",
+    "serverError": "Erreur serveur. Veuillez réessayer."
+  },
+  "backendErrors": {
+    "alreadySentFriendRequest": "Vous avez déjà envoyé une demande d'ami.",
+    "invalidAppId": "AppID invalide.",
+    "noTitleProvided": "Aucun titre fourni.",
+    "blocked": "Bloqué.",
+    "cantBlockYourself": "Vous ne pouvez pas vous bloquer vous-même.",
+    "cantFriendYourself": "Vous ne pouvez pas vous envoyer une demande d'ami à vous-même.",
+    "cantUnblockYourself": "Vous ne pouvez pas vous débloquer vous-même.",
+    "commentNotFound": "Commentaire introuvable.",
+    "couldNotCheckBlock": "Impossible de vérifier le statut de blocage.",
+    "couldNotDeleteComment": "Impossible de supprimer le commentaire.",
+    "couldNotFindBlockedUsers": "Impossible de trouver les utilisateurs bloqués.",
+    "couldNotFindComment": "Impossible de trouver le commentaire.",
+    "couldNotFindConversations": "Impossible de trouver les conversations.",
+    "couldNotSaveFile": "Impossible d'enregistrer le fichier.",
+    "couldNotSaveVote": "Impossible d'enregistrer le vote.",
+    "couldNotUnblock": "Impossible de débloquer.",
+    "couldNotUnfriendUser": "Impossible de retirer cet utilisateur de vos amis.",
+    "couldNotCheckTokenValidity": "Impossible de vérifier la validité du jeton.",
+    "couldNotCountMatchHistory": "Impossible de compter l'historique des parties.",
+    "couldNotFindLeaderboard": "Impossible de trouver le classement.",
+    "couldNotFindMatchHistory": "Impossible de trouver l'historique des parties.",
+    "couldNotSaveComment": "Impossible d'enregistrer le commentaire.",
+    "emailOrUsernameTaken": "Email ou nom d'utilisateur déjà enregistré.",
+    "errorUpdatingTitles": "Erreur lors de la mise à jour des titres.",
+    "errorFetchingComments": "Erreur lors de la récupération des commentaires.",
+    "errorFetchingGames": "Erreur lors de la récupération des jeux.",
+    "errorCountingComments": "Erreur lors du décompte des commentaires.",
+    "errorCountingGames": "Erreur lors du décompte des jeux.",
+    "serverErrorGeneric": "Erreur serveur.",
+    "failedAcceptRejectFriendRequest": "Échec de l'acceptation/du refus de la demande d'ami.",
+    "failedBlockUser": "Échec du blocage de cet utilisateur.",
+    "failedCreateUser": "Échec de la création de l'utilisateur.",
+    "failedGenerateToken": "Échec de la génération du jeton.",
+    "failedLogout": "Échec de la déconnexion.",
+    "failedSaveToken": "Échec de l'enregistrement du jeton.",
+    "failedSendFriendRequest": "Échec de l'envoi de la demande d'ami.",
+    "failedUpdateDescription": "Échec de la mise à jour de la description.",
+    "fileTooLarge": "Fichier trop volumineux.",
+    "invalidUserIdParamFormat": "Format d'ID utilisateur en paramètre invalide.",
+    "unknownUserIdFormat": "Format d'ID utilisateur inconnu.",
+    "invalidUserIdFormat": "Format d'ID utilisateur invalide.",
+    "invalidUserIdFormatInToken": "Format d'ID utilisateur invalide dans le jeton.",
+    "friendRequestAlreadyAccepted": "Demande d'ami déjà acceptée.",
+    "friendRequestNotFound": "Demande d'ami introuvable.",
+    "couldNotUpdateQuest": "Impossible de mettre à jour la quête.",
+    "invalidJsonBody": "Corps de requête invalide.",
+    "invalidToken": "Jeton invalide.",
+    "invalidCommentId": "ID de commentaire invalide.",
+    "invalidCredential": "Identifiants invalides.",
+    "invalidFileType": "Type de fichier invalide.",
+    "invalidTokenUserId": "ID utilisateur invalide dans le jeton.",
+    "invalidUserId": "ID utilisateur invalide.",
+    "invalidUserIdQueryParam": "Paramètre de requête ID utilisateur invalide.",
+    "gameNotFound": "Jeu introuvable.",
+    "appIdMustBeInteger": "L'appID doit être un entier valide.",
+    "listParamRequired": "Le paramètre 'list' est requis (likes, dislikes, wishlist).",
+    "appIdAndListRequired": "Les paramètres 'appID' et 'list' sont requis.",
+    "loginFailed": "Échec de la connexion.",
+    "missingFile": "Fichier manquant.",
+    "missingToken": "Jeton manquant.",
+    "noProfilePictureFound": "Aucune photo de profil trouvée.",
+    "unauthorized": "Non autorisé.",
+    "notFriendWithUser": "Vous n'êtes pas ami avec cet utilisateur.",
+    "userAlreadyBlocked": "Cet utilisateur est déjà bloqué.",
+    "title1Invalid": "Titre 1 invalide ou non autorisé.",
+    "title2Invalid": "Titre 2 invalide ou non autorisé.",
+    "invalidListType": "Type de liste invalide. Valeurs acceptées : 'likes', 'dislikes', 'wishlist'.",
+    "invalidUuid": "UUID invalide.",
+    "userIdMissing": "ID utilisateur manquant.",
+    "userNotAuthenticated": "Utilisateur non authentifié.",
+    "userNotBlocked": "Utilisateur non bloqué.",
+    "userNotFound": "Utilisateur introuvable.",
+    "invalidOrUnauthenticatedUser": "Utilisateur non valide ou non authentifié.",
+    "voteMustBeOneOrMinusOne": "Le vote doit être 1 ou -1.",
+    "invalidRequestFormat": "Format de requête invalide.",
+    "invalidBody": "Corps de requête invalide.",
+    "invalidUserIdInContext": "ID utilisateur invalide dans le contexte.",
+    "missingSearchQuery": "Requête de recherche manquante.",
+    "somethingWentWrong": "Une erreur est survenue.",
+    "userIdMissingFromContext": "ID utilisateur manquant dans le contexte."
   }
 }

@@ -1,5 +1,6 @@
 import axios from "axios";
 import i18n from "../i18n";
+import { translateBackendError } from "./translateBackendError";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL_V1,
@@ -22,6 +23,9 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (error.response?.data?.error) {
+      error.response.data.error = translateBackendError(error.response.data.error);
+    }
     if (error.response && error.response.status === 401) {
       console.warn("Token invalide ou expiré détecté par le serveur.");
 

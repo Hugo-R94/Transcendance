@@ -11,6 +11,9 @@ type (
 		AppID                 uint64         `gorm:"primary_key;uniqueIndex" json:"app_id"`
 		Name                  string         `gorm:"index" json:"name"`
 		Description           string         `gorm:"type:text" json:"description"`
+		DescriptionFr         string         `gorm:"type:text" json:"descriptionFr"`
+		DescriptionEs         string         `gorm:"type:text" json:"descriptionEs"`
+		DescriptionAr         string         `gorm:"type:text" json:"descriptionAr"`
 		Header_image_link     string         `gorm:"type:varchar(500)" json:"header_image_link"`
 		Background_image_link string         `gorm:"type:varchar(500)" json:"background_image_link"`
 		Owners_string         string         `gorm:"type:varchar(255)" json:"owners_string"`
@@ -41,9 +44,12 @@ type (
 	}
 
 	Genre struct {
-		ID        string         `gorm:"primary_key;uniqueIndex;type:varchar(255)" json:"id"`
-		Name      string         `gorm:"type:varchar(255);uniqueIndex" json:"description"`
-		Games     []Game         `gorm:"many2many:genre_games"`
+		ID        string `gorm:"primary_key;uniqueIndex;type:varchar(255)" json:"id"`
+		Name      string `gorm:"type:varchar(255);uniqueIndex" json:"description"`
+		NameFr    string `gorm:"type:varchar(255)" json:"name_fr"`
+		NameEs    string `gorm:"type:varchar(255)" json:"name_es"`
+		NameAr    string `gorm:"type:varchar(255)" json:"name_ar"`
+		Games     []Game `gorm:"many2many:genre_games"`
 		CreatedAt time.Time      `json:"-"`
 		UpdatedAt time.Time      `json:"-"`
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
@@ -54,8 +60,8 @@ type (
 		Name                  string    `json:"name"`
 		Description           string    `json:"description"`
 		Header_image_link     string    `json:"header_image"`
-		Background_image_link string    `json:"background_image"`
-		ReleaseDate           string	 `json:"release_date"`
+		Background_image_link string    `json:"backg round_image"`
+		ReleaseDate           time.Time	 `json:"release_date"`
 		SteamScore            float64   `json:"steam_score"`
 		Genres                []string  `json:"genres,omitempty"`
 		Developers            []string  `json:"developers,omitempty"`

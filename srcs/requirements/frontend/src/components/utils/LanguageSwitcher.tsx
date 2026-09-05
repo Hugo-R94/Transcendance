@@ -11,9 +11,17 @@ const LANGUAGES = [
 function LanguageSwitcher() {
   const { i18n } = useTranslation();
 
+  const actualUrl = window.location.pathname; 
+  
+  const reloadIfGamepage = async () => {
+      if (actualUrl.startsWith("/game/")){
+        window.location.reload();
+      }
+  }
+  
   const items = LANGUAGES.map((lang) => ({
     label: lang.label,
-    onClick: () => i18n.changeLanguage(lang.code),
+    onClick: () => {i18n.changeLanguage(lang.code), reloadIfGamepage()}
   }));
 
   const current =

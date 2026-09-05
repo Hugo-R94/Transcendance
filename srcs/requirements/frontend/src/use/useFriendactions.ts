@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Conversation, Friend, FriendRequest } from "../api/chat";
 import { getOtherUser } from "./usechatHelpers";
 import api from "../api/api";
@@ -26,6 +27,7 @@ export function useFriendActions({
     fetchConversations,
     showNotification,
 }: UseFriendActionsParams) {
+    const { t } = useTranslation();
     const [targetUsername, setTargetUsername] = useState("");
 
     const handleFriendClick = async (friend: Friend) => {
@@ -45,7 +47,7 @@ export function useFriendActions({
         });
 
         if (!conversation) {
-            showNotification("Conversation introuvable.");
+            showNotification(t("chatNotifications.conversationNotFound"));
             return;
         }
 
@@ -73,7 +75,7 @@ export function useFriendActions({
         const username = targetUsername.trim();
 
         if (!username) {
-            showNotification("Entrez un nom d'utilisateur.");
+            showNotification(t("chatNotifications.enterUsername"));
             return;
         }
 
@@ -83,11 +85,12 @@ export function useFriendActions({
             setTargetUsername("");
             await fetchConversations();
 
-            showNotification("Invitation envoyée !");
+            showNotification(t("chatNotifications.invitationSent"));
         } catch (err: any) {
+
             showNotification(
                 err.response?.data?.error ||
-                    "Utilisateur inconnu."
+                t("chatNotifications.unknownUser")
             );
         }
     };
@@ -102,11 +105,11 @@ export function useFriendActions({
             await fetchConversations();
 
             showNotification(
-                `${req.username} est maintenant votre ami !`
+                t("chatNotifications.nowFriends", { username: req.username })
             );
         } catch (err: any) {
             showNotification(
-                err.response?.data?.error || "Erreur."
+                err.response?.data?.error || t("chatNotifications.genericError")
             );
         }
     };
@@ -121,11 +124,11 @@ export function useFriendActions({
             await fetchConversations();
 
             showNotification(
-                `${req.username} a refuser votre demande d'ami !`
+                t("chatNotifications.friendRequestRejected", { username: req.username })
             );
         } catch (err: any) {
             showNotification(
-                err.response?.data?.error || "Erreur."
+                err.response?.data?.error || t("chatNotifications.genericError")
             );
         }
     };
@@ -174,7 +177,7 @@ export function useFriendActions({
             await fetchConversations();
 
             showNotification(
-                `${friend.username} supprimé de vos amis.`
+                t("chatNotifications.friendRemoved", { username: friend.username })
             );
         } catch (err: any) {
             console.error(
@@ -193,17 +196,16 @@ export function useFriendActions({
             await fetchConversations();
 
             showNotification(
-                `${friend.username} a été bloqué.`
+                t("chatNotifications.userBlocked", { username: friend.username })
             );
         } catch (err: any) {
             console.error(
                 "[BLOCK] CATCH",
                 err.response?.data || err.message
             );
-
             showNotification(
                 err.response?.data?.error ||
-                    "Impossible de bloquer cet utilisateur."
+                t("chatNotifications.blockFailed")
             );
         }
     };
