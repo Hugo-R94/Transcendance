@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import api from "../api/api";
 import type { Conversation } from "../api/chat";
 
@@ -15,6 +16,7 @@ export function useChatWebSocket({
     showNotification,
     setUnreadUserIds,
 }: UseChatWebSocketParams) {
+    const { t } = useTranslation();
     const [wsConnected, setWsConnected] = useState(false);
     const [typingConversations, setTypingConversations] = useState<string[]>(
         []
@@ -192,36 +194,32 @@ export function useChatWebSocket({
 					
                     else if (data.type === "friend_req") {
                         fetchConversations();
-                        showNotification("Nouvelle demande d'ami !");
+                        showNotification(t("chatNotifications.newFriendRequest"));
                     }
 
                     else if (data.type === "quest_completed") {
                         showNotification(
-                            "felicitation quest completed youre so good!",
+                            t("chatNotifications.questCompleted"),
                             3000
                         );
                     }
 
-					else if (data.type === "quest_completed"){
-						showNotification("felicitation quest completed youre so good!", 3000)
-					}
-					
                     else if (data.type === "friend_accept") {
                         fetchConversations();
-                        showNotification("Demande d'ami acceptée !");
+                        showNotification(t("chatNotifications.friendRequestAccepted"));
                     }
 
                     else if (data.type === "friend_remove") {
                         fetchConversations();
                         showNotification(
-                            "Quelqu'un vous a retirer de sa liste d'ami."
+                            t("chatNotifications.friendRemovedYou")
                         );
                     }
 
                     else if (data.type === "blocked") {
                         fetchConversations();
                         showNotification(
-                            "Quelqu'un vous a bloquer."
+                            t("chatNotifications.someoneBlockedYou")
                         );
                     }
 
@@ -229,7 +227,7 @@ export function useChatWebSocket({
                         fetchConversations();
 
                         showNotification(
-                            `Invitation pour rejoindre la room ${data.text}`
+                            t("chatNotifications.gameInviteReceived", { room: data.text })
                         );
                     }
 					
