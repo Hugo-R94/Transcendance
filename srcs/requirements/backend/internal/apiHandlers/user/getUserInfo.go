@@ -35,18 +35,27 @@ var TitleMap = map[string]string{
 }
 
 // Helper pour récupérer le profil
-func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, error) {
+func GetUserProfileByID(db *gorm.DB, userID uuid.UUID, isMe bool) (*UserProfileResponse, error) {
 	var user models.User
+	
+	var err error
 
-
-	err := db.Model(&models.User{}).
-		Select("username", "description", "title1", "title2", "ProfilePic").
-		Where("id = ? AND deleted_at IS NULL", userID).
-		First(&user).Error
+	if isMe {
+		err = db.Model(&models.User{}).
+			Select("username", "description", "title1", "title2", "ProfilePic", "Email").
+			Where("id = ? AND deleted_at IS NULL", userID).
+			First(&user).Error
+	} else {
+		err = db.Model(&models.User{}).
+			Select("username", "description", "title1", "title2", "ProfilePic").
+			Where("id = ? AND deleted_at IS NULL", userID).
+			First(&user).Error
+	}
 
 	if err != nil {
 		return nil, err
 	}
+
 
 	t1 := user.Title1
 	if t1 == "" {
@@ -136,7 +145,7 @@ func GetUserProfileByIDHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		profile, err := GetUserProfileByID(db, userID)
+		profile, err := GetUserProfileByID(db, userID, false)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur introuvable"})
@@ -164,7 +173,7 @@ func GetMyProfileHandler(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		profile, err := GetUserProfileByID(db, userID)
+		profile, err := GetUserProfileByID(db, userID, true)
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur introuvable"})
