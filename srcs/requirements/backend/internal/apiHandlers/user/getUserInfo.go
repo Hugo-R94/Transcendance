@@ -17,6 +17,7 @@ type UserProfileResponse struct {
 	Title1      string `json:"title_1"`
 	Title2      string `json:"title_2"`
 	ProfilePic string `json:"profile_pic"`
+	Email		string `json:"email"`
 }
 
 // Liste officielle des titres autorisés côté Backend
@@ -64,6 +65,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID) (*UserProfileResponse, er
 		Title1:      t1,
 		Title2:      t2,
 		ProfilePic: user.ProfilePic,
+		Email:		user.Email,
 	}, nil
 }
 
