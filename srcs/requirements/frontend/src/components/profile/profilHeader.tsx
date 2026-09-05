@@ -38,7 +38,7 @@ export function ProfileHeader({
     }
 
     try {
-      await api.get("/deleteProfile");
+      await api.delete("/deleteProfile");
 
       window.location.href = "/";
     } catch (error) {
