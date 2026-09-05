@@ -1,11 +1,2 @@
-.env
-backend/.env
-backend/backend
+*.env
 *.swp
-Transcendance
-certificates
-docker/.env
-docker/.env_pgadmin
-docker/certificates
-docker/.DB_data
-backend/uploads
