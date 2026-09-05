@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, ReactNode } from "react";
+import { Link } from "react-router-dom";
 
 export type MenuItem = {
   label: string;
@@ -100,14 +101,14 @@ function DropdownMenu({
 
             // Si c'est une redirection simple
             return (
-              <a
+              <Link
                 key={index}
-                href={item.href ?? "#"}
+                to={item.href ?? "#"}
                 className={itemStyles}
                 onClick={() => handleItemClick(item)}
               >
                 {item.label}
-              </a>
+              </Link>
             );
           })}
         </div>

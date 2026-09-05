@@ -19,8 +19,11 @@ function Login() {
 			return;
 		}
 
-		const data = { username, password };
-
+		const data = {
+		username: username.trim().slice(0, 100),
+		password,
+		};
+		
 		try {
 			const response = await fetch("https://localhost:8443/login", {
 				method: "POST",
@@ -35,12 +38,6 @@ function Login() {
 					result.error || t("login.errors.serverError", { status: response.status })
 				);
 			}
-
-			/*
-			 * =========================
-			 * SESSION
-			 * =========================
-			 */
 
 			localStorage.setItem(
 				"token",
@@ -69,21 +66,8 @@ function Login() {
 				"USER ID STOCKÉ =",
 				localStorage.getItem("userID")
 			);
-
-			/*
-			 * =========================
-			 * PHOTO DE PROFIL
-			 * =========================
-			 *
-			 * On récupère le blob depuis l'API
-			 * puis on le transforme en Data URL.
-			 *
-			 * IMPORTANT :
-			 * On ne fait PAS URL.createObjectURL()
-			 * ici car le blob: URL peut devenir
-			 * inutilisable après un changement de contexte.
-			 */
-
+			
+			//pp
 			try {
 				const ppRes = await api.get(
 					`/getPP?userID=${result.user_ID}`,
@@ -117,18 +101,8 @@ function Login() {
 					ppErr
 				);
 
-				/*
-				 * Si aucune photo n'est disponible,
-				 * on supprime une éventuelle ancienne photo.
-				 */
 				localStorage.removeItem("userPP");
 			}
-
-			/*
-			 * =========================
-			 * NOTIFICATION
-			 * =========================
-			 */
 
 			setNotificationMessage(t("login.success"));
 
@@ -139,8 +113,7 @@ function Login() {
 				navigate("/games");
 			}, 1000);
 		} catch (error: any) {
-			console.error("Login error:", error);
-			setNotificationMessage(error.response?.data?.error || t("login.errors.invalidCredentials"));
+			setNotificationMessage(error.message || t("login.errors.invalidCredentials"));
 		}
 	}
 
@@ -156,90 +129,32 @@ function Login() {
 				/>
 			)}
 
-			<div
-				className="
-          absolute
-          inset-0
-          m-auto
-          h-100
-          w-70
-          bg-white
-        "
-			>
+			<div className="absolute inset-0 m-auto
+          		h-100 w-70 bg-white ">
 
 				<div
 					id="card"
-					className="
-            absolute
-            h-100
-            w-70
-            rounded-2xl
-            bg-gray-800
-            p-2
-            outline-10
-            outline-gray-400
-            transition-all
-            duration-300
-          "
-				/>
-
+					className="absolute h-100 w-70 rounded-2xl
+            bg-gray-800 p-2  outline-10 outline-gray-400 transition-all duration-300"/>
 				<form
 					onSubmit={handleSubmit}
-					className="
-            absolute
-            flex
-            h-100
-            w-70
-            flex-col
-            rounded-2xl
-            bg-[#334b4d]
-            p-3
-            shadow-lg
-            shadow-black
-            outline-10
-            outline-gray-300
-            transition
-            focus:shadow-2xl
-          "
-				>
+					className="absolute flex h-100 w-70 flex-col
+					rounded-2xl bg-[#334b4d] p-3 shadow-lg shadow-black
+					outline-10 outline-gray-300 transition focus:shadow-2xl ">
 
-					{/* SIGN IN */}
-
-					<Link
-						to="/signin"
-						className="
-              balatro
-              z-15
-              flex
-              h-10
-              w-full
-              items-center
-              justify-center
-              rounded-full
-              bg-[#00509f]
-              p-2
-              text-center
-              font-bold
-              text-gray-300
-              shadow-md
-              shadow-black
-              outline-1
-              hover:scale-105
-              active:scale-90
-            "
-					>{t("login.signin")}</Link>
+				<Link
+				to="/signin"
+				className=" balatro z-15 flex h-10 w-full items-center justify-center
+            	rounded-full  bg-[#00509f] p-2 text-center font-bold text-gray-300 shadow-md
+            	shadow-black outline-1 hover:scale-105 active:scale-90">
+					{t("login.signin")}
+				</Link>
 
 
-					{/* LOGO */}
-
-					<img
-						src="https://cdn2.steamgriddb.com/logo/2553761c31ac33576b6030cf1a70a08b.png"
-						className="
-              z-15
-              mt-5
-              scale-70
-            "
-						alt={t("login.logoAlt")}
+				<img
+					src="https://cdn2.steamgriddb.com/logo/2553761c31ac33576b6030cf1a70a08b.png"
+					className="z-15 mt-5 scale-70"
+					alt={t("login.logoAlt")}
 					/>
 
 
@@ -249,81 +164,35 @@ function Login() {
 						onChange={(e) =>
 							setUsername(e.target.value)
 						}
-						value={username}
-						className="
-              balatro
-              z-15
-              mb-5
-              h-15
-              w-full
-              rounded-2xl
-              bg-[#ed8a00]
-              p-2
-              text-gray-700
-              shadow-md
-              shadow-black
-              outline-0
-              hover:outline-2
-              hover:outline-white
-              focus:scale-105
-              focus:bg-[#ffaa00]
-              active:scale-90
-            "
+						maxLength={100}
+
+						value={username} 
+						className="balatro z-15 mb-5 h-15 w-full rounded-2xl bg-[#ed8a00]
+						p-2 text-gray-700 shadow-md shadow-black outline-0 hover:outline-2
+						hover:outline-white focus:scale-105 focus:bg-[#ffaa00] active:scale-90"
 						placeholder={t("login.usernamePlaceholder")} />
 
-
-					{/* PASSWORD */}
 
 					<input
 						onChange={(e) =>
 							setPassword(e.target.value)
 						}
+						maxLength={100}
 						value={password}
 						type="password"
-						className="
-						balatro
-						z-15
-						mb-5
-						h-15
-						w-full
-						rounded-2xl
-						bg-[#fb4740]
-						p-2
-						text-gray-700
-						shadow-md
-						shadow-black
-						outline-0
-						hover:outline-2
-						hover:outline-white
-						focus:scale-105
-						focus:bg-[#ff3830]
-						active:scale-90
-            "
+						className="balatro z-15 mb-5 h-15 w-full rounded-2xl bg-[#fb4740]
+						p-2 text-gray-700 shadow-md shadow-black outline-0 hover:outline-2 
+						hover:outline-white focus:scale-105 focus:bg-[#ff3830] active:scale-90"
 						placeholder={t("login.passwordPlaceholder")} />
 
 
-					{/* LOGIN */}
-
 					<button
-						type="submit"
-						className="
-              balatro
-              mx-auto
-              h-15
-              w-2/3
-              rounded-2xl
-              bg-[#3c9b71]
-              text-xl
-              font-bold
-              text-gray-300
-              shadow-md
-              shadow-black
-              hover:scale-105
-              hover:outline-2
-              active:scale-90
-              transition
-            "
-					>{t("login.submit")}</button>
+					type="submit"
+					className="balatro mx-auto h-15 w-2/3 rounded-2xl bg-[#3c9b71]
+					text-xl font-bold text-gray-300  shadow-md shadow-black hover:scale-105
+					hover:outline-2 active:scale-90 transition ">
+						{t("login.submit")}
+					</button>
 
 				</form>
 			</div>

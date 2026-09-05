@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 interface Game {
   appid: number;
   name: string;
@@ -14,7 +16,7 @@ function SearchCard({ appid, name, header, index }: Game) {
    const color = colors[index % 4];
 
   return (
-	<a href={`http://localhost:5173/game/${appid}`}>
+	<Link to={`/game/${appid}`}>
     <div className={`flex ${color} w-full h-15 rounded-2xl p-1 transition overflow-x-auto hover:scale-105 shadow-sm shadow-black hover:outline-3`}>
 
       <div className="bg-gray-600 h-full aspect-square rounded-2xl me-1 overflow-hidden">
@@ -33,7 +35,7 @@ function SearchCard({ appid, name, header, index }: Game) {
       </div>
 
     </div>
-	</a>
+	</Link>
   );
 }
 

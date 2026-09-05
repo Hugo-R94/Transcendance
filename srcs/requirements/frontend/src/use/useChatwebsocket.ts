@@ -299,13 +299,7 @@ export function useChatWebSocket({
                 setWsConnected(false);
             };
 
-            ws.onclose = (event) => {
-                console.warn(
-                    "[CHAT] WebSocket fermé :",
-                    event.code,
-                    event.reason
-                );
-
+            ws.onclose = () => {
                 setWsConnected(false);
 
                 if (wsRef.current === ws) {

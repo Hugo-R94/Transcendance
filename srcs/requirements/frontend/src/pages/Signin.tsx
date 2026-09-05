@@ -9,6 +9,37 @@ function Signin() {
 	const [password, setPassword] = useState("");
 	const [passwordCheck, setPasswordCheck] = useState("");
 	const [message, setMessage] = useState("");
+    const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+	if (
+		!username.trim() ||
+		!email.trim() ||
+		!password.trim() ||
+		!passwordCheck.trim()
+		) {
+		setNotificationMessage(t("signin.errors.fillAllFields"));
+		return;
+		}
+
+		if (password !== passwordCheck) {
+		setNotificationMessage(t("signin.errors.passwordMismatch"));
+		return;
+		}
+
+		/*
+		* Vérification simple du format de l'e-mail
+		*/
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+		if (!emailRegex.test(email.trim())) {
+		setNotificationMessage(t("signin.errors.invalidEmail"));
+		return;
+		}
+
+	const data = {
+	username: username.trim().slice(0, 100),
+	email: email.trim().slice(0, 100),
+	password,
+	};
 
 	const navigate = useNavigate();
 
@@ -35,7 +66,6 @@ function Signin() {
 
 			const result = await response.json();
 
-			console.log(result);
 			setMessage(t("signin.success"));
 
 			setUsername("");
@@ -45,7 +75,6 @@ function Signin() {
 
 			setTimeout(() => navigate("/login"), 1500);
 		} catch (error) {
-			console.error(error);
 			setMessage(t("signin.errors.registrationFailed"));
 		}
 	}

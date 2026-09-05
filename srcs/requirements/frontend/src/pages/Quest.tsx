@@ -116,9 +116,7 @@ export default function Quest(){
 			await api.get("/claimReward");	
 		};
 		
-    console.log("quest type = %d | quest is finish = %v", questType, isFinished);
     const questTitle = t(`questTitle.${questType}`);	
-    console.log("quest count = ", questCount, "quest requirement = ", questRequirement);
     const completion = questCount / questRequirement;
     const rest = 1 - (questCount / questRequirement);
     return(

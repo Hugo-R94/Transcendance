@@ -237,7 +237,7 @@ export default function Profil() {
           />
         </div>
 
-        <div className=" rounded-2xl mt-3 w-full min-h-[400px] mb-5 flex flex-col overflow-y-auto p-2 bg-white">
+         <div className="bg-black/50 rounded-2xl mt-3 w-full min-h-[400px] mb-5 flex flex-col overflow-y-auto p-2">
           {renderTabContent()}
         </div>
       </div>

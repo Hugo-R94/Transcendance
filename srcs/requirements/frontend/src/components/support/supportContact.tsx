@@ -5,8 +5,10 @@ import Notification from "../utils/notification";
 
 function SupportContact() {
 	const { t } = useTranslation();
-	const [message, setMessage] = useState("");
-	const [notification, setNotification] = useState(null);
+    const [message, setMessage] = useState("");
+    const [notification, setNotification] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
 
 	const showNotification = (message: string) => {
 		setNotification(null);
@@ -14,21 +16,55 @@ function SupportContact() {
 			setNotification(message);
 		}, 10);
 	};
+	const MAX_LENGTH = 1000;
 
-	const handleSubmit = async (e) => {
-		e.preventDefault();
+	const handleSubmit = async (e: React.FormEvent) => {
+			e.preventDefault();
 
-		if (!message.trim()) {
-			showNotification(t("supportContact.emptyMessage"));
-			return;
-		}
-		try {
-			await api.post("/support", { message: message.trim() });
-			showNotification(t("supportContact.complaintReceived"));
-		} catch {
-			showNotification(t("supportContact.serverError"));
-		}
-	};
+			const cleanMessage = message.trim();
+
+			if (!cleanMessage) {
+				showNotification(t("supportContact.emptyMessage"));
+				return;
+			}
+
+			// 2. Validation de la longueur
+			if (cleanMessage.length > MAX_LENGTH) {
+				showNotification(`Le message ne doit pas dépasser ${MAX_LENGTH} caractères.`);
+				return;
+			}
+
+			// 3. Prévention du double-envoi
+			if (isSubmitting) return;
+
+			setIsSubmitting(true);
+
+			try {
+				await api.post("/support", { message: cleanMessage });
+				showNotification(t("supportContact.complaintReceived"));
+				
+				setMessage(""); 
+			} catch (error) {
+				showNotification(t("supportContact.serverError"));
+			} finally {
+				setIsSubmitting(false);
+			}
+    };
+
+	// const handleSubmit = async (e) => {
+	// 	e.preventDefault();
+
+	// 	if (!message.trim()) {
+	// 		showNotification(t("supportContact.emptyMessage"));
+	// 		return;
+	// 	}
+	// 	try {
+	// 		await api.post("/support", { message: message.trim() });
+	// 		showNotification(t("supportContact.complaintReceived"));
+	// 	} catch {
+	// 		showNotification(t("supportContact.serverError"));
+	// 	}
+	// };
 	return (
 		<div className="bg-bdarkgreen w-full h-full rounded-2xl shadow-lg shadow-black/75 p-3">
 			<p className="text-white font-bold mt-1">{t("supportContact.heading")}</p>

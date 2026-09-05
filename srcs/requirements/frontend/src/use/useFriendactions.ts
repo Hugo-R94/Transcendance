@@ -144,9 +144,6 @@ export function useFriendActions({
         });
 
         if (!conversation) {
-            console.error(
-                "[GAME INVITE] Conversation introuvable"
-            );
             return;
         }
 
@@ -180,10 +177,6 @@ export function useFriendActions({
                 t("chatNotifications.friendRemoved", { username: friend.username })
             );
         } catch (err: any) {
-            console.error(
-                "[UNFRIEND] CATCH",
-                err.response?.data || err.message
-            );
         }
     };
 
@@ -199,10 +192,6 @@ export function useFriendActions({
                 t("chatNotifications.userBlocked", { username: friend.username })
             );
         } catch (err: any) {
-            console.error(
-                "[BLOCK] CATCH",
-                err.response?.data || err.message
-            );
             showNotification(
                 err.response?.data?.error ||
                 t("chatNotifications.blockFailed")

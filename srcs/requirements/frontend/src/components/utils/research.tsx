@@ -41,7 +41,6 @@ useEffect(() => {
   if (games.length === 0) {
     return null;
   }
-console.log("games state:", games);
   return (
 		<div className="absolute top-full left-0 mt-8  bg-[#334b4d] h-fit w-75 max-h-100 overflow-auto py-2 px-3 rounded-2xl no-scrollbar flex flex-col gap-y-2 shadow-lg -translate-x-5 shadow-lg shadow-black outline-5 outline-white transition">
 		{games.map((game, index) => (

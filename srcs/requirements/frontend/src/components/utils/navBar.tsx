@@ -5,6 +5,7 @@ import SearchBar from "./searchBar";
 import ButtonLink from "./buttonLink";
 import DropdownMenu from "./DropdownMenu";
 import Notification from "./notification";
+import { Link } from "react-router-dom";
 
 function NavBar() {
 	const { t } = useTranslation();
@@ -67,7 +68,7 @@ function NavBar() {
 			)}
 
 			<ButtonLink
-				link="http://localhost:5173/games"
+				link="/games"
 				color="bg-[#00509f]"
 				className="m-auto font-extrabold lg:text-xl md:text-sm sm:text-sm text-xs transition me-5"
 			>
@@ -82,7 +83,7 @@ function NavBar() {
 			</div>
 
 			<ButtonLink
-				link="http://localhost:5173/clicker"
+				link="/clicker"
 				color="bg-[#fb4740]"
 				className="hidden sm:flex"
 			>
@@ -106,7 +107,7 @@ function NavBar() {
 			</ButtonLink>
 
 			<ButtonLink
-				link="http://localhost:5173/profil"
+				link="/profil"
 				color="bg-[#3c9b71]"
 				className="hidden sm:flex"
 			>
