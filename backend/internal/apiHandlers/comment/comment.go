@@ -89,10 +89,10 @@ func atoi(value string) int {
 	return i
 }
 
-// GET /game/comment?game_id=ID (ou avec paramètre de route)
 func (h *CommentHandler) commentGet(c *gin.Context) {
-	// ⚠️ Si l'URL utilise un query param ?game_id=1, utilise c.Query("game_id")
-	// Si la route est /game/comment/:gameID, c.Param("gameID") est correct.
+	idRaw, _ := c.Get("id")
+	id := idRaw.(uuid.UUID)
+
 	gameID := c.Query("game_id")
 	if gameID == "" {
 		gameID = c.Param("gameID")
@@ -101,7 +101,6 @@ func (h *CommentHandler) commentGet(c *gin.Context) {
 	var comments []models.Comment
 	var total int64
 
-	// 1. Compte total des commentaires pour ce jeu
 	h.db.
 		Model(&models.Comment{}).
 		Where("game_id = ?", gameID).
@@ -111,13 +110,21 @@ func (h *CommentHandler) commentGet(c *gin.Context) {
 	page := atoi(c.DefaultQuery("page", "1"))
 	offset := (page - 1) * limit
 
-	// 2. Récupération des commentaires avec Preload du User
 	err := h.db.
+		Select(`comments.*,
+        COALESCE(COUNT(DISTINCT uv.id), 0) as likes,
+        COALESCE(COUNT(DISTINCT dv.id), 0) as dislikes,
+        MAX(CASE WHEN uv.user_id = ? THEN 1 ELSE 0 END) as user_voted_up,
+        MAX(CASE WHEN dv.user_id = ? THEN 1 ELSE 0 END) as user_voted_down`,
+			id, id).
 		Preload("Author", func(db *gorm.DB) *gorm.DB {
 			return db.Select("id, username, profile_pic, title1, title2")
 		}).
-		Where("game_id = ?", gameID).
-		Order("created_at DESC").
+		Joins("LEFT JOIN comment_vote_ups uv ON comments.id = uv.comment_id").
+		Joins("LEFT JOIN comment_vote_downs dv ON comments.id = dv.comment_id").
+		Where("comments.game_id = ?", gameID).
+		Group("comments.id").
+		Order("comments.created_at DESC").
 		Limit(limit).
 		Offset(offset).
 		Find(&comments).Error

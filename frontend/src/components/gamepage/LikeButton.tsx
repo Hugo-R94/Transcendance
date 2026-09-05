@@ -57,7 +57,7 @@ function LikeButton({
     let newDislikes = dislikes;
 
     if (userState === targetVote) {
-      newVote = 0;
+      newVote = targetVote;
       if (targetVote === 1) newLikes = Math.max(0, likes - 1);
       if (targetVote === -1) newDislikes = Math.max(0, dislikes - 1);
     } else {

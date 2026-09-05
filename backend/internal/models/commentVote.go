@@ -7,14 +7,28 @@ import (
 	"gorm.io/gorm"
 )
 
-type CommentVote struct {
+type CommentVoteUp struct {
 	ID        uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
-	UserID    uuid.UUID      `gorm:"type:uuid; constraint:onDelete:CASCADE" json:"user_id"`
-	CommentID uuid.UUID      `gorm:"type:uuid; uniqueIndex; constraint:onDelete:CASCADE" json:"comment_id"`
-	Comment   Comment        `gorm:"foreignKey:CommentID; references:ID" json:"-"`
-	User      User           `gorm:"foreignKey:UserID; references:ID" json:"-"`
-	Vote      int            `gorm:"type:int" json:"vote"`
+	UserID    uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_user_vote" json:"user_id"`
+	CommentID uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_user_vote" json:"comment_id"`
+	Comment   Comment        `gorm:"foreignKey:CommentID; constraint:OnDelete:CASCADE; references:ID" json:"-"`
+	User      User           `gorm:"foreignKey:UserID; constraint:OnDelete:CASCADE; references:ID" json:"-"`
 	CreatedAt time.Time      `json:"-"`
 	UpdatedAt time.Time      `json:"-"`
 	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+type CommentVoteDown struct {
+	ID        uuid.UUID      `gorm:"primary_key;type:uuid; default:gen_random_uuid()" json:"id"`
+	UserID    uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_user_vote" json:"user_id"`
+	CommentID uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_user_vote" json:"comment_id"`
+	Comment   Comment        `gorm:"foreignKey:CommentID; constraint:OnDelete:CASCADE; references:ID" json:"-"`
+	User      User           `gorm:"foreignKey:UserID; constraint:OnDelete:CASCADE; references:ID" json:"-"`
+	CreatedAt time.Time      `json:"-"`
+	UpdatedAt time.Time      `json:"-"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
+}
+
+type CommentVoteRequest struct {
+	Vote int `json:"vote" binding:"required"`
 }

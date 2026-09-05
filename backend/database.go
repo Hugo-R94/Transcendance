@@ -26,7 +26,7 @@ func dbSetup() (*gorm.DB, *sql.DB) {
 		log.Fatalf("[ERROR] Fatal error, could not get db generic interface: %v", err)
 	}
 
-	if err := db.AutoMigrate(&models.User{}, &models.GameScore{}, &models.Game{}, &models.Developer{}, &models.Publisher{}, &models.Comment{}, &models.CommentVote{}, &models.Conversation{}, &models.Message{}, &models.UserBlock{}, &models.WSToken{}); err != nil {
+	if err := db.AutoMigrate(&models.User{}, &models.GameScore{}, &models.Game{}, &models.Developer{}, &models.Publisher{}, &models.Comment{}, &models.CommentVoteUp{}, &models.CommentVoteDown{}, &models.Conversation{}, &models.Message{}, &models.UserBlock{}, &models.WSToken{}); err != nil {
 		log.Fatalf("[ERROR] Fatal error, Failed to automigrate: %v", err)
 	}
 	return db, sqldb
