@@ -3,82 +3,89 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 function Signin() {
-	const { t } = useTranslation();
-	const [username, setUsername] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [passwordCheck, setPasswordCheck] = useState("");
-	const [message, setMessage] = useState("");
-    const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
-	if (
-		!username.trim() ||
-		!email.trim() ||
-		!password.trim() ||
-		!passwordCheck.trim()
-		) {
-		setNotificationMessage(t("signin.errors.fillAllFields"));
-		return;
-		}
+ const { t } = useTranslation();
 
-		if (password !== passwordCheck) {
-		setNotificationMessage(t("signin.errors.passwordMismatch"));
-		return;
-		}
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [passwordCheck, setPasswordCheck] = useState("");
 
-		/*
-		* Vérification simple du format de l'e-mail
-		*/
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const [notificationMessage, setNotificationMessage] = useState<
+    string | null
+  >(null);
 
-		if (!emailRegex.test(email.trim())) {
-		setNotificationMessage(t("signin.errors.invalidEmail"));
-		return;
-		}
+  const navigate = useNavigate();
 
-	const data = {
-	username: username.trim().slice(0, 100),
-	email: email.trim().slice(0, 100),
-	password,
-	};
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
 
-	const navigate = useNavigate();
+    if (
+      !username.trim() ||
+      !email.trim() ||
+      !password.trim() ||
+      !passwordCheck.trim()
+    ) {
+      setNotificationMessage(t("signin.errors.fillAllFields"));
+      return;
+    }
 
-	async function handleSubmit(e: React.FormEvent) {
-		e.preventDefault();
+    if (password !== passwordCheck) {
+      setNotificationMessage(t("signin.errors.passwordMismatch"));
+      return;
+    }
 
-		if (password !== passwordCheck) {
-			setMessage(t("signin.errors.passwordMismatch"));
-			return;
-		}
+    /*
+     * Vérification simple du format de l'e-mail
+     */
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-		const data = { username, email, password };
+    if (!emailRegex.test(email.trim())) {
+      setNotificationMessage(t("signin.errors.invalidEmail"));
+      return;
+    }
 
-		try {
-			const response = await fetch("https://localhost:8443/register", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(data),
-			});
+    const data = {
+    username: username.trim().slice(0, 100),
+    email: email.trim().slice(0, 100),
+    password,
+    };
 
-			if (!response.ok) {
-				throw new Error(t("signin.errors.serverError", { status: response.status }));
-			}
+    try {
+      const response = await fetch("https://localhost:8443/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-			const result = await response.json();
+      const result = await response.json().catch(() => null);
 
-			setMessage(t("signin.success"));
+      if (!response.ok) {
+        setNotificationMessage(
+          result?.error ||
+            t(
+              "signin.errors.serverError",
+              { status: response.status }
+            )
+        );
+        return;
+      }
 
-			setUsername("");
-			setEmail("");
-			setPassword("");
-			setPasswordCheck("");
+      setNotificationMessage(t("signin.success"));
 
-			setTimeout(() => navigate("/login"), 1500);
-		} catch (error) {
-			setMessage(t("signin.errors.registrationFailed"));
-		}
-	}
+      setUsername("");
+      setEmail("");
+      setPassword("");
+      setPasswordCheck("");
 
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch {
+      setNotificationMessage(t("signin.errors.registrationFailed"));
+    }
+  }
 	return (
 		<div className="relative min-h-screen">
 			<div className="absolute h-100 w-70 bg-white m-auto inset-0">
@@ -86,9 +93,9 @@ function Signin() {
 					id="card"
 					className="absolute bg-gray-800 outline-10 outline-gray-400 h-100 w-70 p-2 rounded-2xl transition-all duration-300"
 				>
-					{message && (
+					{notificationMessage && (
 						<p id="message" className="absolute text-center font-semibold text-white w-full p-2">
-							{message}
+							{notificationMessage}
 						</p>
 					)}
 				</div>

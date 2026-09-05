@@ -21,7 +21,7 @@ type (
 		UserVotedDown bool              `json:"user_voted_down"`
 		VotesUp       []CommentVoteUp   `gorm:"foreignKey:CommentID; constraint:OnDelete:CASCADE" json:"-"`
 		VotesDown     []CommentVoteDown `gorm:"foreignKey:CommentID; constraint:OnDelete:CASCADE" json:"-"`
-		Author        User              `gorm:"foreignKey:AuthorID;references:ID" json:"author"`
+		Author        User              `gorm:"foreignKey:AuthorID;references:ID; constraint:onDelete:CASCADE" json:"author"`
 		Game          Game              `gorm:"foreignKey:GameID;references:AppID" json:"-"`
 		CreatedAt     time.Time         `json:"-"`
 		UpdatedAt     time.Time         `json:"-"`

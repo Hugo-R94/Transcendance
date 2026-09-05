@@ -80,6 +80,7 @@ func setupRouter(db *gorm.DB, hub *chat.Hub) *gin.Engine {
 	apigambling.GetHistory(v1, db)
 	chat.ChatSetup(chatGroup, db, hub)
 	user.GetPP(v1, db)
+	user.DeleteUser(v1, db)
 	user.GetUserComments(v1, db)
 	user.UserDescriptionRoutes(v1, db)
 	user.AddGameToList(v1, db)

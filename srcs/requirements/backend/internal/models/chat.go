@@ -21,12 +21,12 @@ type (
 	}
 
 	Conversation struct {
-		ID        uuid.UUID `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
-		User1ID   uuid.UUID `gorm:"type:uuid;uniqueIndex:idx_conv_users" json:"user1_id"`
-		User2ID   uuid.UUID `gorm:"type:uuid;uniqueIndex:idx_conv_users" json:"user2_id"`
+		ID      uuid.UUID `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
+		User1ID uuid.UUID `gorm:"type:uuid;uniqueIndex:idx_conv_users" json:"user1_id"`
+		User2ID uuid.UUID `gorm:"type:uuid;uniqueIndex:idx_conv_users" json:"user2_id"`
 
-		User1 User `gorm:"foreignKey:User1ID;references:ID" json:"user1"`
-		User2 User `gorm:"foreignKey:User2ID;references:ID" json:"user2"`
+		User1 User `gorm:"foreignKey:User1ID;references:ID; constraint:onDelete:CASCADE" json:"user1"`
+		User2 User `gorm:"foreignKey:User2ID;references:ID; constraint:onDelete:CASCADE" json:"user2"`
 
 		Accepted1 bool `gorm:"default:false" json:"accepted_1"`
 		Accepted2 bool `gorm:"default:false" json:"accepted_2"`
@@ -43,12 +43,12 @@ type (
 		UpdatedAt time.Time      `json:"-"`
 		DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 	}
-	
+
 	UserBlock struct {
 		ID            uuid.UUID      `gorm:"primary_key;type:uuid;default:gen_random_uuid()" json:"id"`
 		UserID        uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_block_list" json:"-"`
 		BlockedUserID uuid.UUID      `gorm:"type:uuid; uniqueIndex:idx_block_list" json:"-"`
-		User          User           `gorm:"foreignKey:UserID;references:ID" json:"-"`
+		User          User           `gorm:"foreignKey:UserID;references:ID; constraint:onDelete:CASCADE" json:"-"`
 		BlockedUser   User           `gorm:"foreignKey:BlockedUserID;references:ID" json:"blocked_user"`
 		CreatedAt     time.Time      `json:"-"`
 		UpdatedAt     time.Time      `json:"-"`
@@ -88,7 +88,7 @@ type (
 	BlockRequest struct {
 		Username string `json:"username" binding:"required,min=3,max=20,alphanum"`
 	}
-	
+
 	FriendAccept struct {
 		ID     string `json:"id" binding:"required"`
 		Accept bool   `json:"accept"`
@@ -96,16 +96,15 @@ type (
 )
 
 const (
-	MessageTypeChat          = "message"
-	MessageTypeConnect       = "connect"
-	MessageTypeDisconnect    = "disconnect"
-	MessageTypeFriendReq     = "friend_req"
-	MessageTypeFriendAccept  = "friend_accept"
-	MessageTypeUnfriend 	 = "friend_remove"
-	MessageTypeBlocked       = "blocked"
-	MessageTypeRead			 = "read"
+	MessageTypeChat             = "message"
+	MessageTypeConnect          = "connect"
+	MessageTypeDisconnect       = "disconnect"
+	MessageTypeFriendReq        = "friend_req"
+	MessageTypeFriendAccept     = "friend_accept"
+	MessageTypeUnfriend         = "friend_remove"
+	MessageTypeBlocked          = "blocked"
+	MessageTypeRead             = "read"
 	MessageTypeChatNotification = "chat_notification"
-	MessageTypeGameInvit	 = "game_invit"
-	MessageIsTyping			 = "is_typing"
-
+	MessageTypeGameInvit        = "game_invit"
+	MessageIsTyping             = "is_typing"
 )

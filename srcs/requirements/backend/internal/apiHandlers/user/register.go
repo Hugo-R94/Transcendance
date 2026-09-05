@@ -35,7 +35,7 @@ func (h *UserHandler) register(c *gin.Context) {
 			Email:      req.Email,
 			Username:   req.Username,
 			PassHash:   hashedPassword,
-			ProfilePic: "/app/avatars/avatar_default.png",
+			ProfilePic: "/app/avatars/default_avatar.png",
 			Title1:     "9",
 			Title2:     "10",
 		}
