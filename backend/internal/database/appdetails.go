@@ -19,81 +19,118 @@ func timeParser(timeString string) (time.Time, error) {
 	return time.Parse(layout, timeString)
 }
 
-func fetchAndUpdate(ctx context.Context, game *models.Game, tx *gorm.DB) error {
-
-	if game == nil {
-		return errors.New("game is nil")
-	}
-
+func fetchSteamData(ctx context.Context, appID uint64, steamLang string) (models.GameData, error) {
 	client := &http.Client{Timeout: 5 * time.Second}
-	urlString := fmt.Sprintf("https://store.steampowered.com/api/appdetails?appids=%v&l=english", game.AppID)
+	urlString := fmt.Sprintf("https://store.steampowered.com/api/appdetails?appids=%v&l=%s", appID, steamLang)
+
 	req, err := http.NewRequestWithContext(ctx, "GET", urlString, nil)
 	if err != nil {
-		return fmt.Errorf("failed to create request: %w", err)
+		return models.GameData{}, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return fmt.Errorf("request failed: %w", err)
+		return models.GameData{}, fmt.Errorf("request failed: %w", err)
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode != http.StatusOK {
-		return fmt.Errorf("unexpected status code: %d", resp.StatusCode)
-	}
-
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("error reading response body: %w", err)
+		return models.GameData{}, fmt.Errorf("error reading response body: %w", err)
 	}
 
 	var response map[string]models.SteamAppdetails
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return fmt.Errorf("error unmarshaling JSON: %w", err)
+	if err := json.Unmarshal(body, &response); err != nil {
+		return models.GameData{}, fmt.Errorf("error unmarshaling JSON: %w", err)
 	}
 
-	appIDstr := fmt.Sprintf("%v", game.AppID)
+	appIDstr := fmt.Sprintf("%v", appID)
 	steamGame, exists := response[appIDstr]
 	if !exists || !steamGame.Success {
-		game.Name = "%"
-		return fmt.Errorf("Failed to find the game with AppID %d", game.AppID)
+		return models.GameData{}, fmt.Errorf("no data for AppID %d in language %s", appID, steamLang)
 	}
-	releaseDate, _ := timeParser(steamGame.Data.ReleaseDate.Date)
-	game.Name = steamGame.Data.Name
-	game.Description = steamGame.Data.Description
-	game.Header_image_link = steamGame.Data.Header
-	game.Background_image_link = steamGame.Data.Background
-	game.ComingSoon = steamGame.Data.ReleaseDate.ComingSoon
-	game.Date = releaseDate
-	for _, steamGenre := range steamGame.Data.Genres {
-		genre := models.Genre{
-			ID:   steamGenre.ID,
-			Name: steamGenre.Name,
-		}
-		if err := tx.FirstOrCreate(&genre, models.Genre{ID: steamGenre.ID}).Error; err != nil {
-			return err
-		}
-		game.Genres = append(game.Genres, genre)
+
+	return steamGame.Data, nil
+}
+
+func fetchAndUpdate(ctx context.Context, game *models.Game, tx *gorm.DB) error {
+	if game == nil {
+		return errors.New("game is nil")
 	}
-	for _, steamDev := range steamGame.Data.Developers {
-		developer := models.Developer{
-			Name: steamDev,
+
+	languages := []string{"english", "french", "spanish", "arabic"}
+
+	for _, lang := range languages {
+		data, err := fetchSteamData(ctx, game.AppID, lang)
+		if err != nil {
+			continue
 		}
-		if err := tx.FirstOrCreate(&developer, models.Developer{Name: steamDev}).Error; err != nil {
-			return err
+
+		switch lang {
+		case "english":
+			releaseDate, _ := timeParser(data.ReleaseDate.Date)
+
+			game.Name = data.Name
+			game.Description = data.Description
+			game.Header_image_link = data.Header
+			game.Background_image_link = data.Background
+			game.ComingSoon = data.ReleaseDate.ComingSoon
+			game.Date = releaseDate
+
+			for _, steamGenre := range data.Genres {
+				genre := models.Genre{ID: steamGenre.ID, Name: steamGenre.Name}
+				if err := tx.FirstOrCreate(&genre, models.Genre{ID: steamGenre.ID}).Error; err != nil {
+					return err
+				}
+				game.Genres = append(game.Genres, genre)
+			}
+
+			for _, steamDev := range data.Developers {
+				developer := models.Developer{Name: steamDev}
+				if err := tx.FirstOrCreate(&developer, models.Developer{Name: steamDev}).Error; err != nil {
+					return err
+				}
+				game.Developers = append(game.Developers, developer)
+			}
+
+			for _, steamPub := range data.Publishers {
+				publisher := models.Publisher{Name: steamPub}
+				if err := tx.FirstOrCreate(&publisher, models.Publisher{Name: steamPub}).Error; err != nil {
+					return err
+				}
+				game.Publishers = append(game.Publishers, publisher)
+			}
+
+		case "french":
+			game.DescriptionFr = data.Description
+		    for _, steamGenre := range data.Genres {
+        		var genre models.Genre
+        		if err := tx.First(&genre, "id = ?", steamGenre.ID).Error; err == nil {
+        		    genre.NameFr = steamGenre.Name
+        			tx.Save(&genre)
+        		}
+			}
+		case "spanish":
+			game.DescriptionEs = data.Description
+			for _, steamGenre := range data.Genres {
+        		var genre models.Genre
+        		if err := tx.First(&genre, "id = ?", steamGenre.ID).Error; err == nil {
+        		    genre.NameEs = steamGenre.Name
+        			tx.Save(&genre)
+        		}
+			}
+		case "arabic":
+			game.DescriptionAr = data.Description
+			for _, steamGenre := range data.Genres {
+        		var genre models.Genre
+        		if err := tx.First(&genre, "id = ?", steamGenre.ID).Error; err == nil {
+					genre.NameAr = steamGenre.Name
+        			tx.Save(&genre)
+        		}
+			}
 		}
-		game.Developers = append(game.Developers, developer)
 	}
-	for _, steamPub := range steamGame.Data.Publishers {
-		publisher := models.Publisher{
-			Name: steamPub,
-		}
-		if err := tx.FirstOrCreate(&publisher, models.Publisher{Name: steamPub}).Error; err != nil {
-			return err
-		}
-		game.Publishers = append(game.Publishers, publisher)
-	}
+
 	return nil
 }
 

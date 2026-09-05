@@ -140,7 +140,7 @@ function Login() {
 			}, 1000);
 		} catch (error: any) {
 			console.error("Login error:", error);
-			setNotificationMessage(error.message || t("login.errors.invalidCredentials"));
+			setNotificationMessage(error.response?.data?.error || t("login.errors.invalidCredentials"));
 		}
 	}
 

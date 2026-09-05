@@ -164,10 +164,24 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 		}
 	}
 
+	lang := c.GetHeader("Accept-Language")
+
+	var description string
+
+	switch lang {
+	case "fr":
+	    description = existingGame.DescriptionFr
+	case "es":
+	    description = existingGame.DescriptionEs
+	case "ar":
+	    description = existingGame.DescriptionAr
+	default:
+	    description = existingGame.Description
+	}
 	response := models.GetGameResponse{
 		AppID:                 existingGame.AppID,
 		Name:                  existingGame.Name,
-		Description:           parseDescription(existingGame.Description),
+		Description:           parseDescription(description),
 		Header_image_link:     existingGame.Header_image_link,
 		Background_image_link: existingGame.Background_image_link,
 		ReleaseDate:           FormatGameDate(existingGame.Date),
@@ -176,7 +190,22 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 		ListState:             listState,
 	}
 	for _, genre := range existingGame.Genres {
-		response.Genres = append(response.Genres, genre.Name)
+	    var genreName string
+
+	    switch lang {
+	    case "fr":
+	        genreName = genre.NameFr
+	    case "es":
+	        genreName = genre.NameEs
+	    case "ar":
+	        genreName = genre.NameAr
+	    default:
+	        genreName = genre.Name
+	    }
+		if genreName == "" {
+    	genreName = genre.Name
+		}
+	    response.Genres = append(response.Genres, genreName)
 	}
 	for _, dev := range existingGame.Developers {
 		response.Developers = append(response.Developers, dev.Name)
