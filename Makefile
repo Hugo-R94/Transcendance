@@ -12,7 +12,8 @@ IMAGES		= docker.io/library/golang:1.26.4-alpine \
 all: up
 
 setup:
-	@mkdir -p $(DATA_DIR)/postgres $(DATA_DIR)/avatars
+	@mkdir -p $(DATA_DIR)/postgres $(DATA_DIR)/avatars $(DATA_DIR)/uploads
+
 	@if [ ! -f $(DATA_DIR)/avatars/default_avatar.png ]; then \
 		cp srcs/requirements/backend/avatars/avatar_default.png $(DATA_DIR)/avatars/default_avatar.png; \
 		echo "Default avatar seeded to $(DATA_DIR)/avatars"; \

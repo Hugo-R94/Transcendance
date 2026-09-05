@@ -42,6 +42,7 @@ services:
         condition: service_healthy
     volumes:
       - avatars_data:/app/avatars
+      - uploads_data:/app/uploads
     networks:
       - app_net
     restart: unless-stopped
@@ -81,3 +82,10 @@ volumes:
       type: none
       o: bind
       device: /home/${USER}/data/avatars
+  uploads_data:
+    name: uploads_data
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/${USER}/data/uploads
