@@ -439,7 +439,10 @@
     "dailyQuestPending": "Pending",
     "dailyQuestCompleted": "Completed",
     "leaderboard": "LEADERBOARD",
-    "level":      "Level"
+    "level":      "Level",
+	"claim": "CLAIM REWARD",
+   "alreadyClaimed": "ALREADY CLAIMED"
+	
   },"questTitle":{
     "0": "Post reviews to level up!",
     "1": "Play roulette to gain a level!"

@@ -3,6 +3,8 @@ import api from "../api/api";
 import { useEffect, useState } from "react";
 import { useUserAvatar } from "../api/getUserAvatar";
 import { Link } from "react-router-dom";
+import { LeaderboardSection } from "../components/utils/leaderBoardSection";
+import type { LeaderboardCardProps } from "../components/utils/leaderBoardSection";
 
 const topColors = [
     "bg-[#FFD700]",
@@ -39,6 +41,17 @@ interface userCardProps{
     color: string;
 }
 
+function UserCardWrapper({ player, color }: LeaderboardCardProps<leaderboardUser>) {
+    return (
+        <UserCard
+            user_id={player.user_id}
+            username={player.username}
+            level={player.level}
+            color={color}
+        />
+    );
+}
+
 function UserCard({ username, level, user_id, color }: userCardProps) {
     const avatar = useUserAvatar(user_id);
     const { t } = useTranslation();
@@ -73,15 +86,11 @@ export default function Quest(){
     const { t } = useTranslation();
     const [isFinished, setIsFinished] = useState<boolean>(false);
     const [questType, setQuestType] = useState<number>(-1);
-    const [isCollected, setIsCollected] = useState<boolean>(false);
+    const [isCollected, setIsCollected] = useState<boolean>(true);
     const [questCount, setQuestCount] = useState<number>(-1);
     const [questRequirement, setQuestRequirement] = useState<number>(-1);
     const [leaderboard, setLeaderboard] = useState<leaderboardUser[]>([]);
-    const [usersAvatar, setUsersAvatars] = useState<string[]>([]);
 
-// recuperation de la quest et de son etat avec le back + leaderboard
-    const state = true;
-    // const quest = t("Quest.dailyQuest1")
     useEffect(() => {
         const loadQuest = async () => {
             const response = await api.get<questType>("/quest");
@@ -91,7 +100,6 @@ export default function Quest(){
             setQuestType(data.quest_type);
             setIsCollected(data.is_collected);
             setQuestCount(data.quest_count);
-            // setQuestCount(data.quest_count);
             setQuestRequirement(data.quest_requirement);
 
             const resp = await api.get<leaderboardUser[]>("/questLeaderboard");
@@ -99,17 +107,23 @@ export default function Quest(){
             
         };
 
+		
+		
         loadQuest();
     }, []);
+	
+	const claimReward = async () => {
+			await api.get("/claimReward");	
+		};
+		
     console.log("quest type = %d | quest is finish = %v", questType, isFinished);
-    const questTitle = t(`questTitle.${questType}`);
-    const isFinish = isFinished ? "quest is finished" : "quest is not finished";
+    const questTitle = t(`questTitle.${questType}`);	
     console.log("quest count = ", questCount, "quest requirement = ", questRequirement);
     const completion = questCount / questRequirement;
     const rest = 1 - (questCount / questRequirement);
     return(
-    <div className="relative min-h-screen items-center justify-center">
-        <div className="w-[90vw] h-[85vh] mt-30 mx-auto flex sm:flex-row flex-col gap-x-2 ">
+    <div className="sm:relative min-h-screen items-center justify-center">
+        <div className="w-[90vw] h-[85vh] sm:mt-30 mt-35 mx-auto flex sm:flex-row flex-col gap-x-2 sm:gap-y-0 gap-y-10">
 
             <div className="sm:w-1/2 sm:h-full w-full h-1/3 flex flex-col gap-y-2">
                 <div className="bg- w-full h-[88%] rounded-2xl p-3 flex flex-col justify-center items-center gap-y-3">
@@ -132,6 +146,25 @@ export default function Quest(){
                                 ></div>
                             </div>
                         </div>
+						{/* 1. Quête terminée mais PAS encore récupérée */}
+						{isFinished && !isCollected && (
+						<button 
+							className="bg-bgreen px-2 w-40 h-15 balatro hover:outline-3 active:scale-90 rounded-2xl shadow-black/75 shadow-md hover:shadow-lg cursor-pointer"
+							onClick={() => claimReward()}
+						>
+							<p className="font-extrabold">{t("Quest.claim")}</p>
+						</button>
+						)}
+
+						{/* 2. Quête terminée ET déjà récupérée */}
+						{isFinished && isCollected && (
+						<button 
+							disabled 
+							className="bg-gray-400 px-2 opacity-60 w-40 h-15 balatro rounded-2xl cursor-not-allowed"
+						>
+							<p className="font-extrabold">{t("Quest.alreadyClaimed")}</p>
+						</button>
+						)}
                         {/* <p className={`font-semibold ${state ? "bg-bgreen" : "bg-bred"} p-3 rounded-2xl shadow-black/50 shadow-md`}>
                             {isFinish}
                         </p> */}
@@ -147,61 +180,27 @@ export default function Quest(){
                 <div className="bg-bdarkgreen flex flex-col h-[90%] w-full rounded-2xl p-3 gap-y-2">
 
                     {/* TOP 3 */}
-                <div className="bg-bdarkgreen flex flex-col h-[90%] w-full rounded-2xl p-3 gap-y-2">
+					<div className="bg-black/50 w-full h-1/3 rounded-2xl p-2">
+						<LeaderboardSection
+							data={leaderboard}
+							limit={3}
+							offset={0}
+							getColor={(i) => topColors[i]}
+							CardComponent={UserCardWrapper}
+						/>
+					</div>
 
-                    {/* TOP 3 : TOUJOURS 3 CASES */}
-                    <div className="bg-black/50 w-full h-1/3 rounded-2xl p-2 flex flex-col gap-y-2">
-                        {Array.from({ length: 3 }).map((_, index) => {
-                            const player = leaderboard[index];
-
-                            return (
-                                <div
-                                    key={player?.user_id ?? `top-${index}`}
-                                    className="flex-1 min-h-0"
-                                >
-                                    {player && (
-                                        <UserCard
-                                            user_id={player.user_id}
-                                            username={player.username}
-                                            level={player.level}
-                                            color={topColors[index]}
-                                        />
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-
-                    {/* PLACES 4-15 : TOUJOURS 12 CASES */}
-                    <div className="bg-black/50 w-full h-2/3 rounded-2xl p-2 flex flex-col gap-y-2">
-                        {Array.from({ length: 12 }).map((_, index) => {
-                            const player = leaderboard[index + 3];
-
-                            return (
-                                <div
-                                    key={player?.user_id ?? `player-${index + 3}`}
-                                    className="flex-1 min-h-0"
-                                >
-                                    {player && (
-                                        <UserCard
-                                            user_id={player.user_id}
-                                            username={player.username}
-                                            level={player.level}
-                                            color={colors[index % 4]}
-                                        />
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </div>
-
+					<div className="bg-black/50 w-full h-2/3 rounded-2xl p-2">
+						<LeaderboardSection
+							data={leaderboard}
+							limit={12}
+							offset={3}
+							getColor={(i) => colors[i % colors.length]}
+							CardComponent={UserCardWrapper}
+						/>
+					</div>
                 </div>
-
-
-                </div>
-
             </div>
-
         </div>
     </div>
     );

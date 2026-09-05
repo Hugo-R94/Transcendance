@@ -14,21 +14,21 @@ import (
 // ============================================================
 
 const (
-	MinPlayers      = 2
-	MaxTurns        = 5
-	GameStartDelay  = 10 * time.Second
-	BettingDuration = 15 * time.Second
-	ScratchDuration = 10 * time.Second
-	SpinningDuration = 4 * time.Second
-	ResultDuration = 6 * time.Second 
-	//FastMode
 	// MinPlayers      = 2
 	// MaxTurns        = 5
-	// GameStartDelay  = 1 * time.Second /2
-	// BettingDuration = 1 * time.Second /2
-	// ScratchDuration = 1 * time.Second /2
-	// SpinningDuration = 1 * time.Second /2
-	// ResultDuration = 1 * time.Second  /2
+	// GameStartDelay  = 10 * time.Second
+	// BettingDuration = 15 * time.Second
+	// ScratchDuration = 10 * time.Second
+	// SpinningDuration = 4 * time.Second
+	// ResultDuration = 6 * time.Second 
+	// FastMode
+	MinPlayers      = 2
+	MaxTurns        = 5
+	GameStartDelay  = 1 * time.Second /2
+	BettingDuration = 1 * time.Second /2
+	ScratchDuration = 1 * time.Second /2
+	SpinningDuration = 1 * time.Second /2
+	ResultDuration = 1 * time.Second  /2
 )
 
 // ============================================================

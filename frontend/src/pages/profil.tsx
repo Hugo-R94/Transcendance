@@ -196,7 +196,7 @@ export default function Profil() {
         />
       )}
 
-      <main className="hidden sm:flex sm:flex-col mx-[5%] w-[90%] pt-20 pb-4 h-screen overflow-hidden">
+      <main className="hidden sm:flex sm:flex-col mx-[5%] w-[90%] pt-20 pb-4 h-screen overflow-visible">
         <ProfileHeader
           profile={profile}
           imageSrc={imageSrc}
@@ -207,14 +207,14 @@ export default function Profil() {
           onImageChange={handleImageChange}
         />
 
-        <div className="flex-shrink-0 my-2">
+        <div className="flex-shrink-0 my-2 overflow-visible">
           <ProfileMenu
             activeTab={activeTab}
             onTabChange={setActiveTab}
           />
         </div>
 
-        <div className="flex-1 min-h-0 bg-black/50 rounded-2xl p-4 backdrop-blur-md shadow-black shadow-md flex flex-col overflow-y-auto">
+        <div className="flex-1 min-h-0 bg-black/50 rounded-2xl p-4 backdrop-blur-md shadow-black shadow-md flex flex-col overflow-visible">
           {renderTabContent()}
         </div>
       </main>
@@ -237,7 +237,7 @@ export default function Profil() {
           />
         </div>
 
-        <div className="bg-black/50 rounded-2xl mt-3 w-full min-h-[400px] mb-5 flex flex-col overflow-y-auto p-2">
+        <div className=" rounded-2xl mt-3 w-full min-h-[400px] mb-5 flex flex-col overflow-y-auto p-2 bg-white">
           {renderTabContent()}
         </div>
       </div>

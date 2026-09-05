@@ -88,7 +88,7 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
       <div
         className={`hidden sm:flex w-full h-[calc(100vh-280px)] min-h-[400px] flex-col rounded-2xl relative ${className}`}
       >
-        <div className="w-full flex justify-center items-center h-[85%] overflow-visible p-2 rounded-t-2xl ">
+        <div className="w-full flex justify-center items-center h-[1000%] overflow-visible p-2 rounded-t-2xl">
           {loading ? (
             <div className="flex h-full w-full items-center justify-center">
               <span className="text-gray-400">{t("common.loading")}</span>

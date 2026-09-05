@@ -243,7 +243,9 @@
   "dailyQuestPending": "قيد الانتظار",
   "dailyQuestCompleted": "مكتملة",
   "leaderboard": "لوحة المتصدرين",
-  "level": "المستوى"
+  "level": "المستوى",
+  "claim": "مطالبة بالمكافأة",
+  "alreadyClaimed": "تمت المطالبة به بالفعل"
 },
 "questTitle": {
   "0": "انشر مراجعات للارتقاء بالمستوى!",

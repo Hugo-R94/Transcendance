@@ -237,7 +237,9 @@
   "dailyQuestPending": "Pendiente",
   "dailyQuestCompleted": "Completada",
   "leaderboard": "CLASIFICACIÓN",
-  "level": "Nivel"
+  "level": "Nivel",
+  "claim": "RECLAMAR RECOMPENSA",
+  "alreadyClaimed": "YA RECLAMADO"  
 },
 "questTitle": {
   "0": "¡Publica reseñas para subir de nivel!",

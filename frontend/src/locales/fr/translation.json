@@ -232,7 +232,9 @@
   "dailyQuestPending": "En attente",
   "dailyQuestCompleted": "Terminée",
   "leaderboard": "CLASSEMENT",
-  "level": "Niveau"
+  "level": "Niveau",
+  "claim": "RECUPERER SA RECOMPENSE",
+  "alreadyClaimed": "DEJA RECUPEREE"
 },
 "questTitle": {
   "0": "Publiez des avis pour monter de niveau !",

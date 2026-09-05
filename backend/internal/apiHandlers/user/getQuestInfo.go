@@ -98,6 +98,75 @@ func updateQuest(db *gorm.DB, user *models.User) error {
     return db.Save(user).Error
 }
 
+func ClaimQuestReward(db *gorm.DB) (bool, error) {
+	idRaw, _ := c.Get("id")
+	ID := idRaw.(uuid.UUID)
+	
+	var user user.User
+	if err := db.Where("id = ?", ID).First(&user).Error; err != nil{
+		if err == gorm.ErrRecordNotFound{
+			return false, errors.New("User not found")
+		}else{
+			return false, err
+		}
+	}
+	
+	log.Printf(
+		"[QUEST REWARD] user=%s isFinished=%v isCollected=%v level=%d",
+		user.ID,
+		user.IsFinished,
+		user.IsCollected,
+		user.Level,
+	)
+
+	if !user.IsFinished {
+		return false, fmt.Errorf("la quête n'est pas encore terminée")
+	}
+
+	if user.IsCollected {
+		return false, fmt.Errorf("la récompense a déjà été récupérée")
+	}
+
+	var completed bool
+
+	err := db.Transaction(func(tx *gorm.DB) error {
+		var lockedUser models.User
+
+		if err := tx.Set("gorm:query_option", "FOR UPDATE").
+			First(&lockedUser, user.ID).Error; err != nil {
+			return fmt.Errorf("échec du verrouillage utilisateur : %w", err)
+		}
+
+		if !lockedUser.IsFinished {
+			return fmt.Errorf("la quête n'est pas terminée")
+		}
+
+		if lockedUser.IsCollected {
+			return fmt.Errorf("la récompense a déjà été récupérée")
+		}
+
+		lockedUser.Level++
+		lockedUser.IsCollected = true
+		completed = true
+
+		log.Printf("[QUEST REWARD] user %s a réclamé sa récompense (nouveau level: %d)", lockedUser.ID, lockedUser.Level)
+
+		if err := tx.Save(&lockedUser).Error; err != nil {
+			return fmt.Errorf("échec de la sauvegarde de la récompense : %w", err)
+		}
+
+		*user = lockedUser
+
+		return nil
+	})
+
+	if err != nil {
+		return false, err
+	}
+
+	return completed, nil
+}
+
 func ExecQuest(db *gorm.DB, user *models.User, tryquest string, hub *chat.Hub) (bool, error) {
 	log.Printf(
 		"[QUEST] user=%s type=%d quest=%s count=%d/%d finished=%v",
@@ -135,9 +204,9 @@ func ExecQuest(db *gorm.DB, user *models.User, tryquest string, hub *chat.Hub) (
 		lockedUser.QuestCount++
 
 		if lockedUser.QuestCount == lockedUser.QuestRequirement {
-			lockedUser.Level++
+			// lockedUser.Level++
 			lockedUser.IsFinished = true
-			completed = true
+			// completed = true
 
 			log.Printf("[QUEST] user %s completed quest", lockedUser.ID)
 		}

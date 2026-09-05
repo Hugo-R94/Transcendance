@@ -2,11 +2,10 @@ import { useState, useEffect } from "react";
 import api from "../api/api";
 
 export function useUserAvatar(userId?: string) {
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
   useEffect(() => {
     if (!userId) {
-      setAvatarUrl(null);
+      setAvatarUrl(undefined);
       return;
     }
 

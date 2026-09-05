@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
 import api from "../../api/api";
 import { useUserAvatar } from "../../api/getUserAvatar";
+import { LeaderboardSection } from "../utils/leaderBoardSection";
+import type { LeaderboardCardProps } from "../utils/leaderBoardSection";
 
 type Player = {
     user_id: string;
@@ -17,6 +18,16 @@ type ScoreCardProps = {
     classement: number;
     color: string;
 };
+
+function ScoreCardWrapper({ player, rank, color }: LeaderboardCardProps<leaderboardUser>) {
+    return (
+        <ScoreCard
+            player={player}
+            classement={rank}
+            color={color}
+        />
+    );
+}
 
 function ScoreCard({
     player,
@@ -107,35 +118,26 @@ export default function Leaderboard() {
                 </div>
             </div>
 
-            <div className="flex flex-col w-full h-3/10 gap-y-2 p-2 bg-black/25 rounded-2xl border-3">
-                {leaderboard.slice(0, 3).map((player, index) => (
-                    <div
-                        key={player.user_id}
-                        className="flex-1 min-h-0"
-                    >
-                        <ScoreCard
-                            player={player}
-                            classement={index + 1}
-                            color={topColors[index]}
-                        />
-                    </div>
-                ))}
-            </div>
+			{/* CAS 2 : Utilisation avec ScoreCard (ex: taille dynamique) */}
+			<div className="w-full h-3/10 bg-black/25 rounded-2xl border-3 p-2">
+				<LeaderboardSection
+					data={leaderboard}
+					limit={3}
+					offset={0}
+					getColor={(i) => topColors[i]}
+					CardComponent={ScoreCardWrapper}
+				/>
+			</div>
 
-            <div className="flex flex-col w-full h-6/10 gap-y-1 p-2 bg-black/25 rounded-2xl border-3">
-                {leaderboard.slice(3, 15).map((player, index) => (
-                    <div
-                        key={player.user_id}
-                        className="flex-1 min-h-0"
-                    >
-                        <ScoreCard
-                            player={player}
-                            classement={index + 4}
-                            color={colors[index % colors.length]}
-                        />
-                    </div>
-                ))}
-            </div>
+			<div className="w-full h-6/10 bg-black/25 rounded-2xl border-3 p-2">
+				<LeaderboardSection
+					data={leaderboard}
+					limit={12}
+					offset={3}
+					getColor={(i) => colors[i % colors.length]}
+					CardComponent={ScoreCardWrapper}
+				/>
+			</div>
         </div>
     );
 }

@@ -36,7 +36,7 @@ export default function FriendList({
 }: {
   friends: any[];
   onFriendClick: (friend: any) => void;
-  onUnfriend: (friend: any) => void;
+  onUnfriend: (friend: any, convID?: any) => void;
   onBlock: (friend: any) => void;
   unreadUserIds: string[];
 }) {
