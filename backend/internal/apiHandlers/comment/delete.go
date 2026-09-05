@@ -23,7 +23,8 @@ func (h *CommentHandler) deleteCom(c *gin.Context) {
 
 	var toDelete models.Comment
 	if err := h.db.Where("author_id = ? AND game_id = ?", id, req.GameID).
-		Preload("Votes").
+		Preload("VotesUp").
+		Preload("VotesDown").
 		First(&toDelete).
 		Unscoped().
 		Delete(&toDelete).Error; err != nil {

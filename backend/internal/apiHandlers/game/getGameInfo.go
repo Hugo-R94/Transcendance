@@ -402,6 +402,8 @@ func (h *GameHandler) optHandler(c *gin.Context) {
 }
 
 func (h *GameHandler) VoteComment(c *gin.Context) {
+	idRaw, _ := c.Get("id")
+	id := idRaw.(uuid.UUID)
 	commentIDString := c.Param("id")
 	commentID, err := uuid.Parse(commentIDString)
 	if err != nil {
@@ -411,77 +413,73 @@ func (h *GameHandler) VoteComment(c *gin.Context) {
 		return
 	}
 
-	var vote models.CommentVote
-	if err := c.ShouldBindJSON(&vote); err != nil {
+	var req models.CommentVoteRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
 		return
 	}
 
-	var existing models.CommentVote
-	result := h.db.Where("user_id = ? AND comment_id = ?", vote.UserID, commentID).First(&existing)
-
-	// --- 1. L'utilisateur a DÉJÀ un vote enregistré ---
-	if result.Error == nil {
-
-		// Cas A : Reclic sur le même vote OU demande explicite d'annulation (vote == 0)
-		if existing.Vote == vote.Vote || vote.Vote == 0 {
-			h.db.Delete(&existing)
-
-			if existing.Vote == 1 {
-				h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-					UpdateColumn("likes", gorm.Expr("GREATEST(0, likes - 1)"))
-			} else if existing.Vote == -1 {
-				h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-					UpdateColumn("dislikes", gorm.Expr("GREATEST(0, dislikes - 1)"))
+	var count int64
+	if err := h.db.Model(&models.Comment{}).
+		Where("id = ?", commentID).
+		Count(&count).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Could not save vote",
+		})
+		log.Printf("[ERROR] Could not save vote: %v", err)
+		return
+	}
+	if count != 1 {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Could not find comment",
+		})
+		return
+	}
+	if req.Vote == 1 || req.Vote == -1 {
+		voteUp := models.CommentVoteUp{UserID: id, CommentID: commentID}
+		voteDown := models.CommentVoteDown{UserID: id, CommentID: commentID}
+		if err := h.db.Transaction(func(tx *gorm.DB) error {
+			resUp := tx.Where(&voteUp).FirstOrInit(&voteUp)
+			resDown := tx.Where(&voteDown).FirstOrInit(&voteDown)
+			if req.Vote == 1 {
+				if resUp.RowsAffected != 0 {
+					return tx.Unscoped().Delete(&voteUp).Error
+				} else {
+					if err := tx.Save(&voteUp).Error; err != nil {
+						return err
+					}
+					if resDown.RowsAffected != 0 {
+						return tx.Unscoped().Delete(&voteDown).Error
+					}
+				}
+			} else {
+				if resDown.RowsAffected != 0 {
+					return tx.Unscoped().Delete(&voteDown).Error
+				} else {
+					if err := tx.Save(&voteDown).Error; err != nil {
+						return err
+					}
+					if resUp.RowsAffected != 0 {
+						return tx.Unscoped().Delete(&voteUp).Error
+					}
+				}
 			}
-
-			c.JSON(http.StatusOK, gin.H{"message": "vote removed"})
+			return nil
+		}); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Could not save vote",
+			})
+			log.Printf("[ERROR] Could not save vote: %v", err)
 			return
 		}
-
-		// Cas B : Changement de vote (ex: Like -> Dislike ou Dislike -> Like)
-		if vote.Vote == 1 {
-			// De Dislike (-1) à Like (1)
-			h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-				Updates(map[string]interface{}{
-					"likes":    gorm.Expr("likes + 1"),
-					"dislikes": gorm.Expr("GREATEST(0, dislikes - 1)"),
-				})
-		} else if vote.Vote == -1 {
-			// De Like (1) à Dislike (-1)
-			h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-				Updates(map[string]interface{}{
-					"likes":    gorm.Expr("GREATEST(0, likes - 1)"),
-					"dislikes": gorm.Expr("dislikes + 1"),
-				})
-		}
-
-		existing.Vote = vote.Vote
-		h.db.Save(&existing)
-
-		c.JSON(http.StatusOK, gin.H{"message": "vote changed"})
+		c.JSON(http.StatusOK, gin.H{
+			"message": "vote saved",
+		})
 		return
 	}
-
-	// --- 2. NOUVEAU VOTE ---
-	if vote.Vote == 0 {
-		c.JSON(http.StatusOK, gin.H{"message": "no action"})
-		return
-	}
-
-	vote.CommentID = commentID
-
-	h.db.Create(&vote)
-
-	if vote.Vote == 1 {
-		h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-			UpdateColumn("likes", gorm.Expr("likes + 1"))
-	} else if vote.Vote == -1 {
-		h.db.Model(&models.Comment{}).Where("id = ?", commentID).
-			UpdateColumn("dislikes", gorm.Expr("dislikes + 1"))
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "vote added"})
+	c.JSON(http.StatusBadRequest, gin.H{
+		"error": "Vote should be 1 or -1",
+	})
 }
 
 func GetGameInfo(router *gin.RouterGroup, db *gorm.DB) {
