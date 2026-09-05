@@ -42,12 +42,20 @@ function HistoryComponent({
     time,
     final_score,
 }: HistoryComponentProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const scoreColor =
         final_score > 1000 ? "text-bgreen" : "text-bred";
 
     const rankColor =
         isRankInSecondHalf(rank) ? "text-bgreen" : "text-bred";
+
+    const formattedTime = new Intl.DateTimeFormat(i18n.language, {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+    }).format(new Date(time));
 
     return (
         <div className="bg-byellow w-full h-15 shrink-0 font-extrabold md:text-2xl text-lg flex items-center border-t border-l border-8 border-black/25 rounded-2xl hover:scale-101 hover:z-50 shadow-md shadow-black/75 hover:shadow-lg">
@@ -65,7 +73,7 @@ function HistoryComponent({
             </div>
 
             <div className="w-1/3 h-full flex items-center justify-center">
-                <p className="text-black/50">{time}</p>
+                <p className="text-black/50">{formattedTime}</p>
             </div>
         </div>
     );

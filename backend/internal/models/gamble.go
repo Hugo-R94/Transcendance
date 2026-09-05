@@ -24,7 +24,7 @@ type (
 	GameScoreResponse struct{
 		FinalScore   int            `gorm:"type:int; index" json:"final_score"`
 		Rank         string 		`json:"rank"`
-		Time         string		    `gorm:"index" json:"time"`
+		Time         time.Time      `json:"time"`
 		Total		 int64			`gorm:"total_game" json:"total"`
 	}
 	

@@ -4,28 +4,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
-	"fmt"
 
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
-
-func FormatGameDate(t time.Time) string {
-	if t.IsZero() || t.Year() <= 1 {
-		return "Date inconnue"
-	}
-
-	months := map[time.Month]string{
-		time.January: "janvier", time.February: "février", time.March: "mars",
-		time.April: "avril", time.May: "mai", time.June: "juin",
-		time.July: "juillet", time.August: "août", time.September: "septembre",
-		time.October: "octobre", time.November: "novembre", time.December: "décembre",
-	}
-	return fmt.Sprintf("%dh%d - %d %s %d", t.Hour(), t.Minute(), t.Day(), months[t.Month()], t.Year())
-}
 
 func (h *GamblingHandler) history(c *gin.Context) {
 	userIDRaw := c.Param("userID")
@@ -80,7 +64,7 @@ func (h *GamblingHandler) history(c *gin.Context) {
 		response = append(response, models.GameScoreResponse{
 			FinalScore: score.FinalScore,
 			Rank:       score.Rank,
-			Time:       FormatGameDate(score.Time),
+			Time:       score.Time,
 			Total:      total,
 		})
 	}

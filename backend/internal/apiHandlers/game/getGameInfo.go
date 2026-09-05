@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"github.com/Hugo-R94/Transcendance/backend/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -77,22 +76,6 @@ func parseDescription(rawHTML string) string {
 	content = multiNewlineRegex.ReplaceAllString(content, "\n\n")
 
 	return strings.TrimSpace(content)
-}
-
-func FormatGameDate(t time.Time) string {
-	// Si la date est vide (0001-01-01)
-	if t.IsZero() || t.Year() <= 1 {
-		return "Date inconnue"
-	}
-
-	months := map[time.Month]string{
-		time.January: "janvier", time.February: "février", time.March: "mars",
-		time.April: "avril", time.May: "mai", time.June: "juin",
-		time.July: "juillet", time.August: "août", time.September: "septembre",
-		time.October: "octobre", time.November: "novembre", time.December: "décembre",
-	}
-
-	return fmt.Sprintf("%d %s %d", t.Day(), months[t.Month()], t.Year())
 }
 
 func (h *GameHandler) gameInfoHandler(c *gin.Context) {
@@ -184,7 +167,7 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 		Description:           parseDescription(description),
 		Header_image_link:     existingGame.Header_image_link,
 		Background_image_link: existingGame.Background_image_link,
-		ReleaseDate:           FormatGameDate(existingGame.Date),
+		ReleaseDate:           existingGame.Date,
 		SteamScore:            existingGame.SteamScore / 10,
 		TotalReviews:          existingGame.TotalReviews,
 		ListState:             listState,
