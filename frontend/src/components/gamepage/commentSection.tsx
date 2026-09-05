@@ -14,7 +14,8 @@ export interface CommentData {
   likes: number;
   dislikes: number;
   rating?: number;
-  userVote?: number;
+  user_voted_up: boolean;
+  user_voted_down: boolean;
   title_1: string;
   title_2: string;
   profile_picture: string;
@@ -41,7 +42,6 @@ function CommentSection({
   const [loading, setLoading] = useState(false);
 
   const normalizedCurrentUserId = String(currentUserId || "");
-
   useEffect(() => {
     if (!gameID) return;
 
@@ -62,6 +62,9 @@ function CommentSection({
               item.author?.ID ??
               ""
             );
+			var userVote = 0;
+			userVote =  item.user_voted_up === true ? 1 : 0;
+			userVote =  item.user_voted_down === true ? -1 : userVote;
 
             return {
               id: commentId,
@@ -72,7 +75,7 @@ function CommentSection({
               likes: Number(item.likes ?? item.Likes ?? 0),
               dislikes: Number(item.dislikes ?? item.Dislikes ?? 0),
               rating: Number(item.rating ?? item.Rating ?? 0),
-              userVote: Number(item.user_vote ?? item.userVote ?? 0),
+              userVote: userVote,
               title_1: String(item.title_1 ?? item.title1 ?? item.Title1 ?? 9),
               title_2: String(item.title_2 ?? item.title2 ?? item.Title2 ?? 10),
               profile_picture: String(

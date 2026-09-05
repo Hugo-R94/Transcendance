@@ -5,7 +5,7 @@ import api from "../../api/api";
 interface LikeButtonProps {
   commentId: number;
   initialLikes?: number;
-  initialDislikes?: number;
+  initialDislikes: number;
   initialState?: number;
 }
 
@@ -13,7 +13,7 @@ function LikeButton({
   commentId,
   initialLikes = 0,
   initialDislikes = 0,
-  initialState = 0,
+  initialState ,
 }: LikeButtonProps) {
   const { t } = useTranslation();
   const [likes, setLikes] = useState<number>(initialLikes);
@@ -21,84 +21,93 @@ function LikeButton({
   const [userState, setUserState] = useState<number>(Number(initialState));
   const [isPending, setIsPending] = useState<boolean>(false);
 
-  // Synchronisation des props vers le state interne
-  useEffect(() => {
-    setLikes(initialLikes);
-    setDislikes(initialDislikes);
-    
-    // Si un vote est déjà mis en cache localement, il prévaut
-    const savedVote = localStorage.getItem(`vote_${commentId}`);
-    if (savedVote !== null) {
-      setUserState(Number(savedVote));
-    } else {
-      setUserState(Number(initialState));
-    }
-  }, [initialLikes, initialDislikes, initialState, commentId]);
 
-  const handleVote = async (targetVote: number) => {
-    if (isPending) return;
+	const handleVote = async (targetVote: number) => {
+	if (isPending) return;
 
-    // 1. Récupération du token depuis le localStorage
-    const token = localStorage.getItem("token") || localStorage.getItem("jwt");
+	const token =
+		localStorage.getItem("token") ||
+		localStorage.getItem("jwt");
 
-    if (!token) {
-      alert(t("likeButton.mustBeLoggedIn"));
-      return;
-    }
+	if (!token) {
+		alert(t("likeButton.mustBeLoggedIn"));
+		return;
+	}
 
-    setIsPending(true);
+	setIsPending(true);
 
-    const prevLikes = likes;
-    const prevDislikes = dislikes;
-    const prevState = userState;
+	// Sauvegarde pour rollback
+	const prevLikes = likes;
+	const prevDislikes = dislikes;
+	const prevState = userState;
 
-    let newVote = 0;
-    let newLikes = likes;
-    let newDislikes = dislikes;
+	// ============================================================
+	// AFFICHAGE UNIQUEMENT
+	// ============================================================
 
-    if (userState === targetVote) {
-      newVote = targetVote;
-      if (targetVote === 1) newLikes = Math.max(0, likes - 1);
-      if (targetVote === -1) newDislikes = Math.max(0, dislikes - 1);
-    } else {
-      newVote = targetVote;
+	let newState = targetVote;
+	let newLikes = likes;
+	let newDislikes = dislikes;
 
-      if (userState === 1) newLikes = Math.max(0, likes - 1);
-      if (userState === -1) newDislikes = Math.max(0, dislikes - 1);
+	// Même bouton => toggle visuel
+	if (userState === targetVote) {
+		newState = 0;
 
-      if (targetVote === 1) newLikes = newLikes + 1;
-      if (targetVote === -1) newDislikes = newDislikes + 1;
-    }
+		if (targetVote === 1) {
+		newLikes = Math.max(0, likes - 1);
+		} else if (targetVote === -1) {
+		newDislikes = Math.max(0, dislikes - 1);
+		}
+	}
 
-    // 2. Mise à jour optimiste de l'interface
-    setUserState(newVote);
-    setLikes(newLikes);
-    setDislikes(newDislikes);
-    localStorage.setItem(`vote_${commentId}`, String(newVote));
+	// Changement like <-> dislike => affichage
+	else {
+		if (userState === 1) {
+		newLikes = Math.max(0, likes - 1);
+		}
 
-    try {
-      // 3. Envoi au serveur en passant le Token dans les Headers (Bearer Authorization)
-      await api.post(`/game/comment/${commentId}/vote`,{ vote: newVote },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-    } catch (error: any) {
-      console.error("❌ Échec du vote :", error);
-      alert(t("likeButton.voteError", { message: error.response?.data?.message || error.message }));
+		if (userState === -1) {
+		newDislikes = Math.max(0, dislikes - 1);
+		}
 
+		if (targetVote === 1) {
+		newLikes++;
+		}
 
-      // Restauration de l'état local en cas d'erreur API
-      setUserState(prevState);
-      setLikes(prevLikes);
-      setDislikes(prevDislikes);
-      localStorage.setItem(`vote_${commentId}`, String(prevState));
-    } finally {
-      setIsPending(false);
-    }
-  };
+		if (targetVote === -1) {
+		newDislikes++;
+		}
+	}
+
+	setUserState(newState);
+	setLikes(newLikes);
+	setDislikes(newDislikes);
+
+	try {
+		// IMPORTANT :
+		// Le backend reçoit TOUJOURS le vote demandé.
+		// On ne change pas cette logique.
+		await api.post(
+		`/game/comment/${commentId}/vote`,
+		{
+			vote: targetVote,
+		},
+		{
+			headers: {
+			Authorization: `Bearer ${token}`,
+			},
+		}
+		);
+	} catch (error) {
+		// Rollback uniquement de l'affichage
+		setUserState(prevState);
+		setLikes(prevLikes);
+		setDislikes(prevDislikes);
+	} finally {
+		setIsPending(false);
+	}
+	};
+
 
   return (
     <div className="w-50 h-10 rounded-2xl flex m-auto">
