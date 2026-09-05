@@ -1,72 +1,62 @@
-.phony: all clean re gen_cert up down check db_wipe
+NAME		= transcendence
+export USER	:= $(shell whoami)
+DATA_DIR	= /home/$(USER)/data
+COMPOSE		= podman compose -f srcs/docker-compose.yml --env-file srcs/.env
 
-CERT = ./certificates
+IMAGES		= docker.io/library/golang:1.26.4-alpine \
+		  docker.io/library/alpine:3.20 \
+		  docker.io/library/node:22-alpine \
+		  docker.io/library/nginx:1.27-alpine \
+		  docker.io/library/postgres:16-alpine
 
 all: up
-	cd backend && go build && ./backend
 
-up: ${CERT}
-	podman pull docker.io/library/postgres:17.5
-	podman pull docker.io/dpage/pgadmin4:8
-	podman-compose -f compose.yml up -d --build
+setup:
+	@mkdir -p $(DATA_DIR)/postgres $(DATA_DIR)/avatars
+	@if [ ! -f $(DATA_DIR)/avatars/default_avatar.png ]; then \
+		cp srcs/requirements/backend/avatars/avatar_default.png $(DATA_DIR)/avatars/default_avatar.png; \
+		echo "Default avatar seeded to $(DATA_DIR)/avatars"; \
+	fi
+	@echo "Data directories ready at $(DATA_DIR)"
+
+pull:
+	@for img in $(IMAGES); do \
+		echo "Pulling $$img..."; \
+		podman pull $$img || exit 1; \
+	done
+	@echo "All base images pulled."
+
+build: setup pull
+	@$(COMPOSE) build
+
+up: setup pull
+	@$(COMPOSE) up -d --build
 
 down:
-	podman-compose -f compose.yml down
+	@$(COMPOSE) down
 
-clean:
-	rm -rf certificates
+stop:
+	@$(COMPOSE) stop
 
-fclean:clean
-	rm -f Transcendance
+restart: down up
 
-re: down fclean all
+logs:
+	@$(COMPOSE) logs -f
 
-${CERT}:
-	mkdir -p certificates
-	openssl genrsa -out certificates/rootCA.key 2048
-	openssl req -x509 -new -nodes -key certificates/rootCA.key -sha256 -days 365 \
-	  -out certificates/rootCA.crt -subj "/CN=MyLocalCA"
-	
-	openssl genrsa -out certificates/server.key 2048
-	openssl req -new -key certificates/server.key -out certificates/server.csr \
-	  -subj "/CN=postgres" \
-	
-	openssl x509 -req -in certificates/server.csr \
-	  -CA certificates/rootCA.crt \
-	  -CAkey certificates/rootCA.key \
-	  -CAcreateserial \
-	  -out certificates/server.crt \
-	  -days 365 -sha256 \
-	  -extfile <(printf "subjectAltName=DNS:postgres,DNS:localhost,DNS:127.0.0.1,IP:127.0.0.1,IP:::1")
-	
-	openssl genrsa -out certificates/client.key 2048
-	openssl req -new -key certificates/client.key -out certificates/client.csr \
-	  -subj "/CN=postgres"
-	
-	openssl x509 -req -in certificates/client.csr \
-	  -CA certificates/rootCA.crt \
-	  -CAkey certificates/rootCA.key \
-	  -CAcreateserial \
-	  -out certificates/client.crt \
-	  -days 365 -sha256
-	
-	openssl genrsa -out certificates/client_pgadmin.key 2048
-	openssl req -new -key certificates/client_pgadmin.key -out certificates/client_pgadmin.csr \
-	  -subj "/CN=postgres"
-	
-	openssl x509 -req -in certificates/client_pgadmin.csr \
-	  -CA certificates/rootCA.crt \
-	  -CAkey certificates/rootCA.key \
-	  -CAcreateserial \
-	  -out certificates/client_pgadmin.crt \
-	  -days 365 -sha256
+ps:
+	@$(COMPOSE) ps
 
+clean: down
+	@podman system prune -f
 
-db_wipe: check
-	podman-compose -f compose.yml up -d
-	podman exec -u root transcendance_postgres_1 chmod -R a+rwX /var/lib/postgresql/
-	rm -rf ./docker/.DB_data
-	podman-compose -f compose.yml down
+fclean:
+	@$(COMPOSE) down -v --rmi all
+	@podman system prune -af
 
-check:
-	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
+fclean_data: fclean
+	@podman run --rm -v $(DATA_DIR):/data:Z docker.io/library/alpine:3.20 sh -c "rm -rf /data/*"
+	@echo "Removed persisted data at $(DATA_DIR)"
+
+re: fclean up
+
+.PHONY: all setup pull build up down stop restart logs ps clean fclean fclean_data re
