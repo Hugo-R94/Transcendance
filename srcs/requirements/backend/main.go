@@ -4,7 +4,6 @@ import (
 	"context"
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"syscall"
@@ -20,7 +19,7 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	//envCheck()
+	envCheck()
 
 	db, sqldb := dbSetup()
 	gambling.InitRoomManager(db)

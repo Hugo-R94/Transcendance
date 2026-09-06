@@ -42,7 +42,7 @@ func (h *SupportHandler) mailSupport(c *gin.Context) {
 
 	from := os.Getenv("SUPPORT_MAIL")
 	password := os.Getenv("SUPPORT_MAIL_PASWD")
-	to := ("SUPPORT_MAIL")
+	to := os.Getenv("SUPPORT_MAIL")
 
 	message := mail.NewMsg()
 
