@@ -74,7 +74,11 @@
     "save": "Guardar",
     "saving": "Guardando...",
     "descriptionPlaceholder": "Sin descripción todavía...",
-    "changePicture": "Cambiar"
+    "changePicture": "Cambiar",
+	"sendDataMsg": "¿Desea recibir su información personal por correo electrónico, de conformidad con los requisitos del RGPD?",
+	"sendDataError": "Se ha producido un error al enviar los datos.",
+	"deleteProfileMsg": "¿Está seguro de que desea eliminar su perfil? Esta acción es irreversible.",
+	"deleteProfileError": "Se ha producido un error al eliminar el perfil."
   },
   "common": {
     "loading": "Cargando..."
@@ -553,5 +557,23 @@
     "missingSearchQuery": "Falta la consulta de búsqueda.",
     "somethingWentWrong": "Algo salió mal.",
     "userIdMissingFromContext": "Falta el ID de usuario en el contexto."
+  },
+"editProfile": {
+      "UsernameAndEmailRequiered": "El nombre de usuario y la dirección de correo electrónico son obligatorios.",
+      "UsernameLengthLimitErr": "El nombre de usuario no puede superar los 100 caracteres.",
+      "EmailLengthLimitErr": "El correo electrónico no puede superar los 100 caracteres.",
+      "NeedTwoPassword": "Para cambiar tu contraseña, debes introducir la contraseña antigua y la nueva.",
+      "PasswordMinLength": "La nueva contraseña debe tener al menos 8 caracteres.",
+      "informationsUpdated": "Información actualizada.",
+      "ModifyMyInformations": "Modificar mi información",
+      "username": "Nombre de usuario",
+      "email": "Correo electrónico",
+      "oldpass": "Contraseña antigua",
+      "newpass": "Nueva contraseña",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "saved": "Guardado",
+      "PlaceholderOldpass": "Obligatorio para cambiar la contraseña",
+      "PlaceholderNewpass": "Dejar en blanco para conservar la contraseña"
+    }
   }
-}

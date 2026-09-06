@@ -20,13 +20,17 @@ export function UserProfileHeader({ profile, imageSrc }: UserProfileHeaderProps)
   return (
     <>
       {/* -------------------- VERSION DESKTOP -------------------- */}
-      <div className="hidden sm:flex mt-3 w-full gap-3 lg:aspect-[12/1] sm:aspect-[8/1] p-2 flex-shrink-0">
-        <div className="bg-gray-400 h-full aspect-square rounded-full ms-5 shadow-md shadow-black overflow-hidden outline-3 outline-white">
+ 	<div className="hidden sm:flex mt-3 w-full gap-3 h-32 lg:h-36 p-2 flex-shrink-0 min-h-0 min-w-0">        <div className="bg-gray-400 h-full aspect-square rounded-full ms-5 shadow-md shadow-black overflow-hidden outline-3 outline-white">
           <img className="w-full h-full object-cover" src={imageSrc} alt={t("userProfileHeader.pictureAlt", { username: profile.username })} />
         </div>
 
         <div className="flex flex-col justify-center flex-shrink-0 p-1 text-start">
-          <p className="font-bold text-md text-gray-300 whitespace-nowrap">{profile.username}</p>
+          <div className="h-full w-fit flex items-center gap-x-2">
+              <p className="font-bold text-md text-gray-300 whitespace-nowrap">
+                {profile.username}
+              </p>
+              <p className="font-bold text-xs text-gray-300/75 whitespace-nowrap">LVL.{profile.level}</p>
+          </div>
           <p className="font-semibold text-sm text-gray-300/75">
             {label1} {label2}
           </p>

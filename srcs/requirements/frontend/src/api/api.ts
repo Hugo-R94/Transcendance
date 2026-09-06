@@ -27,8 +27,6 @@ api.interceptors.response.use(
       error.response.data.error = translateBackendError(error.response.data.error);
     }
     if (error.response && error.response.status === 401) {
-      console.warn("Token invalide ou expiré détecté par le serveur.");
-
 
       localStorage.removeItem("token");
       localStorage.removeItem("token_expiration");

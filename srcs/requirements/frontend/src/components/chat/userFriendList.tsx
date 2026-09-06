@@ -147,7 +147,6 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
       setTotalPages(Math.ceil(list.length / ITEMS_PER_PAGE) || 1);
       setPage(1);
     } catch (err) {
-      console.error("Erreur lors de la récupération de la liste :", err);
       setFriends([]);
       setTotalPages(1);
       setError(
@@ -177,10 +176,6 @@ function UserFriendsList({ userId, className = "" }: UserFriendsListProps) {
 
       await fetchList();
     } catch (err: any) {
-      console.error(
-        "Erreur lors du déblocage :",
-        err.response?.data || err.message
-      );
     }
   };
 

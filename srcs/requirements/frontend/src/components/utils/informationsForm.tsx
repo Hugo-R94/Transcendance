@@ -1,6 +1,7 @@
 import { useState } from "react";
 import api from "../../api/api";
 import Notification from "../utils/notification";
+import { useTranslation } from "react-i18next";
 
 interface InformationFormProps {
   username: string;
@@ -18,9 +19,8 @@ function InformationForm({
   const [password, setPassword] = useState("");
   const [oldPassword, setOldPassword] = useState("");
   const [isSaving, setIsSaving] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState<string | null>(
-    null
-  );
+  const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
+	const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,23 +32,17 @@ function InformationForm({
      * Vérifications générales
      */
     if (!trimmedUsername || !trimmedMail) {
-      setNotificationMessage(
-        "Le nom d'utilisateur et l'adresse e-mail sont obligatoires."
-      );
+      setNotificationMessage(t("editProfile.UsernameAndEmailRequiered"));
       return;
     }
 
     if (trimmedUsername.length > 100) {
-      setNotificationMessage(
-        "Le nom d'utilisateur ne peut pas dépasser 100 caractères."
-      );
+      setNotificationMessage(t("editProfile.UsernameLengthLimitErr"));
       return;
     }
 
     if (trimmedMail.length > 100) {
-      setNotificationMessage(
-        "L'adresse e-mail ne peut pas dépasser 100 caractères."
-      );
+      setNotificationMessage(t("editProfile.EmailLengthLimitErr"));
       return;
     }
 
@@ -60,9 +54,7 @@ function InformationForm({
     const hasNewPassword = password.trim().length > 0;
 
     if (hasOldPassword !== hasNewPassword) {
-      setNotificationMessage(
-        "Pour modifier votre mot de passe, vous devez renseigner l'ancien et le nouveau mot de passe."
-      );
+      setNotificationMessage(t("editProfile.NeedTwoPassword"));
       return;
     }
 
@@ -71,9 +63,7 @@ function InformationForm({
      * vérifier sa longueur minimale.
      */
     if (hasNewPassword && password.length < 8) {
-      setNotificationMessage(
-        "Le nouveau mot de passe doit contenir au moins 8 caractères."
-      );
+      setNotificationMessage(t("editProfile.PasswordMinLength"));
       return;
     }
 
@@ -87,7 +77,7 @@ function InformationForm({
         password: hasNewPassword ? password : null,
       });
 
-      setNotificationMessage("Informations mises à jour.");
+      setNotificationMessage(t("editProfile.informationsUpdated"));
 
       setTimeout(() => {
         onClose();
@@ -114,7 +104,7 @@ function InformationForm({
       <div className="w-full max-w-md bg-black/80 rounded-2xl shadow-xl shadow-black p-6 border border-white/10">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white">
-            Modifier mes informations
+           {t("editProfile.ModifyMyInformations")}
           </h2>
 
           <button
@@ -129,7 +119,7 @@ function InformationForm({
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-bold text-white mb-1">
-              Nom d'utilisateur
+             {t("editProfile.username")}
             </label>
 
             <input
@@ -144,7 +134,7 @@ function InformationForm({
 
           <div>
             <label className="block text-sm font-bold text-white mb-1">
-              Adresse e-mail
+                {t("editProfile.email")}
             </label>
 
             <input
@@ -159,28 +149,28 @@ function InformationForm({
 
           <div>
             <label className="block text-sm font-bold text-white mb-1">
-              Ancien mot de passe
+                {t("editProfile.oldpass")}
             </label>
 
             <input
               type="password"
               value={oldPassword}
               onChange={(e) => setOldPassword(e.target.value)}
-              placeholder="Obligatoire pour changer le mot de passe"
+              placeholder= {t("editProfile.placeholderOldpass")}
               className="w-full bg-white/10 text-white rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-bblue"
             />
           </div>
 
           <div>
             <label className="block text-sm font-bold text-white mb-1">
-              Nouveau mot de passe
+              {t("editProfile.newpass")}
             </label>
 
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Laisser vide pour conserver le mot de passe"
+              placeholder= {t("editProfile.placeholderNewpass")}
               className="w-full bg-white/10 text-white rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-bblue"
             />
           </div>
@@ -191,15 +181,15 @@ function InformationForm({
               onClick={onClose}
               className="flex-1 bg-white/10 hover:bg-white/20 text-white font-bold py-2 rounded-xl transition-colors"
             >
-              Annuler
+              {t("editProfile.cancel")}
             </button>
 
-            <button
+            <button	
               type="submit"
               disabled={isSaving}
               className="flex-1 bg-bblue hover:bg-bblue/80 text-white font-bold py-2 rounded-xl transition-colors disabled:opacity-50"
             >
-              {isSaving ? "Enregistrement..." : "Enregistrer"}
+              {isSaving ? t("editProfile.saving") : t("editProfile.saved")}
             </button>
           </div>
         </form>

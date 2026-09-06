@@ -34,7 +34,7 @@ export function ProfileHeader({
 
   const handleDeleteProfile = async () => {
     const confirmed = window.confirm(
-      "Êtes-vous sûr de vouloir supprimer votre profil ? Cette action est irréversible."
+		t("profileHeader.deleteProfileError")
     );
 
     if (!confirmed) {
@@ -46,17 +46,15 @@ export function ProfileHeader({
 
       window.location.href = "/";
     } catch (error) {
-      console.error("Erreur lors de la suppression du profil :", error);
-
       window.alert(
-        "Une erreur est survenue lors de la suppression du profil."
+		t("profileHeader.deleteProfileMsg")
       );
     }
   };
 
     const handleClaimData = async () => {
     const confirmed = window.confirm(
-      "Souhaitez-vous recevoir vos informations personnelles par e-mail, conformément aux exigences du RGPD ?"
+		t("profileHeader.sendDataMsg")
     );
 
     if (!confirmed) {
@@ -68,7 +66,7 @@ export function ProfileHeader({
 
     } catch (error) {
       window.alert(
-        "Une erreur est survenue lors de la suppression du profil."
+       		t("profileHeader.sendDataError")
       );
     }
   };
@@ -93,7 +91,7 @@ export function ProfileHeader({
 		/>
 		)}
 
-      <div className="hidden sm:flex mt-3 w-full gap-3 h-32 lg:h-36 p-2 flex-shrink-0 min-w-0">
+      <div className="hidden sm:flex mt-3 w-full gap-3 h-32 lg:h-36 p-2 flex-shrink-0 min-w-0 min-h-0">
 		
         <div className="relative bg-gray-400 h-full aspect-square rounded-full ms-5 shadow-md shadow-black overflow-hidden outline-3 outline-white group cursor-pointer bg-byellow flex-shrink-0">
           <img
@@ -140,7 +138,7 @@ export function ProfileHeader({
               onClick={handleDeleteProfile}
               className="bg-black/50 h-2/3 aspect-square rounded-2xl balatro hover:outline-2 active:scale-90 p-1 overflow-visible"
             >
-              <Tooltip>trash</Tooltip>
+              {/* <Tooltip>trash</Tooltip> */}
 
               <svg
                 width="100%"
@@ -164,7 +162,7 @@ export function ProfileHeader({
               className="bg-black/50 h-2/3 aspect-square rounded-2xl balatro hover:outline-2 active:scale-90 p-1"
               onClick={handleClaimData}
 			>
-              <Tooltip>download</Tooltip>
+              {/* <Tooltip>download</Tooltip> */}
 
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -185,7 +183,7 @@ export function ProfileHeader({
               className="bg-black/50 h-2/3 aspect-square rounded-2xl balatro hover:outline-2 active:scale-90 p-1"
               onClick={handleChangeInformation}
 			>
-              <Tooltip> edit informations</Tooltip>
+              {/* <Tooltip> edit informations</Tooltip> */}
 			 	<svg strokeWidth="1.5"
                 stroke="#FFFFFF" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 					<path d="M2 12C2 16.714 2 19.0711 3.46447 20.5355C4.92893 22 7.28595 22 12 22C16.714 22 19.0711 22 20.5355 20.5355C22 19.0711 22 16.714 22 12V10.5M13.5 2H12C7.28595 2 4.92893 2 3.46447 3.46447C2.49073 4.43821 2.16444 5.80655 2.0551 8" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" />

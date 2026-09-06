@@ -168,7 +168,6 @@ export function ResultsTable({
             );
 
             const playerNumber = player?.playerNumber ?? 0;
-				console.log("player numbeer = %d\n",playerNumber);
 
             const color =
               chipColors[

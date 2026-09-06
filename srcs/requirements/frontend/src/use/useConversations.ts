@@ -19,10 +19,6 @@ export function useConversations() {
                 localStorage.setItem("userID", id);
             }
         } catch (err: any) {
-            console.error(
-                "[CHAT] Erreur profil :",
-                err.response?.data || err.message
-            );
         }
     };
 
@@ -37,10 +33,6 @@ export function useConversations() {
 
             setConvs(res.data.conversations as Conversation[]);
         } catch (err: any) {
-            console.error(
-                "[CHAT] Erreur conversations :",
-                err.response?.data || err.message
-            );
         }
     };
 

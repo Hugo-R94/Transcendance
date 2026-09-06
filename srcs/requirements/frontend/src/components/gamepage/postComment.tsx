@@ -32,7 +32,6 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
                     setPpURL(url);
                 }
             } catch (err) {
-                console.error("Erreur fetch avatar:", err);
             }
         };
 
@@ -65,8 +64,6 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
     window.location.reload();
 
     } catch (error) {
-      console.error("Erreur lors de la suppression du commentaire :", error);
-
       window.alert(
         "Une erreur est survenue lors de la suppression du commentaire."
       );
@@ -119,7 +116,6 @@ function PostComment({ gameId, onCommentPosted }: PostCommentProps) {
                 onCommentPosted();
             }
         } catch (error: any) {
-            console.error("Error posting comment:", error);
 
             setNotificationMessage(
                 error?.response?.data?.error ||

@@ -16,7 +16,8 @@ type UserProfileResponse struct {
 	Description string `json:"description"`
 	Title1      string `json:"title_1"`
 	Title2      string `json:"title_2"`
-	ProfilePic string `json:"profile_pic"`
+	ProfilePic	string `json:"profile_pic"`
+	Level		int		`json:"level"`
 	Email		string `json:"email"`
 }
 
@@ -42,12 +43,12 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID, isMe bool) (*UserProfileR
 
 	if isMe {
 		err = db.Model(&models.User{}).
-			Select("username", "description", "title1", "title2", "ProfilePic", "Email").
+			Select("username", "description", "title1", "title2", "ProfilePic", "Level", "Email").
 			Where("id = ? AND deleted_at IS NULL", userID).
 			First(&user).Error
 	} else {
 		err = db.Model(&models.User{}).
-			Select("username", "description", "title1", "title2", "ProfilePic").
+			Select("username", "description", "title1", "title2", "ProfilePic", "Level").
 			Where("id = ? AND deleted_at IS NULL", userID).
 			First(&user).Error
 	}
@@ -74,6 +75,7 @@ func GetUserProfileByID(db *gorm.DB, userID uuid.UUID, isMe bool) (*UserProfileR
 		Title1:      t1,
 		Title2:      t2,
 		ProfilePic: user.ProfilePic,
+		Level:		user.Level,
 		Email:		user.Email,
 	}, nil
 }
@@ -194,5 +196,5 @@ func GetUserInfo(publicGroup *gin.RouterGroup, protectedGroup *gin.RouterGroup, 
 	protectedGroup.GET("/quest", GetMyQuest(db))
 	protectedGroup.POST("/data", sendDataToUser(db))
 	protectedGroup.GET("/questLeaderboard", GetLevelLeaderboard(db))
-	// protectedGroup.GET("/claimReward", ClaimQuestReward(db))
+	protectedGroup.GET("/claimReward", ClaimQuestReward(db))
 }

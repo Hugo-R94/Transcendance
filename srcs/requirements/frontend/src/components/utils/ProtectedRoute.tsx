@@ -10,11 +10,6 @@ export const ProtectedRoute = ({ redirectTo = "/login" }: ProtectedRouteProps) =
   const expirationStr = localStorage.getItem("token_expiration");
   const refreshToken = localStorage.getItem("refresh_token");
 
-  console.log("--- DEBUG PROTECTED ROUTE ---");
-  console.log("Token présent :", !!token);
-  console.log("Refresh Token présent :", !!refreshToken);
-  console.log("Temps avant expiration (secondes) :", expirationStr ? Math.floor((Number(expirationStr) - Date.now()) / 1000) : "N/A");
-
   if (!token || !expirationStr) {
     return <Navigate to={redirectTo} replace />;
   }
@@ -28,7 +23,6 @@ export const ProtectedRoute = ({ redirectTo = "/login" }: ProtectedRouteProps) =
   }
 
   useEffect(() => {
-    console.log("Tentative de déclenchement du refresh...");
     refreshTokenInBackground();
   }, []);	
   return <Outlet />; 
@@ -38,7 +32,6 @@ async function refreshTokenInBackground() {
   try {
     const refreshToken = localStorage.getItem("refresh_token");
     if (!refreshToken) {
-      console.warn("Aucun refresh_token trouvé dans le localStorage !");
       return;
     }
 
@@ -70,9 +63,7 @@ async function refreshTokenInBackground() {
       if (data.expiration) {
         localStorage.setItem("token_expiration", data.expiration);
       }
-      console.log("Token rafraîchi avec succès !");
     }
   } catch (error) {
-    console.error("Échec du rafraîchissement automatique du token :", error);
   }
 }

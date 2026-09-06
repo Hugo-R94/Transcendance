@@ -98,74 +98,91 @@ func updateQuest(db *gorm.DB, user *models.User) error {
     return db.Save(user).Error
 }
 
-// func ClaimQuestReward(db *gorm.DB) (bool, error) {
-// 	idRaw, _ := c.Get("id")
-// 	ID := idRaw.(uuid.UUID)
-	
-// 	var user user.User
-// 	if err := db.Where("id = ?", ID).First(&user).Error; err != nil{
-// 		if err == gorm.ErrRecordNotFound{
-// 			return false, errors.New("User not found")
-// 		}else{
-// 			return false, err
-// 		}
-// 	}
-	
-// 	log.Printf(
-// 		"[QUEST REWARD] user=%s isFinished=%v isCollected=%v level=%d",
-// 		user.ID,
-// 		user.IsFinished,
-// 		user.IsCollected,
-// 		user.Level,
-// 	)
+func ClaimQuestReward(db *gorm.DB) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		idRaw, exists := c.Get("id")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Non autorisé"})
+			return
+		}
 
-// 	if !user.IsFinished {
-// 		return false, fmt.Errorf("la quête n'est pas encore terminée")
-// 	}
+		ID, ok := idRaw.(uuid.UUID)
+		if !ok {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Format d'ID utilisateur invalide"})
+			return
+		}
 
-// 	if user.IsCollected {
-// 		return false, fmt.Errorf("la récompense a déjà été récupérée")
-// 	}
+		var user models.User
+		if err := db.Where("id = ?", ID).First(&user).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur introuvable"})
+			} else {
+				log.Printf("Erreur récupération utilisateur: %v", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur serveur"})
+			}
+			return
+		}
 
-// 	var completed bool
+		log.Printf(
+			"[QUEST REWARD] user=%s isFinished=%v isCollected=%v level=%d",
+			user.ID,
+			user.Quest.IsFinished,
+			user.Quest.IsCollected,
+			user.Level,
+		)
 
-// 	err := db.Transaction(func(tx *gorm.DB) error {
-// 		var lockedUser models.User
+		if !user.Quest.IsFinished {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "la quête n'est pas encore terminée"})
+			return
+		}
 
-// 		if err := tx.Set("gorm:query_option", "FOR UPDATE").
-// 			First(&lockedUser, user.ID).Error; err != nil {
-// 			return fmt.Errorf("échec du verrouillage utilisateur : %w", err)
-// 		}
+		if user.Quest.IsCollected {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "la récompense a déjà été récupérée"})
+			return
+		}
 
-// 		if !lockedUser.IsFinished {
-// 			return fmt.Errorf("la quête n'est pas terminée")
-// 		}
+		var newLevel int
 
-// 		if lockedUser.IsCollected {
-// 			return fmt.Errorf("la récompense a déjà été récupérée")
-// 		}
+		err := db.Transaction(func(tx *gorm.DB) error {
+			var lockedUser models.User
 
-// 		lockedUser.Level++
-// 		lockedUser.IsCollected = true
-// 		completed = true
+			if err := tx.Set("gorm:query_option", "FOR UPDATE").
+				Where("id = ?", user.ID).
+				First(&lockedUser).Error; err != nil {
+				return fmt.Errorf("échec du verrouillage utilisateur : %w", err)
+			}
 
-// 		log.Printf("[QUEST REWARD] user %s a réclamé sa récompense (nouveau level: %d)", lockedUser.ID, lockedUser.Level)
+			if !lockedUser.Quest.IsFinished {
+				return fmt.Errorf("la quête n'est pas terminée")
+			}
+			if lockedUser.Quest.IsCollected {
+				return fmt.Errorf("la récompense a déjà été récupérée")
+			}
 
-// 		if err := tx.Save(&lockedUser).Error; err != nil {
-// 			return fmt.Errorf("échec de la sauvegarde de la récompense : %w", err)
-// 		}
+			lockedUser.Level++
+			lockedUser.Quest.IsCollected = true
+			newLevel = lockedUser.Level
 
-// 		*user = lockedUser
+			log.Printf("[QUEST REWARD] user %s a réclamé sa récompense (nouveau level: %d)", lockedUser.ID, lockedUser.Level)
 
-// 		return nil
-// 	})
+			if err := tx.Save(&lockedUser).Error; err != nil {
+				return fmt.Errorf("échec de la sauvegarde de la récompense : %w", err)
+			}
 
-// 	if err != nil {
-// 		return false, err
-// 	}
+			return nil
+		})
 
-// 	return completed, nil
-// }
+		if err != nil {
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"success":  true,
+			"newLevel": newLevel,
+		})
+	}
+}
 
 func ExecQuest(db *gorm.DB, user *models.User, tryquest string, hub *chat.Hub) (bool, error) {
 	log.Printf(

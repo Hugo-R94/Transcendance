@@ -109,10 +109,6 @@ export default function GambleHistory({
             const totalGame = data[0]?.total ?? 0;
             setTotalPages(Math.ceil(totalGame / 15));
         } catch (err: any) {
-            console.error(
-                "Détail complet de l'erreur API :",
-                err.response || err
-            );
 
             setError(
                 err.response?.data?.error ||

@@ -54,7 +54,6 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
           setAvatarUrl(objectUrl);
         }
       } catch (err) {
-        console.error("Erreur chargement avatar :", err);
       }
     };
 
@@ -79,7 +78,6 @@ function ReviewCard({ review, index }: { review: CommentItem; index: number }) {
           });
         }
       } catch (err) {
-        console.error("Erreur chargement infos du jeu :", err);
       }
     };
 
@@ -264,7 +262,6 @@ function UserReviews({ userId, className = "" }: UserReviewsProps) {
       setReviews(response.data.comments || []);
       setTotalPages(response.data.total_pages || 1);
     } catch (err) {
-      console.error("Erreur lors de la récupération des avis :", err);
       setError(t("userReviews.loadError"));
       setReviews([]);
     } finally {

@@ -66,12 +66,10 @@ export function Roulette({
     if (state !== "spinning") return;
 
     if (winningNumber === null) {
-      console.warn("[ROULETTE] winningNumber manquant");
       return;
     }
 
     if (rotationDegree === null) {
-      console.warn("[ROULETTE] rotationDegree manquant");
       return;
     }
 
@@ -117,22 +115,6 @@ export function Roulette({
     const ballTurns = 8;
 
     ballDelta -= ballTurns * 360;
-
-    console.log("[ROULETTE] RESULTAT", {
-      turn,
-      winningNumber,
-      rotationDegree,
-      currentWheelAngle,
-      winningCellAngle,
-      wheelDelta,
-      currentBallAngle,
-      cellStartAngle,
-      cellCenterAngle,
-      preferredBallAngle,
-      randomOffset,
-      targetBallAngle,
-      ballDelta,
-    });
 
     if (ballScaleIntervalRef.current) {
       clearInterval(ballScaleIntervalRef.current);

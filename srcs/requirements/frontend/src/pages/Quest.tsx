@@ -5,6 +5,7 @@ import { useUserAvatar } from "../api/getUserAvatar";
 import { Link } from "react-router-dom";
 import { LeaderboardSection } from "../components/utils/leaderBoardSection";
 import type { LeaderboardCardProps } from "../components/utils/leaderBoardSection";
+import Notification from "../components/utils/notification";
 
 const topColors = [
     "bg-[#FFD700]",
@@ -90,6 +91,7 @@ export default function Quest(){
     const [questCount, setQuestCount] = useState<number>(-1);
     const [questRequirement, setQuestRequirement] = useState<number>(-1);
     const [leaderboard, setLeaderboard] = useState<leaderboardUser[]>([]);
+	const [notificationMessage, setNotificationMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const loadQuest = async () => {
@@ -113,14 +115,29 @@ export default function Quest(){
     }, []);
 	
 	const claimReward = async () => {
-			await api.get("/claimReward");	
-		};
+		try {
+			const resp = await api.get("/claimReward");
+			if (resp.data.success) {
+				setIsCollected(true);
+				setNotificationMessage("You just level up ! Congratulation !");
+				
+				
+			}
+		} catch (err) {
+		}
+	};
 		
     const questTitle = t(`questTitle.${questType}`);	
     const completion = questCount / questRequirement;
     const rest = 1 - (questCount / questRequirement);
     return(
     <div className="sm:relative min-h-screen items-center justify-center">
+		  {notificationMessage && (
+        <Notification
+          message={notificationMessage}
+          onClose={() => setNotificationMessage(null)}
+        />
+      )}
         <div className="w-[90vw] h-[85vh] sm:mt-30 mt-35 mx-auto flex sm:flex-row flex-col gap-x-2 sm:gap-y-0 gap-y-10">
 
             <div className="sm:w-1/2 sm:h-full w-full h-1/3 flex flex-col gap-y-2">

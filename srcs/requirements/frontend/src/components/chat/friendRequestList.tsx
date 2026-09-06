@@ -57,7 +57,6 @@ export default function FriendRequestList({
     <div className="overflow-y-auto overflow-x-visible h-full">
       <div className="flex flex-col gap-3 p-3 overflow-x-visible">
         {requests.map((req, index) => {
-          console.log("[FRIEND REQUEST]", req);
 
           const keyId = req.id;
 
@@ -65,7 +64,6 @@ export default function FriendRequestList({
 
           const username = req.username || t("chat.defaultUsername");
           const bgColor = colors[index % colors.length];
-          console.log("[REQUEST]", requests);
           return (
             <div
               key={keyId}

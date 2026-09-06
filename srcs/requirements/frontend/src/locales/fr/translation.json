@@ -80,7 +80,11 @@
     "save": "Enregistrer",
     "saving": "Enregistrement...",
     "descriptionPlaceholder": "Aucune description pour le moment...",
-    "changePicture": "Changer"
+    "changePicture": "Changer",
+	"sendDataMsg": "Souhaitez-vous recevoir vos informations personnelles par e-mail, conformément aux exigences du RGPD ?",
+	"sendDataError": "Une erreur est survenue lors de l'envoie des données.",
+	"deleteProfileMsg": "Êtes-vous sûr de vouloir supprimer votre profil ? Cette action est irréversible.",
+	"deleteProfileError": "Une erreur est survenue lors de la suppression du profil."
   },
   "common": {
     "loading": "Chargement..."
@@ -553,5 +557,23 @@
     "missingSearchQuery": "Requête de recherche manquante.",
     "somethingWentWrong": "Une erreur est survenue.",
     "userIdMissingFromContext": "ID utilisateur manquant dans le contexte."
+  },
+  "editProfile": {
+	"UsernameAndEmailRequiered": "Le nom d'utilisateur et l'adresse e-mail sont obligatoires.",
+	"UsernameLengthLimitErr": "Le nom d'utilisateur ne peut pas dépasser 100 caractères.",
+	"EmailLengthLimitErr": "L'adresse email ne peut pas dépasser 100 caractères.",
+	"NeedTwoPassword": "Pour modifier votre mot de passe, vous devez renseigner l'ancien et le nouveau mot de passe.",
+	"PasswordMinLength":   "Le nouveau mot de passe doit contenir au moins 8 caractères.",
+	"informationsUpdated": "Informations mises a jour.",
+	"ModifyMyInformations": "Modifier mes informations",
+	"username": "Nom d'utilisateur",
+	"email": "adresse email",
+	"oldpass": "ancien mot de passe",
+	"newpass": "nouveau mot de passe",
+	"cancel": "annuler",
+	"saving":"Enregistrement...",
+	"saved": "enregistré",
+	"PlaceholderOldpass": "Obligatoire pour changer le mot de passe",
+	"PlaceholderNewpass": "Laisser vide pour conserver le mot de passe"
   }
 }

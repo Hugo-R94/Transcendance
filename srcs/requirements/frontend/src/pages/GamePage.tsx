@@ -35,7 +35,6 @@ function GamePage() {
     if (appid) {
       getGameRatingStats(appid)
         .then(setStats)
-        .catch(console.error);
     }
   };
 

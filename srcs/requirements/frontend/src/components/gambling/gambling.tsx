@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useGambling } from "../../use/useGambling";
 import { useChat } from "../../use/useChat";
 import { Roulette } from "./roulette";
@@ -7,17 +6,11 @@ import { BettingPanel } from "./bettingPanel";
 import { ResultsTable } from "./resultTable";
 import { ScratchTicket } from "./scratchTicket";
 import Lobby from "./Lobby";
-import JsonDebugger from "./debug";
-import type {JsonLog} from "../../api/gambling";
 import Notification from "../utils/notification";
 
 export default function Gambling() {
   const game = useGambling();
   const chat = useChat();
-
-  const [showLogs, setShowLogs] = useState(true);
-
-  const jsonLogs: JsonLog[] = game.jsonLogs ?? [];
 
   return (
     <>
@@ -43,12 +36,12 @@ export default function Gambling() {
             joinRoomByID={game.joinRoomByID}
           />
 
-          <JsonDebugger
+          {/* <JsonDebugger
             logs={jsonLogs}
             show={showLogs}
             setShow={setShowLogs}
             clear={game.clearLogs}
-          />
+          /> */}
         </>
       ) : (
         <main className="relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-4xl">

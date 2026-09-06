@@ -26,7 +26,6 @@ export function useUserAvatar(userId?: string) {
           setAvatarUrl(objectUrl);
         }
       } catch (err) {
-        console.error("Erreur chargement avatar :", err);
       }
     };
 
@@ -61,7 +60,6 @@ export async function fetchUserProfilePicture(userId?: string): Promise<string |
       return URL.createObjectURL(blob);
     }
   } catch (err) {
-    console.error("Erreur lors de la récupération de la photo de profil :", err);
   }
 
   return null;

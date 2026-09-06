@@ -80,7 +80,11 @@
 		"save": "حفظ",
 		"saving": "جارٍ الحفظ...",
 		"descriptionPlaceholder": "لا يوجد وصف بعد...",
-		"changePicture": "تغيير"
+		"changePicture": "تغيير",
+		"sendDataMsg": "هل ترغب في استلام معلوماتك الشخصية عبر البريد الإلكتروني، وفقًا لمتطلبات اللائحة العامة لحماية البيانات (GDPR)؟",
+		"sendDataError": "حدث خطأ أثناء إرسال البيانات.",
+		"deleteProfileMsg": "هل أنت تأكد من أنك تريد حذف ملفك الشخصي؟ هذا الإجراء لا يمكن التراجع عنه.",
+		"deleteProfileError": "حدث خطأ أثناء حذف الملف الشخصي."
 	},
 	"common": {
 		"loading": "جارٍ التحميل..."
@@ -553,5 +557,23 @@
 		"missingSearchQuery": "استعلام البحث مفقود.",
 		"somethingWentWrong": "حدث خطأ ما.",
 		"userIdMissingFromContext": "معرّف المستخدم مفقود من السياق."
-	}
-}
+	},
+"editProfile": {
+      "UsernameAndEmailRequiered": "اسم المستخدم والبريد الإلكتروني مطلوبان.",
+      "UsernameLengthLimitErr": "لا يمكن أن يتجاوز اسم المستخدم 100 حرف.",
+      "EmailLengthLimitErr": "لا يمكن أن يتجاوز البريد الإلكتروني 100 حرف.",
+      "NeedTwoPassword": "لتغيير كلمة المرور، يجب إدخال كلمة المرور القديمة والجديدة.",
+      "PasswordMinLength": "يجب أن تحتوي كلمة المرور الجديدة على 8 أحرف على الأقل.",
+      "informationsUpdated": "تم تحديث المعلومات.",
+      "ModifyMyInformations": "تعديل معلوماتي",
+      "username": "اسم المستخدم",
+      "email": "البريد الإلكتروني",
+      "oldpass": "كلمة المرور القديمة",
+      "newpass": "كلمة المرور الجديدة",
+      "cancel": "إلغاء",
+      "saving": "جاري الحفظ...",
+      "saved": "تم الحفظ",
+      "PlaceholderOldpass": "مطلوب لتغيير كلمة المرور",
+      "PlaceholderNewpass": "اتركه فارغًا للاحتفاظ بكلمة المرور"
+    }
+  }

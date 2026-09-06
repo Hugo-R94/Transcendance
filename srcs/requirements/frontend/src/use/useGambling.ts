@@ -127,8 +127,6 @@ export function useGambling() {
             timestamp: new Date().toLocaleTimeString(),
         };
 
-        console.log(`[WS ${direction}]`, data);
-
         setJsonLogs((current) => [
             log,
             ...current,
@@ -210,7 +208,6 @@ export function useGambling() {
 
             case "quest_completed": {
 				if(data.user_id === localStorage.getItem("userID")){
-					console.log("quest completed\n");
 					showNotification(t("chatNotifications.questCompleted"));
 				}
 				break;
@@ -636,11 +633,6 @@ export function useGambling() {
             }
 
             default: {
-                console.warn(
-                    "Message serveur inconnu :",
-                    data
-                );
-
                 break;
             }
         }
@@ -656,21 +648,11 @@ export function useGambling() {
                     res.data?.token;
 
                 if (!token) {
-                    console.error(
-                        "[GAMBLING] Aucun token WebSocket reçu."
-                    );
-
                     return null;
                 }
 
                 return String(token);
             } catch (err: any) {
-                console.error(
-                    "[GAMBLING] Erreur récupération token WebSocket :",
-                    err.response?.data ||
-                        err.message
-                );
-
                 return null;
             }
         };
@@ -707,11 +689,6 @@ export function useGambling() {
 
             return url.toString();
         } catch (err) {
-            console.error(
-                "[GAMBLING] Erreur URL WebSocket :",
-                err
-            );
-
             return null;
         }
     };
@@ -810,12 +787,6 @@ export function useGambling() {
                     data
                 );
             } catch (parseError) {
-                console.error(
-                    "JSON invalide :",
-                    event.data,
-                    parseError
-                );
-
                 addJsonLog(
                     "system",
                     {
@@ -833,11 +804,6 @@ export function useGambling() {
         socket.onerror = (
             event
         ) => {
-            console.error(
-                "WebSocket error :",
-                event
-            );
-
             addJsonLog(
                 "system",
                 {

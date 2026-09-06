@@ -62,10 +62,6 @@ function Login() {
 				"false"
 			);
 
-			console.log(
-				"USER ID STOCKÉ =",
-				localStorage.getItem("userID")
-			);
 			
 			//pp
 			try {
@@ -87,20 +83,12 @@ function Login() {
 							reader.result
 						);
 
-						console.log(
-							"PHOTO STOCKÉE DANS userPP"
-						);
 					}
 				};
 
 				reader.readAsDataURL(ppRes.data);
 
 			} catch (ppErr) {
-				console.error(
-					"Erreur lors de la récupération de la photo de profil :",
-					ppErr
-				);
-
 				localStorage.removeItem("userPP");
 			}
 

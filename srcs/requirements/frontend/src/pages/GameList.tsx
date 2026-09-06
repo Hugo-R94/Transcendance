@@ -96,7 +96,6 @@ function Games() {
         setTotalPages(res.data.total_pages || 1);
       })
       .catch((err) => {
-        console.error(err);
         setError(t("gamesPage.error"));
       })
       .finally(() => {

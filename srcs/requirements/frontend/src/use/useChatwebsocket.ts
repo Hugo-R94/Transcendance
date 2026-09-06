@@ -31,17 +31,11 @@ export function useChatWebSocket({
             const token = res.data?.token;
 
             if (!token) {
-                console.error("[CHAT] Aucun token WebSocket reçu.");
                 return null;
             }
 
             return String(token);
         } catch (err: any) {
-            console.error(
-                "[CHAT] Erreur récupération token WebSocket :",
-                err.response?.data || err.message
-            );
-
             return null;
         }
     };
@@ -81,7 +75,6 @@ export function useChatWebSocket({
 
             return url.toString();
         } catch (err) {
-            console.error("[CHAT] Erreur URL WebSocket :", err);
             return null;
         }
     };
@@ -94,7 +87,6 @@ export function useChatWebSocket({
         const ws = wsRef.current;
 
         if (!ws || ws.readyState !== WebSocket.OPEN) {
-            console.error("[CHAT] WebSocket non connecté.");
             return false;
         }
 
@@ -110,8 +102,6 @@ export function useChatWebSocket({
     };
 
     const sendIsTyping = (conversationId: string): boolean => {
-        console.log("[CHAT] Sending is_typing", conversationId);
-
         return sendWebSocketMessage(
             conversationId,
             "is_typing",
@@ -162,7 +152,6 @@ export function useChatWebSocket({
 
             ws.onopen = () => {
                 if (!cancelled) {
-                    console.log("[CHAT] WebSocket connecté");
                     setWsConnected(true);
                 }
             };
@@ -290,12 +279,10 @@ export function useChatWebSocket({
                         });
                     }
                 } catch (err) {
-                    console.error("[CHAT] JSON invalide :", err);
                 }
             };
 
             ws.onerror = (err) => {
-                console.error("[CHAT] WebSocket error :", err);
                 setWsConnected(false);
             };
 

@@ -5,7 +5,6 @@ import SearchBar from "./searchBar";
 import ButtonLink from "./buttonLink";
 import DropdownMenu from "./DropdownMenu";
 import Notification from "./notification";
-import { Link } from "react-router-dom";
 
 function NavBar() {
 	const { t } = useTranslation();
@@ -46,7 +45,6 @@ function NavBar() {
 				setNotification(t("navbar.logout.done"));
 			}
 		} catch (error) {
-			console.error("Erreur lors de la dÃ©connexion backend :", error);
 			setNotification(t("navbar.logout.networkError"));
 		} finally {
 			localStorage.removeItem("token");

@@ -56,7 +56,6 @@ function UserGameList({ userId, className = "" }: UserGameListProps) {
       setGames(response.data.games || []);
       setTotalPages(response.data.total_pages || 1);
     } catch (error) {
-      console.error("Erreur lors de la récupération des jeux :", error);
       setGames([]);
     } finally {
       setLoading(false);

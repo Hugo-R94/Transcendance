@@ -61,7 +61,6 @@ function Comment({
           setAvatarUrl(null);
         }
       } catch (err) {
-        console.error("Erreur chargement avatar commentaire :", err);
         setAvatarUrl(null);
       }
     };

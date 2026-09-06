@@ -99,18 +99,9 @@ export default function Lobby({
       return;
     }
 
-    console.log("WebSocket connecté");
-    console.log("Room trouvée dans URL :", roomFromUrl);
-    console.log("Join de la room...");
-
     setRoomId(roomFromUrl);
     joinRoomByID(roomFromUrl);
   }, [connected]);
-
-  console.log("connected =", connected);
-  console.log("joined =", joined);
-  console.log("roomFromUrl =", roomFromUrl);
-  console.log("friends reçus dans Lobby :", friends);
 
   return (
     <div className="w-full p-6 text-white">
@@ -179,7 +170,6 @@ export default function Lobby({
                   items={friends.map((friend) => ({
                     label: friend.username,
                     onClick: () => {
-                      console.log("friend id =", friend.id);
                       invite(friend.id, roomId);
                     },
                   }))}

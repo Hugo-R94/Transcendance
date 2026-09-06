@@ -56,10 +56,6 @@ function GameInteractionBar({
         `/addToList?appID=${gameId}&list=${listName}`
       )
       .catch((error) => {
-        console.error(
-          "Erreur lors de l'ajout à la liste :",
-          error
-        );
 
         // Rollback si la requête échoue.
         setListState(previousState);

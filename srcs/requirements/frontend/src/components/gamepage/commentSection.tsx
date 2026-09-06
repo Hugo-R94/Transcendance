@@ -92,7 +92,6 @@ function CommentSection({
           Math.max(1, Math.ceil((data.total || formattedComments.length) / commentsPerPage))
         );
       } catch (error) {
-        console.error("Error fetching comments:", error);
         setComments([]);
       } finally {
         setLoading(false);

@@ -77,10 +77,6 @@ export default function Leaderboard() {
                 const response = await api.get("/leaderboard");
                 setLeaderboard(response.data);
             } catch (error) {
-                console.error(
-                    "Erreur lors de la récupération du leaderboard :",
-                    error
-                );
             }
         };
 

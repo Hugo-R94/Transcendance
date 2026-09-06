@@ -17,6 +17,7 @@ export type UserProfile = {
   title_1: string;
   title_2: string;
   profile_picture: string;
+  Level: number;
 };
 
 export default function Profil() {

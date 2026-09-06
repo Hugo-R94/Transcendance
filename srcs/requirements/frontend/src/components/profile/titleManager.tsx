@@ -62,7 +62,6 @@ function TitleManager({
     try {
       await setUserTitle(1, numericValue);
     } catch (err) {
-      console.error("Erreur lors de la sauvegarde du titre 1 :", err);
     }
 
     if (onSelectTitle1) onSelectTitle1(numericValue);
@@ -75,7 +74,6 @@ function TitleManager({
     try {
       await setUserTitle(2, numericValue);
     } catch (err) {
-      console.error("Erreur lors de la sauvegarde du titre 2 :", err);
     }
 
     if (onSelectTitle2) onSelectTitle2(numericValue);

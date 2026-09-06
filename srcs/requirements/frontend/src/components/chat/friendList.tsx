@@ -68,10 +68,6 @@ export default function FriendList({
         onUnfriend(friend);
       }
     } catch (error) {
-      console.error(
-        `Erreur lors de l'action ${action} :`,
-        error
-      );
     }
   };
 

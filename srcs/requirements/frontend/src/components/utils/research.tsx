@@ -23,7 +23,6 @@ useEffect(() => {
         setGames(data.games);
 
       } catch (err) {
-        console.error(err);
         setGames([]);
       }
     }, 300);

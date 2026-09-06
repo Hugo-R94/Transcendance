@@ -80,7 +80,11 @@
     "save": "Save",
     "saving": "Saving...",
     "descriptionPlaceholder": "No description yet...",
-    "changePicture": "Change"
+    "changePicture": "Change",
+	"sendDataMsg": "Would you like to receive your personal information by email, in accordance with GDPR requirements?",
+	"sendDataError": "An error occurred while sending the data.",
+	"deleteProfileMsg": "Are you sure you want to delete your profile? This action is irreversible.",
+	"deleteProfileError": "An error occurred while deleting the profile."
   },
   "common": {
     "loading": "Loading..."
@@ -553,6 +557,24 @@
   "missingSearchQuery": "Missing search query.",
   "somethingWentWrong": "Something went wrong.",
   "userIdMissingFromContext": "User ID missing from context."
-}
+},
+"editProfile": {
+      "UsernameAndEmailRequiered": "Username and email address are required.",
+      "UsernameLengthLimitErr": "Username cannot exceed 100 characters.",
+      "EmailLengthLimitErr": "Email address cannot exceed 100 characters.",
+      "NeedTwoPassword": "To change your password, you must enter both your old and new password.",
+      "PasswordMinLength": "The new password must be at least 8 characters long.",
+      "informationsUpdated": "Information updated.",
+      "ModifyMyInformations": "Edit my information",
+      "username": "Username",
+      "email": "Email address",
+      "oldpass": "Old password",
+      "newpass": "New password",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "saved": "Saved",
+      "PlaceholderOldpass": "Required to change password",
+      "PlaceholderNewpass": "Leave blank to keep current password"
+    }
+  }
   
-}
