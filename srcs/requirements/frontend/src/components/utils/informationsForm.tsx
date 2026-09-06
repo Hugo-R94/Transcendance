@@ -116,7 +116,7 @@ function InformationForm({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form name="submitform" onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="block text-sm font-bold text-white mb-1">
              {t("editProfile.username")}

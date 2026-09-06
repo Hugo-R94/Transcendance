@@ -280,6 +280,7 @@ export default function ChatWindow({
 
           {/* Input */}
           <form
+		    name="msg_form"
             onSubmit={handleSendMessage}
             onClick={stopPropagation}
             className="

@@ -6,7 +6,6 @@ import Leaderboard from "../components/gambling/leaderboard";
 function Clicker() {
 	return (
 		<div className="relative flex h-screen flex-col overflow-hidden">
-			<NavBar />
 
 			<div className="relative flex min-h-0 flex-1">
 				<ShaderBackground />
