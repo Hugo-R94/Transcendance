@@ -28,7 +28,7 @@ function NavBar() {
 
 		try {
 			if (token) {
-				const response = await fetch("http://localhost:8080/logout", {
+				const response = await fetch("https://localhost:8443/logout", {
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${token}`,
@@ -51,7 +51,7 @@ function NavBar() {
 
 			setTimeout(() => {
 				setNotification(null);
-				navigate("/login", { replace: true });
+				navigate("/", { replace: true });
 			}, 1500);
 		}
 	};

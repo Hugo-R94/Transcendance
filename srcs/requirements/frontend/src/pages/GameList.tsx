@@ -111,7 +111,6 @@ function Games() {
 
   return (
     <div className="min-h-screen text-white relative overflow-x-hidden">
-      <NavBar />
 
       <div className="relative pt-20 pb-10 px-2 flex flex-col items-center justify-between sm:fixed sm:left-1/2 sm:-translate-x-1/2 sm:w-4/5 lg:w-3/5 sm:h-[calc(100vh-120px)] sm:top-20 sm:p-2 sm:pb-2">
         

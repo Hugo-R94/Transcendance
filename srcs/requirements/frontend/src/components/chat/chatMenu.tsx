@@ -126,6 +126,7 @@ export default function ChatMenu() {
 
           {activeTab === "requests" && (
             <form
+			  name="request_form"
               onSubmit={(e) => {
                 e.preventDefault();
                 handleSendFriendRequest();

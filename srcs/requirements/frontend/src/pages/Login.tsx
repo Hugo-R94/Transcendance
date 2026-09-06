@@ -51,7 +51,15 @@ function Login() {
 					result.expires_in * 1000
 				)
 			);
-
+			
+			localStorage.setItem(
+				"refresh_token_expiration",
+				String(
+					Date.now() +
+					result.refresh_expires_in * 1000
+				)
+			);
+			
 			localStorage.setItem(
 				"userID",
 				String(result.user_ID)
@@ -125,6 +133,7 @@ function Login() {
 					className="absolute h-100 w-70 rounded-2xl
             bg-gray-800 p-2  outline-10 outline-gray-400 transition-all duration-300"/>
 				<form
+					name="logform"
 					onSubmit={handleSubmit}
 					className="absolute flex h-100 w-70 flex-col
 					rounded-2xl bg-[#334b4d] p-3 shadow-lg shadow-black
