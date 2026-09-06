@@ -153,13 +153,13 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 
 	switch lang {
 	case "fr":
-	    description = existingGame.DescriptionFr
+		description = existingGame.DescriptionFr
 	case "es":
-	    description = existingGame.DescriptionEs
+		description = existingGame.DescriptionEs
 	case "ar":
-	    description = existingGame.DescriptionAr
+		description = existingGame.DescriptionAr
 	default:
-	    description = existingGame.Description
+		description = existingGame.Description
 	}
 	response := models.GetGameResponse{
 		AppID:                 existingGame.AppID,
@@ -173,22 +173,22 @@ func (h *GameHandler) gameInfoHandler(c *gin.Context) {
 		ListState:             listState,
 	}
 	for _, genre := range existingGame.Genres {
-	    var genreName string
+		var genreName string
 
-	    switch lang {
-	    case "fr":
-	        genreName = genre.NameFr
-	    case "es":
-	        genreName = genre.NameEs
-	    case "ar":
-	        genreName = genre.NameAr
-	    default:
-	        genreName = genre.Name
-	    }
-		if genreName == "" {
-    	genreName = genre.Name
+		switch lang {
+		case "fr":
+			genreName = genre.NameFr
+		case "es":
+			genreName = genre.NameEs
+		case "ar":
+			genreName = genre.NameAr
+		default:
+			genreName = genre.Name
 		}
-	    response.Genres = append(response.Genres, genreName)
+		if genreName == "" {
+			genreName = genre.Name
+		}
+		response.Genres = append(response.Genres, genreName)
 	}
 	for _, dev := range existingGame.Developers {
 		response.Developers = append(response.Developers, dev.Name)
@@ -214,6 +214,7 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 
 	genre := c.Query("genre")
 
+	db = db.Where("name != ? AND name != ?", "%", "")
 	if genre != "" {
 		db = db.Where(
 			"games.app_id IN (?)",
@@ -243,10 +244,8 @@ func (h *GameHandler) listGamesPageHandler(c *gin.Context) {
 	case "less_played":
 		db = db.Order("total_reviews ASC")
 	case "name_asc":
-		db = db.Where("name != ?", "%")
 		db = db.Order("name ASC")
 	case "name_desc":
-		db = db.Where("name != ?", "%")
 		db = db.Order("name DESC")
 	default:
 		db = db.Order("app_id ASC")
