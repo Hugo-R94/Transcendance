@@ -87,8 +87,8 @@ func updateQuest(db *gorm.DB, user *models.User) error {
 
     user.Quest = models.Quest{
         ExpireAt:         now.Add(24 * time.Hour),
-        QuestType:        1,
-        // QuestType:        rand.Intn(2),
+        // QuestType:        1,
+        QuestType:        rand.Intn(2),
         QuestRequirement: rand.Intn(3) + 1,
         QuestCount:       0,
         IsFinished:       false,

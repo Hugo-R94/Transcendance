@@ -34,7 +34,7 @@ export function ProfileHeader({
 
   const handleDeleteProfile = async () => {
     const confirmed = window.confirm(
-		t("profileHeader.deleteProfileError")
+		t("profileHeader.deleteProfileMsg")
     );
 
     if (!confirmed) {
@@ -47,7 +47,7 @@ export function ProfileHeader({
       window.location.href = "/";
     } catch (error) {
       window.alert(
-		t("profileHeader.deleteProfileMsg")
+		t("profileHeader.deleteProfileError")
       );
     }
   };
